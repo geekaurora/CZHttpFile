@@ -4,16 +4,16 @@
 import PackageDescription
 
 let package = Package(
-  name: "CZWebFile",
+  name: "CZWebFileDownloader",
   platforms: [
     .iOS(.v11),
   ],
   products: [
     // Products define the executables and libraries produced by a package, and make them visible to other packages.
     .library(
-      name: "CZWebFile",
+      name: "CZWebFileDownloader",
       type: .dynamic,
-      targets: ["CZWebFile"]),
+      targets: ["CZWebFileDownloader"]),
   ],
   dependencies: [
     .package(url: "https://github.com/geekaurora/CZUtils.git", from: "3.2.7"),
@@ -21,10 +21,10 @@ let package = Package(
   ],
   targets: [
     .target(
-      name: "CZWebFile",
+      name: "CZWebFileDownloader",
       dependencies: ["CZUtils", "CZNetworking"]),
     .testTarget(
-      name: "CZWebFileTests",
-      dependencies: ["CZWebFile"]),
+      name: "CZWebFileDownloaderTests",
+      dependencies: ["CZWebFileDownloader"]),
   ]
 )
