@@ -1,6 +1,5 @@
 import UIKit
 import CZUtils
-import CZHttpFileCache
 
 /**
  Thread safe local image cache backed by DispatchQueue mutex lock/LRU queue, supports maxFileAge/maxCacheSize purging strategy.

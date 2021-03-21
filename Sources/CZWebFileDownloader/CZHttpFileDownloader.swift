@@ -1,7 +1,6 @@
 import UIKit
 import CZUtils
 import CZNetworking
-import CZHttpFileCache
 
 public enum Constant {
   public static let httpFileDownloadQueueName = "com.cz.httpfile.download"
