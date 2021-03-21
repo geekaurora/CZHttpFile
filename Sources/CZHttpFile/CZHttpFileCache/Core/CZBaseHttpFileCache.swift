@@ -50,6 +50,11 @@ public enum CacheConstant {
   public static let ioQueueLabel = "com.tony.cache.ioQueue"
 }
 
+/**
+ Base class of http file cache.
+ 
+ Constraining `CachedDataClassType` with `NSObjectProtocol` because NSCache requires its Value type to be Class.
+ */
 open class CZBaseHttpFileCache<CachedDataClassType: NSObjectProtocol>: NSObject {
   public typealias CleanDiskCacheCompletion = () -> Void
   

@@ -10,44 +10,41 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
  - Note: the default Data type is `Data`.
  */
 @objc open class CZHttpFileManager: NSObject {
-
-    public static let shared: CZHttpFileManager = CZHttpFileManager()
-    private var downloader: CZHttpFileDownloader<NSData>
-    internal var cache: CZHttpFileCache
-    
-    public override init() {
-      cache = CZHttpFileCache()
-      downloader = CZHttpFileDownloader(cache: cache)
-        super.init()
-    }
-    
-    public func downloadFile(with url: URL,
-                       priority: Operation.QueuePriority = .normal,
-                       completion: @escaping CZHttpFileDownloderCompletion) {
-      cache.getCachedFile(with: url) { [weak self] (data) in
-            guard let `self` = self else { return }
-            if let data = data as? Data {
-                // Load from local disk
-                MainQueueScheduler.sync {
-                    completion(data, nil, true)
-                }
-                return
-            }
-        
-            // Load from http service
-//        self.downloader.downloadHttpFile(
-//          with: url,
-//          priority: priority,
-//          completion: completion)
-        
-//            self.downloader.downloadImage(with: url,
-//                                          priority: priority,
-//                                          completion: completion)
+  
+  public static let shared: CZHttpFileManager = CZHttpFileManager()
+  private var downloader: CZHttpFileDownloader<NSData>
+  internal var cache: CZHttpFileCache
+  
+  public override init() {
+    cache = CZHttpFileCache()
+    downloader = CZHttpFileDownloader(cache: cache)
+    super.init()
+  }
+  
+  public func downloadFile(with url: URL,
+                           priority: Operation.QueuePriority = .normal,
+                           completion: @escaping CZHttpFileDownloderCompletion) {
+    cache.getCachedFile(with: url) { [weak self] (data: NSData?) in
+      guard let `self` = self else { return }
+      if let data = data as Data? {
+        // Load from local disk
+        MainQueueScheduler.sync {
+          completion(data, nil, true)
         }
+        return
+      }
+      
+      // Load from http service
+      self.downloader.downloadHttpFile(
+        with: url,
+        priority: priority) { (data: NSData?, error: Error?, fromCache: Bool) in
+        completion(data as Data?, error, fromCache)
+      }      
     }
-    
-    @objc(cancelDownloadWithURL:)
-    public func cancelDownload(with url: URL) {
-        downloader.cancelDownload(with: url)
-    }
+  }
+  
+  @objc(cancelDownloadWithURL:)
+  public func cancelDownload(with url: URL) {
+    downloader.cancelDownload(with: url)
+  }
 }
