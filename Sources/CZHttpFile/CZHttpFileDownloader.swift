@@ -57,7 +57,7 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
   ///   - decodeData: Closure used to decode `Data` to tuple (DataType?, Data?). If is nil, then returns `Data` directly.
   public func downloadHttpFile(with url: URL?,
                                priority: Operation.QueuePriority = .normal,
-                               decodeData: ((Data) -> (DataType?, Data?)?)?,
+                               decodeData: ((Data) -> (DataType?, Data?)?)? = nil,
                                completion: @escaping (_ httpFile: DataType?, _ error: Error?, _ fromCache: Bool) -> Void) {
     guard let url = url else { return }
     cancelDownload(with: url)
@@ -70,17 +70,28 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
           completion(nil, WebHttpFileError.invalidData, false)
           return
         }
-        // Decode/crop httpFile in decode OperationQueue
+        
+        // Decode Data to httpFile in OperationQueue.
+        // If `decodeData` is nil, then return data directly without decoding.
+        // - Note: you may customize decode work here. e.g. Decode to UIImage and then crop.
         self.httpFileDecodeQueue.addOperation {
-          guard let (outputHttpFile, ouputData) = (decodeData?(data)).assertIfNil else {
-            completion(nil, WebHttpFileError.invalidData, false)
-            return
+          var outputHttpFile: DataType?
+          var ouputData: Data?
+          
+          if let decodeData = decodeData {
+            guard let (decodedHttpFile, decodedData) = (decodeData(data)).assertIfNil else {
+              completion(nil, WebHttpFileError.invalidData, false)
+              return
+            }
+          } else {
+            outputHttpFile = data as? DataType
+            ouputData = data
           }
+          
           // let (outputHttpFile, ouputData) = self.cropHttpFileIfNeeded(httpFile, data: data, cropSize: cropSize)
           
           // Save downloaded file to cache.
           self.cache.setCacheFile(withUrl: url, data: ouputData)
-          // CZImageCache.shared.setCacheFile(withUrl: url, data: ouputData)
           
           // Call completion on mainQueue
           MainQueueScheduler.async {
