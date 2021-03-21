@@ -106,6 +106,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C34204F326079D440072F209 /* Supported_Files */ = {
+			isa = PBXGroup;
+			children = (
+				C3FDAB4B260779CA004BE699 /* CZHttpFileDemoApp.swift */,
+				C3FDAB4F260779CC004BE699 /* Assets.xcassets */,
+				C3076C9626078EB50039D545 /* a25fb258deab6f447a400683739521e6 */,
+			);
+			path = Supported_Files;
+			sourceTree = "<group>";
+		};
 		C3FDAB3F260779CA004BE699 = {
 			isa = PBXGroup;
 			children = (
@@ -134,10 +144,8 @@
 			isa = PBXGroup;
 			children = (
 				C3FDAB4D260779CA004BE699 /* ContentView.swift */,
-				C3076C9626078EB50039D545 /* a25fb258deab6f447a400683739521e6 */,
-				C3FDAB4B260779CA004BE699 /* CZHttpFileDemoApp.swift */,
-				C3FDAB4F260779CC004BE699 /* Assets.xcassets */,
 				C3FDAB54260779CC004BE699 /* Info.plist */,
+				C34204F326079D440072F209 /* Supported_Files */,
 				C3FDAB51260779CC004BE699 /* Preview Content */,
 			);
 			path = CZHttpFileDemo;

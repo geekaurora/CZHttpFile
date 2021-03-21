@@ -13,8 +13,8 @@ import CZAVPlayer
  file:///Users/administrator/Library/Developer/CoreSimulator/Devices/8FF21713-4F10-4410-9700-AFE7376AECCE/data/Containers/Data/Application/098E3EE4-5CC3-44CF-AEDF-BFE48BDEB65C/Documents/CZHttpFileCache/a25fb258deab6f447a400683739521e6
  */
 struct ContentView: View {
-  //let url = URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!
-  let url = URL(string: "https://d37t5b145o82az.cloudfront.net/pictures/01bff78eae0870a01ed491ef86405bdf.jpg")!
+  let url = URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!
+  // let url = URL(string: "https://d37t5b145o82az.cloudfront.net/pictures/01bff78eae0870a01ed491ef86405bdf.jpg")!
 
   var cacheFileUrl: URL? {
     if true {
@@ -28,8 +28,8 @@ struct ContentView: View {
   }
 
   var body: some View {
-//    let audioInfo = CZAudioInfo(url: cacheFileUrl, title: "Test")
-//    AVPlayerView(audioInfo: audioInfo)
+    let audioInfo = CZAudioInfo(url: cacheFileUrl, title: "TestAudio")
+    AVPlayerView(audioInfo: audioInfo)
     
     Button("Download") {
       CZHttpFileManager.shared.downloadFile(
