@@ -27,19 +27,19 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
     cache.getCachedFile(with: url) { [weak self] (data: NSData?) in
       guard let `self` = self else { return }
       if let data = data as Data? {
-        // Load from local disk
+        // Load from local disk.
         MainQueueScheduler.sync {
           completion(data, nil, true)
         }
         return
       }
       
-      // Load from http service
+      // Load from http service.
       self.downloader.downloadHttpFile(
         with: url,
         priority: priority) { (data: NSData?, error: Error?, fromCache: Bool) in
         completion(data as Data?, error, fromCache)
-      }      
+      }
     }
   }
   
