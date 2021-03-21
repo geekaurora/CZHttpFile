@@ -55,7 +55,7 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
   ///
   /// - Parameters:
   ///   - decodeData: Closure used to decode `Data` to tuple (DataType?, Data?). If is nil, then returns `Data` directly.
-  public func downloadHttpFile(with url: URL?,
+  public func downloadHttpFile(url: URL?,
                                priority: Operation.QueuePriority = .normal,
                                decodeData: ((Data) -> (DataType?, Data?)?)? = nil,
                                completion: @escaping (_ httpFile: DataType?, _ error: Error?, _ fromCache: Bool) -> Void) {

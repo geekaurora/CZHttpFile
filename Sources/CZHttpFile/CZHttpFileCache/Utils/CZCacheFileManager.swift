@@ -5,7 +5,7 @@ import CZUtils
 internal class CZCacheFileManager: NSObject {
   
   private(set) lazy var cacheFolder: String = {
-    let cacheFolder = CZFileHelper.documentDirectory + cacheFolderName
+    let cacheFolder = CZFileHelper.documentDirectory + cacheFolderName + "/"
     
     let fileManager = FileManager()
     if !fileManager.fileExists(atPath: cacheFolder) {

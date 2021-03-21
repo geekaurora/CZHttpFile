@@ -73,7 +73,7 @@ open class CZBaseHttpFileCache<CachedDataClassType: NSObjectProtocol>: NSObject 
     return CZCacheFileManager(cacheFolderName: Self.cacheFolderName)
   }()
   private lazy var cachedItemsInfoFileURL: URL = {
-    return URL(fileURLWithPath: cacheFileManager.cacheFolder + "/" + CacheConstant.kCachedItemsInfoFile)
+    return URL(fileURLWithPath: cacheFileManager.cacheFolder + CacheConstant.kCachedItemsInfoFile)
   }()
   private lazy var cachedItemsInfoLock: CZMutexLock<CachedItemsInfo> = {
     let cachedItemsInfo: CachedItemsInfo = loadCachedItemsInfo() ?? [:]
