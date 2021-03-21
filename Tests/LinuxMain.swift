@@ -1,7 +1,7 @@
 import XCTest
 
-import CZWebFileDownloaderTests
+import CZWebFileTests
 
 var tests = [XCTestCaseEntry]()
-tests += CZWebFileDownloaderTests.allTests()
+tests += CZWebFileTests.allTests()
 XCTMain(tests)
