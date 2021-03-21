@@ -21,7 +21,7 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
     super.init()
   }
   
-  public func downloadFile(with url: URL,
+  public func downloadFile(url: URL,
                            priority: Operation.QueuePriority = .normal,
                            completion: @escaping CZHttpFileDownloderCompletion) {
     cache.getCachedFile(with: url) { [weak self] (data: NSData?) in
@@ -36,7 +36,7 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
       
       // Load from http service.
       self.downloader.downloadHttpFile(
-        with: url,
+        url: url,
         priority: priority) { (data: NSData?, error: Error?, fromCache: Bool) in
         completion(data as Data?, error, fromCache)
       }
