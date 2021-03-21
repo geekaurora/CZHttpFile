@@ -1,7 +1,7 @@
 //import UIKit
 //import CZUtils
 //import CZNetworking
-//import CZHttpFileCache
+//import CZWebFileCache
 //
 ///**
 // Web file manager maintains asynchronous web file downloading tasks.
