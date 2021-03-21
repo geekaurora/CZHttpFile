@@ -1,12 +1,12 @@
 import XCTest
-@testable import CZWebFileDownloader
+@testable import CZWebFile
 
-final class CZWebFileDownloaderTests: XCTestCase {
+final class CZWebFileTests: XCTestCase {
     func testExample() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
-        // XCTAssertEqual(CZWebFileDownloader().text, "Hello, World!")
+        // XCTAssertEqual(CZWebFile().text, "Hello, World!")
     }
 
     static var allTests = [

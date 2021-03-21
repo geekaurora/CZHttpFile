@@ -6,9 +6,9 @@
 ///**
 // Web file manager maintains asynchronous web file downloading tasks.
 // */
-//@objc open class CZWebFileManager: NSObject {
+//@objc open class CZHttpFileManager: NSObject {
 //
-//    public static let shared: CZWebFileManager = CZWebFileManager()
+//    public static let shared: CZHttpFileManager = CZHttpFileManager()
 //    private var downloader: CZImageDownloader
 //    internal var cache: CZImageCache
 //    
