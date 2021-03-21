@@ -72,23 +72,20 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
         }
         
         // Decode Data to httpFile in OperationQueue.
-        // If `decodeData` is nil, then return data directly without decoding.
-        // - Note: you may customize decode work here. e.g. Decode to UIImage and then crop.
+        // If `decodeData` closure is nil, returns `data` directly without decoding.
+        // - Note: you may customize decoding with extra work. e.g. Decode to UIImage and then crop.
         self.httpFileDecodeQueue.addOperation {
-          var outputHttpFile: DataType?
-          var ouputData: Data?
+          var outputHttpFile: DataType? = data as? DataType
+          var ouputData: Data? = data
           
+          // Decode from `data` to `(outputHttpFile, ouputData)` if applicable.
           if let decodeData = decodeData {
             guard let (decodedHttpFile, decodedData) = (decodeData(data)).assertIfNil else {
               completion(nil, WebHttpFileError.invalidData, false)
               return
             }
-          } else {
-            outputHttpFile = data as? DataType
-            ouputData = data
+            (outputHttpFile, ouputData) = (decodedHttpFile, decodedData)
           }
-          
-          // let (outputHttpFile, ouputData) = self.cropHttpFileIfNeeded(httpFile, data: data, cropSize: cropSize)
           
           // Save downloaded file to cache.
           self.cache.setCacheFile(withUrl: url, data: ouputData)

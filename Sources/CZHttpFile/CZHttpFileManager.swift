@@ -38,8 +38,8 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
 //        self.downloader.downloadHttpFile(
 //          with: url,
 //          priority: priority,
-//          decodeData: <#T##((Data) -> (NSData?, Data?)?)?##((Data) -> (NSData?, Data?)?)?##(Data) -> (NSData?, Data?)?#>, completion: <#T##(NSData?, Error?, Bool) -> Void#>)
-//        
+//          completion: completion)
+        
 //            self.downloader.downloadImage(with: url,
 //                                          priority: priority,
 //                                          completion: completion)
