@@ -40,7 +40,7 @@ import CZUtils
  }
  ```
  */
-public enum Constant {
+public enum CacheConstant {
   public static let kMaxFileAge: TimeInterval = 60 * 24 * 60 * 60
   public static let kMaxCacheSize: Int = 500 * 1024 * 1024
   public static let kCachedItemsInfoFile = "cachedItemsInfo.plist"
@@ -68,7 +68,7 @@ open class CZBaseHttpFileCache<CachedDataClassType: NSObjectProtocol>: NSObject 
     return CZCacheFileManager(cacheFolderName: Self.cacheFolderName)
   }()
   private lazy var cachedItemsInfoFileURL: URL = {
-    return URL(fileURLWithPath: cacheFileManager.cacheFolder + "/" + Constant.kCachedItemsInfoFile)
+    return URL(fileURLWithPath: cacheFileManager.cacheFolder + "/" + CacheConstant.kCachedItemsInfoFile)
   }()
   private lazy var cachedItemsInfoLock: CZMutexLock<CachedItemsInfo> = {
     let cachedItemsInfo: CachedItemsInfo = loadCachedItemsInfo() ?? [:]
@@ -78,12 +78,12 @@ open class CZBaseHttpFileCache<CachedDataClassType: NSObjectProtocol>: NSObject 
   private(set) var maxCacheAge: TimeInterval
   private(set) var maxCacheSize: Int
   
-  public init(maxCacheAge: TimeInterval = Constant.kMaxFileAge,
-              maxCacheSize: Int = Constant.kMaxCacheSize) {
+  public init(maxCacheAge: TimeInterval = CacheConstant.kMaxFileAge,
+              maxCacheSize: Int = CacheConstant.kMaxCacheSize) {
     operationQueue = OperationQueue()
     operationQueue.maxConcurrentOperationCount = 60
     
-    ioQueue = DispatchQueue(label: Constant.ioQueueLabel,
+    ioQueue = DispatchQueue(label: CacheConstant.ioQueueLabel,
                             qos: .userInitiated,
                             attributes: .concurrent)
     fileManager = FileManager()
@@ -117,9 +117,9 @@ open class CZBaseHttpFileCache<CachedDataClassType: NSObjectProtocol>: NSObject 
       guard let `self` = self else { return }
       do {
         try data.write(to: fileURL)
-        self.setCachedItemsInfo(key: cacheKey, subkey: Constant.kFileModifiedDate, value: NSDate())
-        self.setCachedItemsInfo(key: cacheKey, subkey: Constant.kFileVisitedDate, value: NSDate())
-        self.setCachedItemsInfo(key: cacheKey, subkey: Constant.kFileSize, value: data.count)
+        self.setCachedItemsInfo(key: cacheKey, subkey: CacheConstant.kFileModifiedDate, value: NSDate())
+        self.setCachedItemsInfo(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate())
+        self.setCachedItemsInfo(key: cacheKey, subkey: CacheConstant.kFileSize, value: data.count)
       } catch {
         assertionFailure("Failed to write file. Error - \(error.localizedDescription)")
       }
@@ -139,7 +139,7 @@ open class CZBaseHttpFileCache<CachedDataClassType: NSObjectProtocol>: NSObject 
            // let image = UIImage(data: data)
            let image = transformMetadataToCachedData(data).assertIfNil {
           // Update last visited date
-          self.setCachedItemsInfo(key: cacheKey, subkey: Constant.kFileVisitedDate, value: NSDate())
+          self.setCachedItemsInfo(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate())
           // Set mem cache after loading data from local drive
           self.setMemCache(image: image, forKey: cacheKey)
           return image
@@ -177,7 +177,7 @@ private extension CZBaseHttpFileCache {
   func getSizeWithoutLock(cachedItemsInfo: CachedItemsInfo) -> Int {
     var totalCacheSize: Int = 0
     for (_, value) in cachedItemsInfo {
-      let oneFileSize = (value[Constant.kFileSize] as? Int)  ?? 0
+      let oneFileSize = (value[CacheConstant.kFileSize] as? Int)  ?? 0
       totalCacheSize += oneFileSize
     }
     return totalCacheSize
@@ -242,7 +242,7 @@ private extension CZBaseHttpFileCache {
       
       // Remove key if its fileModifiedDate exceeds maxCacheAge
       cachedItemsInfo.forEach { (keyValue: (key: String, value: [String : Any])) in
-        if let modifiedDate = keyValue.value[Constant.kFileModifiedDate] as? Date,
+        if let modifiedDate = keyValue.value[CacheConstant.kFileModifiedDate] as? Date,
            currDate.timeIntervalSince(modifiedDate) > self.maxCacheAge {
           removedKeys.append(keyValue.key)
           cachedItemsInfo.removeValue(forKey: keyValue.key)
@@ -273,8 +273,8 @@ private extension CZBaseHttpFileCache {
         // Sort files with last visted date
         let sortedItemsInfo = cachedItemsInfo.sorted { (keyValue1: (key: String, value: [String : Any]),
                                                         keyValue2: (key: String, value: [String : Any])) -> Bool in
-          if let modifiedDate1 = keyValue1.value[Constant.kFileVisitedDate] as? Date,
-             let modifiedDate2 = keyValue2.value[Constant.kFileVisitedDate] as? Date {
+          if let modifiedDate1 = keyValue1.value[CacheConstant.kFileVisitedDate] as? Date,
+             let modifiedDate2 = keyValue2.value[CacheConstant.kFileVisitedDate] as? Date {
             return modifiedDate1.timeIntervalSince(modifiedDate2) < 0
           } else {
             fatalError()
@@ -289,7 +289,7 @@ private extension CZBaseHttpFileCache {
           }
           cachedItemsInfo.removeValue(forKey: key)
           removedKeys.append(key)
-          let oneFileSize = (value[Constant.kFileSize] as? Int) ?? 0
+          let oneFileSize = (value[CacheConstant.kFileSize] as? Int) ?? 0
           removedFilesSize += oneFileSize
         }
         self.flushCachedItemsInfoToDisk(cachedItemsInfo)

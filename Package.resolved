@@ -2,15 +2,6 @@
   "object": {
     "pins": [
       {
-        "package": "CZHttpFileCache",
-        "repositoryURL": "https://github.com/geekaurora/CZHttpFileCache.git",
-        "state": {
-          "branch": null,
-          "revision": "805f242aed3eb4312408d2711df5a523ee6c7892",
-          "version": "2.2.0"
-        }
-      },
-      {
         "package": "CZNetworking",
         "repositoryURL": "https://github.com/geekaurora/CZNetworking.git",
         "state": {
