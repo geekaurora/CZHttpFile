@@ -1,4 +1,5 @@
 import SwiftUI
+import CZUtils
 import CZHttpFile
 import CZAVPlayer
 
@@ -14,12 +15,9 @@ import CZAVPlayer
  */
 struct ContentView: View {
   let url = URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!
-  // let url = URL(string: "https://d37t5b145o82az.cloudfront.net/pictures/01bff78eae0870a01ed491ef86405bdf.jpg")!
 
   var cacheFileUrl: URL? {
     if true {
-      // * Note: should use `getCacheFileInfo` because sessionPath changes for each run.
-      // * Needs to surfix with .m4a
       let cacheFileInfo = CZHttpFileManager.shared.cache.getCacheFileInfo(forURL: url)
       return cacheFileInfo.fileURL
     } else {
@@ -34,7 +32,7 @@ struct ContentView: View {
     Button("Download") {
       CZHttpFileManager.shared.downloadFile(
         url: url) { (data: Data?, error: Error?, fromCache: Bool) in
-        
+          dbgPrint("Downloaded url - \(url)")
       }
     }
   }
