@@ -6,7 +6,7 @@ import CZUtils
  
  ### Note
  
- - `CZHttpFileCache` is the default cache with CachedData type `Data`, should subclass `CZBaseHttpFileCache` instead utilizing it directly.
+ - `CZWebFileCache` is the default cache with CachedData type `Data`, should subclass `CZBaseWebFileCache` instead utilizing it directly.
  - `CachedDataClassType` is Class type of decoded CachedData from original `Data`. e.g. UIImage, Data.
  
  ### Usage
@@ -50,11 +50,11 @@ public enum CacheConstant {
   public static let ioQueueLabel = "com.tony.cache.ioQueue"
 }
 
-open class CZBaseHttpFileCache<CachedDataClassType: NSObjectProtocol>: NSObject {
+open class CZBaseWebFileCache<CachedDataClassType: NSObjectProtocol>: NSObject {
   public typealias CleanDiskCacheCompletion = () -> Void
   
   public static var cacheFolderName: String {
-    return "CZHttpFileCache"
+    return "CZWebFileCache"
   }
   
   private var ioQueue: DispatchQueue
@@ -173,7 +173,7 @@ open class CZBaseHttpFileCache<CachedDataClassType: NSObjectProtocol>: NSObject 
 
 // MARK: - Private methods
 
-private extension CZBaseHttpFileCache {
+private extension CZBaseWebFileCache {
   func getSizeWithoutLock(cachedItemsInfo: CachedItemsInfo) -> Int {
     var totalCacheSize: Int = 0
     for (_, value) in cachedItemsInfo {

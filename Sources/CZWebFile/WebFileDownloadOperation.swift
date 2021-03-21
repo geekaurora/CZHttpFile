@@ -3,9 +3,9 @@ import CZUtils
 import CZNetworking
 
 /**
- Concurrent operation class for httpFile downloading OperationQueue, supports success/failure/progress callback
+ Concurrent operation class for webFile downloading OperationQueue, supports success/failure/progress callback
  */
-class HttpFileDownloadOperation: ConcurrentBlockOperation {
+class WebFileDownloadOperation: ConcurrentBlockOperation {
     
     private var requester: HTTPRequestWorker?
     private var progress: HTTPRequestWorker.Progress?
@@ -36,7 +36,7 @@ class HttpFileDownloadOperation: ConcurrentBlockOperation {
     }
     
     override func execute() {
-        downloadHttpFile(url: url)
+        downloadWebFile(url: url)
     }
     
     override func cancel() {
@@ -46,8 +46,8 @@ class HttpFileDownloadOperation: ConcurrentBlockOperation {
     
 }
 
-private extension HttpFileDownloadOperation {
-    func downloadHttpFile(url: URL) {
+private extension WebFileDownloadOperation {
+    func downloadWebFile(url: URL) {
         requester = HTTPRequestWorker(
             .GET,
             url: url,

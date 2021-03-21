@@ -6,8 +6,8 @@ import CZUtils
  
  - Note: CachedData Class type is `NSData`.
  */
-class CZHttpFileCache: CZBaseHttpFileCache<NSData> {
-  public static let shared = CZHttpFileCache()
+class CZWebFileCache: CZBaseWebFileCache<NSData> {
+  public static let shared = CZWebFileCache()
   
   // MARK: - Override methods
   

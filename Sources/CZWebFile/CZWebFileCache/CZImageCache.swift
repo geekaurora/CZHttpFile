@@ -6,7 +6,7 @@ import CZUtils
  
  - Note: CachedData Class type is `UIImage`.
  */
-public class CZImageCache: CZBaseHttpFileCache<UIImage> {
+public class CZImageCache: CZBaseWebFileCache<UIImage> {
   public static let shared = CZImageCache()
   
   // MARK: - Override methods
