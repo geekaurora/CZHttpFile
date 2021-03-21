@@ -13,7 +13,7 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
   
   public static let shared: CZHttpFileManager = CZHttpFileManager()
   private var downloader: CZHttpFileDownloader<NSData>
-  internal var cache: CZHttpFileCache
+  public internal(set) var cache: CZHttpFileCache
   
   public override init() {
     cache = CZHttpFileCache()

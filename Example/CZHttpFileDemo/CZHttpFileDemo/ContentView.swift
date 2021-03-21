@@ -8,8 +8,11 @@ struct ContentView: View {
     let url = URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!
 
     // https://stackoverflow.com/questions/16097404/what-is-difference-between-urlwithstring-and-fileurlwithpath-of-nsurl
-//    let cacheFileUrl = URL(fileURLWithPath: "file:///Users/administrator/Library/Developer/CoreSimulator/Devices/8FF21713-4F10-4410-9700-AFE7376AECCE/data/Containers/Data/Application/AA6183C3-278B-47B2-9AD9-9AD28DCDA2EE/Documents/CZHttpFileCache/a25fb258deab6f447a400683739521e6")
-    let cacheFileUrl = URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")
+    let cacheFileUrl = URL(fileURLWithPath: "file:///Users/administrator/Library/Developer/CoreSimulator/Devices/8FF21713-4F10-4410-9700-AFE7376AECCE/data/Containers/Data/Application/13DC4A55-0659-4A7C-9441-CFBFFF0DA262/Documents/CZHttpFileCache/a25fb258deab6f447a400683739521e6.m4a")
+    
+    let cacheFileInfo = CZHttpFileManager.shared.cache.getCacheFileInfo(forURL: url)
+    
+    //let cacheFileUrl = URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")
     
     let audioInfo = CZAudioInfo(url: cacheFileUrl, title: "Test")
     AVPlayerView(audioInfo: audioInfo)

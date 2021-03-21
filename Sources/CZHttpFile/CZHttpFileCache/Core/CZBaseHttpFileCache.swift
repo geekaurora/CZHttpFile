@@ -227,8 +227,8 @@ private extension CZBaseHttpFileCache {
       cost: cost)
   }
   
-  typealias CacheFileInfo = (fileURL: URL, cacheKey: String)
-  func getCacheFileInfo(forURL url: URL) -> CacheFileInfo {
+  public typealias CacheFileInfo = (fileURL: URL, cacheKey: String)
+  public func getCacheFileInfo(forURL url: URL) -> CacheFileInfo {
     let cacheKey = url.absoluteString.MD5
     let fileURL = URL(fileURLWithPath: cacheFileManager.cacheFolder + url.absoluteString.MD5)
     return (fileURL: fileURL, cacheKey: cacheKey)
