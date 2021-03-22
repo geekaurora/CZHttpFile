@@ -6,11 +6,9 @@ import CZUtils
  
  ### Note
  
- - `CZHttpFileCache` is the default cache with CachedData type `Data`, should subclass `CZBaseHttpFileCache` instead utilizing it directly.
  - `CachedDataClassType` is Class type of decoded CachedData from original `Data`. e.g. UIImage, Data.
  
  ### Usage
- https://github.com/geekaurora/CZWebImage/pull/3/files
  
  1. Initializer
  ```
