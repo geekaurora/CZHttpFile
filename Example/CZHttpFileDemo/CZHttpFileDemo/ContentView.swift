@@ -1,14 +1,24 @@
 import SwiftUI
+import CZUtils
 import CZHttpFile
+import CZAVPlayer
 
 struct ContentView: View {
-  var body: some View {
-    let url = URL(string: "")!
+  let url = URL(string: "")!
+  
+  var cacheFileUrl: URL? {
+      let cacheFileInfo = CZHttpFileManager.shared.cache.getCacheFileInfo(forURL: url)
+      return cacheFileInfo.fileURL
+  }
 
+  var body: some View {
+    let audioInfo = CZAudioInfo(url: cacheFileUrl, title: "TestAudio")
+    AVPlayerView(audioInfo: audioInfo)
+    
     Button("Download") {
       CZHttpFileManager.shared.downloadFile(
-      url: url) { (data: Data?, error: Error?, fromCache: Bool) in
-        
+        url: url) { (data: Data?, error: Error?, fromCache: Bool) in
+          dbgPrint("Downloaded url - \(url)")
       }
     }
   }

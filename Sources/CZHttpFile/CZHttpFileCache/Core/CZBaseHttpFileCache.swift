@@ -110,12 +110,11 @@ open class CZBaseHttpFileCache<CachedDataClassType: NSObjectProtocol>: NSObject 
     guard let data = data.assertIfNil else { return }
     let (fileURL, cacheKey) = getCacheFileInfo(forURL: url)
     // Mem cache
+    // `transformMetadataToCachedData` is to transform `Data` to real Data type.
+    // e.g. let image = UIImage(data: data)
     if let image = transformMetadataToCachedData(data) {
       setMemCache(image: image, forKey: cacheKey)
     }
-    //    if let image = UIImage(data: data) {
-    //      setMemCache(image: image, forKey: cacheKey)
-    //    }
     
     // Disk cache
     ioQueue.async(flags: .barrier) { [weak self] in
@@ -227,12 +226,13 @@ private extension CZBaseHttpFileCache {
       cost: cost)
   }
   
-  typealias CacheFileInfo = (fileURL: URL, cacheKey: String)
-  func getCacheFileInfo(forURL url: URL) -> CacheFileInfo {
-    let cacheKey = url.absoluteString.MD5
-    let fileURL = URL(fileURLWithPath: cacheFileManager.cacheFolder + url.absoluteString.MD5)
+  public typealias CacheFileInfo = (fileURL: URL, cacheKey: String)
+  public func getCacheFileInfo(forURL url: URL) -> CacheFileInfo {
+    let urlString = url.absoluteString
+    let cacheKey = urlString.MD5 + urlString.fileType(includingDot: true)
+    let fileURL = URL(fileURLWithPath: cacheFileManager.cacheFolder + cacheKey)
     return (fileURL: fileURL, cacheKey: cacheKey)
-  }
+  } 
   
   func cacheFileURL(forKey key: String) -> URL {
     return URL(fileURLWithPath: cacheFileManager.cacheFolder + key)

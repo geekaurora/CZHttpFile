@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C30105E3260784AF0011D5C1 /* CZAVPlayer in Frameworks */ = {isa = PBXBuildFile; productRef = C30105E2260784AF0011D5C1 /* CZAVPlayer */; };
+		C30105E4260784AF0011D5C1 /* CZAVPlayer in Embed Frameworks */ = {isa = PBXBuildFile; productRef = C30105E2260784AF0011D5C1 /* CZAVPlayer */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		C3076C9726078EB50039D545 /* a25fb258deab6f447a400683739521e6 in Resources */ = {isa = PBXBuildFile; fileRef = C3076C9626078EB50039D545 /* a25fb258deab6f447a400683739521e6 */; };
+		C34204F726079F9A0072F209 /* CZUtils in Frameworks */ = {isa = PBXBuildFile; productRef = C34204F626079F9A0072F209 /* CZUtils */; };
+		C34204F826079F9A0072F209 /* CZUtils in Embed Frameworks */ = {isa = PBXBuildFile; productRef = C34204F626079F9A0072F209 /* CZUtils */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		C3FDAB4C260779CA004BE699 /* CZHttpFileDemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3FDAB4B260779CA004BE699 /* CZHttpFileDemoApp.swift */; };
 		C3FDAB4E260779CA004BE699 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3FDAB4D260779CA004BE699 /* ContentView.swift */; };
 		C3FDAB50260779CC004BE699 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C3FDAB4F260779CC004BE699 /* Assets.xcassets */; };
@@ -48,6 +53,8 @@
 				C3FDAB8626077A20004BE699 /* CZHttpFile in Embed Frameworks */,
 				C3FDAB9226077A70004BE699 /* SwiftUIRedux in Embed Frameworks */,
 				C3FDAB8C26077A63004BE699 /* SwiftUIKit in Embed Frameworks */,
+				C34204F826079F9A0072F209 /* CZUtils in Embed Frameworks */,
+				C30105E4260784AF0011D5C1 /* CZAVPlayer in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -55,6 +62,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C3076C9626078EB50039D545 /* a25fb258deab6f447a400683739521e6 */ = {isa = PBXFileReference; lastKnownFileType = file; path = a25fb258deab6f447a400683739521e6; sourceTree = "<group>"; };
+		C3076C9C260799CE0039D545 /* CZUtils */ = {isa = PBXFileReference; lastKnownFileType = folder; name = CZUtils; path = ../../../CZUtils; sourceTree = "<group>"; };
+		C33BAF3C2607823A00B12A48 /* CZAVPlayer */ = {isa = PBXFileReference; lastKnownFileType = folder; name = CZAVPlayer; path = ../../../CZAVPlayer; sourceTree = "<group>"; };
 		C3FDAB48260779CA004BE699 /* CZHttpFileDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CZHttpFileDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C3FDAB4B260779CA004BE699 /* CZHttpFileDemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CZHttpFileDemoApp.swift; sourceTree = "<group>"; };
 		C3FDAB4D260779CA004BE699 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -78,6 +88,8 @@
 				C3FDAB8426077A20004BE699 /* CZHttpFile in Frameworks */,
 				C3FDAB9126077A70004BE699 /* SwiftUIRedux in Frameworks */,
 				C3FDAB8B26077A63004BE699 /* SwiftUIKit in Frameworks */,
+				C34204F726079F9A0072F209 /* CZUtils in Frameworks */,
+				C30105E3260784AF0011D5C1 /* CZAVPlayer in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -98,9 +110,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C34204F326079D440072F209 /* Supported_Files */ = {
+			isa = PBXGroup;
+			children = (
+				C3FDAB4B260779CA004BE699 /* CZHttpFileDemoApp.swift */,
+				C3FDAB4F260779CC004BE699 /* Assets.xcassets */,
+				C3076C9626078EB50039D545 /* a25fb258deab6f447a400683739521e6 */,
+			);
+			path = Supported_Files;
+			sourceTree = "<group>";
+		};
 		C3FDAB3F260779CA004BE699 = {
 			isa = PBXGroup;
 			children = (
+				C3076C9C260799CE0039D545 /* CZUtils */,
+				C33BAF3C2607823A00B12A48 /* CZAVPlayer */,
 				C3FDAB7926077A08004BE699 /* CZHttpFile */,
 				C3FDAB4A260779CA004BE699 /* CZHttpFileDemo */,
 				C3FDAB5C260779CD004BE699 /* CZHttpFileDemoTests */,
@@ -124,9 +148,8 @@
 			isa = PBXGroup;
 			children = (
 				C3FDAB4D260779CA004BE699 /* ContentView.swift */,
-				C3FDAB4B260779CA004BE699 /* CZHttpFileDemoApp.swift */,
-				C3FDAB4F260779CC004BE699 /* Assets.xcassets */,
 				C3FDAB54260779CC004BE699 /* Info.plist */,
+				C34204F326079D440072F209 /* Supported_Files */,
 				C3FDAB51260779CC004BE699 /* Preview Content */,
 			);
 			path = CZHttpFileDemo;
@@ -187,6 +210,8 @@
 				C3FDAB8326077A20004BE699 /* CZHttpFile */,
 				C3FDAB8A26077A63004BE699 /* SwiftUIKit */,
 				C3FDAB9026077A70004BE699 /* SwiftUIRedux */,
+				C30105E2260784AF0011D5C1 /* CZAVPlayer */,
+				C34204F626079F9A0072F209 /* CZUtils */,
 			);
 			productName = CZHttpFileDemo;
 			productReference = C3FDAB48260779CA004BE699 /* CZHttpFileDemo.app */;
@@ -281,6 +306,7 @@
 			files = (
 				C3FDAB53260779CC004BE699 /* Preview Assets.xcassets in Resources */,
 				C3FDAB50260779CC004BE699 /* Assets.xcassets in Resources */,
+				C3076C9726078EB50039D545 /* a25fb258deab6f447a400683739521e6 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -651,6 +677,14 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		C30105E2260784AF0011D5C1 /* CZAVPlayer */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CZAVPlayer;
+		};
+		C34204F626079F9A0072F209 /* CZUtils */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CZUtils;
+		};
 		C3FDAB7D26077A1D004BE699 /* CZHttpFile */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = CZHttpFile;
