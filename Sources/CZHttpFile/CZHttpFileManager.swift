@@ -24,7 +24,7 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
   public func downloadFile(url: URL,
                            priority: Operation.QueuePriority = .normal,
                            completion: @escaping CZHttpFileDownloderCompletion) {
-    cache.getCachedFile(with: url) { [weak self] (data: NSData?) in
+    cache.getCachedFile(withUrl: url) { [weak self] (data: NSData?) in
       guard let `self` = self else { return }
       if let data = data as Data? {
         // Load from local disk.

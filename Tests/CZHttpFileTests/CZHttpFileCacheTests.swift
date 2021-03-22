@@ -31,7 +31,7 @@ final class CZHttpFileCacheTests: XCTestCase {
     httpFileCache.setCacheFile(withUrl: MockData.testUrl, data: data)
     
     Thread.sleep(forTimeInterval: 0.01)
-    httpFileCache.getCachedFile(with: MockData.testUrl) { (readData: NSData?) in
+    httpFileCache.getCachedFile(withUrl: MockData.testUrl) { (readData: NSData?) in
       let readData = readData as Data?
       XCTAssert(data == readData, "Actual result = \(readData), Expected result = \(data)")
 
@@ -54,7 +54,7 @@ final class CZHttpFileCacheTests: XCTestCase {
     //httpFileCache.setCacheFile(withUrl: MockData.testUrl, data: data)
     
     Thread.sleep(forTimeInterval: 0.01)
-    httpFileCache.getCachedFile(with: MockData.testUrl) { (readData: NSData?) in
+    httpFileCache.getCachedFile(withUrl: MockData.testUrl) { (readData: NSData?) in
       let readData = readData as Data?
       XCTAssert(data == readData, "Actual result = \(readData), Expected result = \(data)")
 

@@ -128,7 +128,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
     }
   }
   
-  public func getCachedFile(with url: URL,
+  public func getCachedFile(withUrl url: URL,
                             completion: @escaping (DataType?) -> Void)  {
     let (fileURL, cacheKey) = self.getCacheFileInfo(forURL: url)
     // Read data from mem cache
