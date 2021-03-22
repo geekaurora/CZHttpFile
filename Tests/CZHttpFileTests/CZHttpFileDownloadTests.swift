@@ -6,8 +6,8 @@ import CZNetworking
 
 final class CZHttpFileDownloadTests: XCTestCase {
   private enum MockData {
-    static let urlForGet = URL(string: "https://www.apple.com/newsroom/rss-feed-GET.rss")!
-    static let urlForGetCodable = URL(string: "https://www.apple.com/newsroom/rss-feed-GETCodable.rss")!
+    static let urlForGet = URL(string: "http://www.test.com/some_file.jpg")!
+    static let urlForGetCodable = URL(string: "http://www.test.com/some_file.jpg")!
     static let dictionary: [String: AnyHashable] = [
       "a": "sdlfjas",
       "c": "sdlksdf",
@@ -26,11 +26,43 @@ final class CZHttpFileDownloadTests: XCTestCase {
   @ThreadSafe
   private var executionSuccessCount = 0
   
+  private var httpFileManager: CZHttpFileManager!
+  
   override func setUp() {
     executionSuccessCount = 0
+    httpFileManager = CZHttpFileManager()
   }
   
-  func testGET() {
+  func testDownloadFile() {
+    let (waitForExpectatation, expectation) = CZTestUtils.waitWithInterval(30, testCase: self)
+    
+    // Create mockDataMap.
+    let mockData = CZHTTPJsonSerializer.jsonData(with: MockData.dictionary)!
+    let mockDataMap = [MockData.urlForGet: mockData]
+    
+    // Fetch with stub URLSession.
+    let sessionConfiguration = CZHTTPStub.stubURLSessionConfiguration(mockDataMap: mockDataMap)
+    // Replace urlSessionConfiguration of CZHTTPManager to stub data.
+    CZHTTPManager.urlSessionConfiguration = sessionConfiguration
+    
+    
+    httpFileManager.downloadFile(url: MockData.urlForGet) { (data: Data?, error: Error?, fromCache: Bool) in
+      let res: [String: AnyHashable]? = CZHTTPJsonSerializer.deserializedObject(with: data)
+            XCTAssert(res == MockData.dictionary, "Actual result = \(res), Expected result = \(MockData.dictionary)")
+            expectation.fulfill()
+    }
+
+//    CZHTTPManager.shared.GET(MockData.urlForGet.absoluteString, success: { (_, data) in
+//      let res: [String: AnyHashable]? = CZHTTPJsonSerializer.deserializedObject(with: data)
+//      XCTAssert(res == MockData.dictionary, "Actual result = \(res), Expected result = \(MockData.dictionary)")
+//      expectation.fulfill()
+//    })
+    
+    // Wait for expectatation.
+    waitForExpectatation()
+  }
+  
+  func testCZHTTPManagerGET() {
     let (waitForExpectatation, expectation) = CZTestUtils.waitWithInterval(30, testCase: self)
     
     // Create mockDataMap.
@@ -71,6 +103,12 @@ final class CZHttpFileDownloadTests: XCTestCase {
 //    waitForExpectatation()
 //  }
   
+  
+}
+
+// MARK: - Helper methods
+
+private extension CZHttpFileDownloadTests {
   
 }
 
