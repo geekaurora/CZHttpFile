@@ -23,6 +23,9 @@ final class CZHttpFileDownloadTests: XCTestCase {
     httpFileManager = CZHttpFileManager()
   }
   
+  /**
+   Test downloaded file.
+   */
   func testDownloadFile() {
     let (waitForExpectatation, expectation) = CZTestUtils.waitWithInterval(Constant.timeOut, testCase: self)
     
@@ -41,6 +44,9 @@ final class CZHttpFileDownloadTests: XCTestCase {
     waitForExpectatation()
   }
   
+  /**
+   Test downloaded file and verify cached data.
+   */
   func testDownloadFileWithCache() {
     let (waitForExpectatation, expectation) = CZTestUtils.waitWithInterval(Constant.timeOut, testCase: self)
     
