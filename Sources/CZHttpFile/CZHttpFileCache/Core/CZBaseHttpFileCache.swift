@@ -175,7 +175,7 @@ open class CZBaseHttpFileCache<CachedDataClassType: NSObjectProtocol>: NSObject 
 
 // MARK: - Private methods
 
-private extension CZBaseHttpFileCache {
+internal extension CZBaseHttpFileCache {
   func getSizeWithoutLock(cachedItemsInfo: CachedItemsInfo) -> Int {
     var totalCacheSize: Int = 0
     for (_, value) in cachedItemsInfo {
@@ -206,6 +206,11 @@ private extension CZBaseHttpFileCache {
       cachedItemsInfo.removeValue(forKey: key)
       self.flushCachedItemsInfoToDisk(cachedItemsInfo)
     }
+  }
+  
+  func removeCachedItemsInfo(forUrl url: URL) {
+    let cacheFileInfo = self.getCacheFileInfo(forURL: url)
+    removeCachedItemsInfo(forKey: cacheFileInfo.cacheKey)
   }
   
   func flushCachedItemsInfoToDisk(_ cachedItemsInfo: CachedItemsInfo) {

@@ -25,7 +25,7 @@ final class CZHttpFileCacheTests: XCTestCase {
   
   override func setUp() {
     httpFileCache = CZHttpFileCache()
-    // httpFileCache.removeData(key: MockData.key)
+    httpFileCache.removeCachedItemsInfo(forUrl: MockData.testUrl)
     Thread.sleep(forTimeInterval: 0.01)
   }
   
@@ -48,6 +48,7 @@ final class CZHttpFileCacheTests: XCTestCase {
     // 2. Wait for the expectatation.
     waitForExpectatation()
   }
+  
 //
 //  func testReadWriteDictionary() {
 //    let dictionary = MockData.dict
