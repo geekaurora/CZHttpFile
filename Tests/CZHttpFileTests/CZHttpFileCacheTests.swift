@@ -23,7 +23,7 @@ final class CZHttpFileCacheTests: XCTestCase {
     Thread.sleep(forTimeInterval: 0.01)
   }
   
-  func test1ReadWriteData() {
+  func testReadWriteData1() {
     // 1. Intialize the async expectation.
     let (waitForExpectatation, expectation) = CZTestUtils.waitWithInterval(1, testCase: self)
     
@@ -32,8 +32,8 @@ final class CZHttpFileCacheTests: XCTestCase {
     
     Thread.sleep(forTimeInterval: 0.01)
     httpFileCache.getCachedFile(with: MockData.testUrl) { (readData: NSData?) in
-      //XCTAssert(data == readData, "Actual result = \(readData), Expected result = \(data)")
-      XCTAssert(readData?.isEqual(to: data) ?? false, "Actual result = \(readData as Data?), Expected result = \(data)")
+      let readData = readData as Data?
+      XCTAssert(data == readData, "Actual result = \(readData), Expected result = \(data)")
 
       // 3. Fulfill the expectatation.
       expectation.fulfill()
@@ -43,7 +43,10 @@ final class CZHttpFileCacheTests: XCTestCase {
     waitForExpectatation()
   }
   
-  func test2ReadWriteData() {
+  /// Test read cache after relaunching App (written by the precious test).
+  /// As Swift doesn't support `testInvocations` override, so can only order tests by alphabet names
+  /// to simulate relaunching App.
+  func testReadWriteData2AfterRelaunchingApp() {
     // 1. Intialize the async expectation.
     let (waitForExpectatation, expectation) = CZTestUtils.waitWithInterval(1, testCase: self)
     
@@ -52,8 +55,8 @@ final class CZHttpFileCacheTests: XCTestCase {
     
     Thread.sleep(forTimeInterval: 0.01)
     httpFileCache.getCachedFile(with: MockData.testUrl) { (readData: NSData?) in
-      //XCTAssert(data == readData, "Actual result = \(readData), Expected result = \(data)")
-      XCTAssert(readData?.isEqual(to: data) ?? false, "Actual result = \(readData as Data?), Expected result = \(data)")
+      let readData = readData as Data?
+      XCTAssert(data == readData, "Actual result = \(readData), Expected result = \(data)")
 
       // 3. Fulfill the expectatation.
       expectation.fulfill()
@@ -63,34 +66,34 @@ final class CZHttpFileCacheTests: XCTestCase {
     waitForExpectatation()
   }
   
-  func testReadWriteDataByRelaunchingApp() {
-    // Intialize the async expectation.
-    let (waitForExpectatation, expectation) = CZTestUtils.waitWithInterval(5, testCase: self)
-
-    let data = CZHTTPJsonSerializer.jsonData(with: MockData.dict)!
-    // 1. Save cache data.
-    httpFileCache.setCacheFile(withUrl: MockData.testUrl, data: data)
-
-    // 2. Read cache data during app running.
-    Thread.sleep(forTimeInterval: 0.05)
-    httpFileCache.getCachedFile(with: MockData.testUrl) { (readData: NSData?) in
-      XCTAssert(data == readData as Data?, "Actual result = \(readData), Expected result = \(data)")
-    }
-
-    // 3. Relaunching App - read cache data.
-    Thread.sleep(forTimeInterval: 0.1)
-    //XCUIApplication().launch()
-    XCUIApplication().terminate()
-    httpFileCache.getCachedFile(with: MockData.testUrl) { (readData: NSData?) in
-      XCTAssert(data == readData as Data?, "Actual result = \(readData), Expected result = \(data)")
-
-      // Fulfill the expectatation.
-      expectation.fulfill()
-    }
-
-    // Wait for the expectatation.
-    waitForExpectatation()
-
-  }
+//  func testReadWriteDataByRelaunchingApp() {
+//    // Intialize the async expectation.
+//    let (waitForExpectatation, expectation) = CZTestUtils.waitWithInterval(5, testCase: self)
+//
+//    let data = CZHTTPJsonSerializer.jsonData(with: MockData.dict)!
+//    // 1. Save cache data.
+//    httpFileCache.setCacheFile(withUrl: MockData.testUrl, data: data)
+//
+//    // 2. Read cache data during app running.
+//    Thread.sleep(forTimeInterval: 0.05)
+//    httpFileCache.getCachedFile(with: MockData.testUrl) { (readData: NSData?) in
+//      XCTAssert(data == readData as Data?, "Actual result = \(readData), Expected result = \(data)")
+//    }
+//
+//    // 3. Relaunching App - read cache data.
+//    Thread.sleep(forTimeInterval: 0.1)
+//    //XCUIApplication().launch()
+//    XCUIApplication().terminate()
+//    httpFileCache.getCachedFile(with: MockData.testUrl) { (readData: NSData?) in
+//      XCTAssert(data == readData as Data?, "Actual result = \(readData), Expected result = \(data)")
+//
+//      // Fulfill the expectatation.
+//      expectation.fulfill()
+//    }
+//
+//    // Wait for the expectatation.
+//    waitForExpectatation()
+//
+//  }
   
 }
