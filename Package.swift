@@ -16,8 +16,9 @@ let package = Package(
       targets: ["CZHttpFile"]),
   ],
   dependencies: [
-    .package(url: "https://github.com/geekaurora/CZUtils.git", from: "3.2.7"),
-    .package(url: "https://github.com/geekaurora/CZNetworking.git", from: "3.2.2"),
+    .package(url: "https://github.com/geekaurora/CZUtils.git", from: "3.4.8"),
+    .package(url: "https://github.com/geekaurora/CZTestUtils.git", from: "1.1.2"),
+    .package(url: "https://github.com/geekaurora/CZNetworking.git", from: "3.3.1"),
   ],
   targets: [
     .target(
@@ -25,6 +26,6 @@ let package = Package(
       dependencies: ["CZUtils", "CZNetworking"]),
     .testTarget(
       name: "CZHttpFileTests",
-      dependencies: ["CZHttpFile"]),
+      dependencies: ["CZHttpFile", "CZUtils", "CZNetworking", "CZTestUtils"]),
   ]
 )

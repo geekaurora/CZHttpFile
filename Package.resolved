@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/geekaurora/CZTestUtils.git",
         "state": {
           "branch": null,
-          "revision": "5116e9c704e6926aaca52613ce8434321b62efce",
-          "version": "1.1.0"
+          "revision": "fee1c04183de55cf07ce699e25bc6d27e308f49b",
+          "version": "1.1.2"
         }
       },
       {
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/geekaurora/CZUtils.git",
         "state": {
           "branch": null,
-          "revision": "5b7244795eb69eaff1fd1e2553d063eb40b7b11f",
-          "version": "3.4.7"
+          "revision": "f22a8591179bae6349d2ec514de47db13d10614c",
+          "version": "3.4.8"
         }
       }
     ]
