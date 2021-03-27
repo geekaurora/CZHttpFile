@@ -10,6 +10,7 @@ struct TabsView: View {
     
     MultiDownloadsView()
       .onAppear() {
+        CZHttpFileDownloaderConstant.shouldObserveOperations = true
         // CZHttpFileManager.Config.maxConcurrencies = 7
       }
   }

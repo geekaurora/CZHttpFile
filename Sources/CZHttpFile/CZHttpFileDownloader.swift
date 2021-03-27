@@ -5,7 +5,7 @@ import CZNetworking
 public enum Constant {
   public static let httpFileDownloadQueueName = "com.cz.httpfile.download"
   public static let httpFileDecodeQueueName = "com.cz.httpfile.decode"
-  public static var kOperations = "operations"
+  public static var operationsKeyPath = "operations"
 }
 
 private var kvoContext: UInt8 = 0
@@ -25,7 +25,9 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
   private let httpFileDecodeQueue: OperationQueue
   private let shouldObserveOperations: Bool
   private let cache: CZBaseHttpFileCache<DataType>
-  
+  @ThreadSafe
+  private(set) var downloadingURLs: [URL] = []
+
   public init(cache: CZBaseHttpFileCache<DataType>,
               downloadQueueMaxConcurrent: Int = CZHttpFileDownloaderConstant.downloadQueueMaxConcurrent,
               decodeQueueMaxConcurrent: Int = CZHttpFileDownloaderConstant.decodeQueueMaxConcurrent,
@@ -46,15 +48,17 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
     httpFileDecodeQueue.maxConcurrentOperationCount = decodeQueueMaxConcurrent
     super.init()
     
-    if shouldObserveOperations {
-      httpFileDownloadQueue.addObserver(self, forKeyPath: Constant.kOperations, options: [.new, .old], context: &kvoContext)
-    }
+    // if shouldObserveOperations {
+    httpFileDownloadQueue.addObserver(
+      self,
+      forKeyPath: Constant.operationsKeyPath,
+      options: [.new, .old],
+      context: &kvoContext)
   }
   
   deinit {
-    if shouldObserveOperations {
-      httpFileDownloadQueue.removeObserver(self, forKeyPath: Constant.kOperations)
-    }
+    // if shouldObserveOperations {
+    httpFileDownloadQueue.removeObserver(self, forKeyPath: Constant.operationsKeyPath)
     httpFileDownloadQueue.cancelAllOperations()
   }
   
@@ -130,11 +134,19 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
     guard context == &kvoContext,
           let object = object as? OperationQueue,
           let keyPath = keyPath,
-          keyPath == Constant.kOperations else {
+          keyPath == Constant.operationsKeyPath else {
       return
     }
     if object === httpFileDownloadQueue {
-      CZUtils.dbgPrint("[CZHttpFileDownloader] Queued tasks: \(object.operationCount)")
+      if let fileDownloadOperations = object.operations as? [HttpFileDownloadOperation] {
+        _downloadingURLs.threadLock { downloadingURLs in
+          downloadingURLs = fileDownloadOperations.map(\.url)          
+        }
+      }
+      
+      if shouldObserveOperations {
+        CZUtils.dbgPrint("[CZHttpFileDownloader] Queued tasks: \(object.operationCount), currentThread = \(Thread.current), downloadingURLs = \(downloadingURLs)")
+      }
     }
   }
 }
