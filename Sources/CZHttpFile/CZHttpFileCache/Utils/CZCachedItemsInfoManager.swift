@@ -3,15 +3,16 @@ import CZUtils
 
 internal typealias CachedItemsInfo = [String: [String: Any]]
 
-internal class CZCachedItemsInfoManager: NSObject {
+internal class CZCachedItemsInfoManager<DataType: NSObjectProtocol>: NSObject {
   public typealias CleanDiskCacheCompletion = () -> Void
-  
+    
   private var ioQueue: DispatchQueue
-
   private var fileManager: FileManager
   private var cacheFileManager: CZCacheFileManager
   private var operationQueue: OperationQueue
   private var hasCachedItemsInfoToFlushToDisk: Bool = false
+  // TODO: move helper methods to CZCacheUtils to untangle deps on CZBaseHttpFileCache.
+  private weak var httpFileCache: CZBaseHttpFileCache<DataType>!
   
   private lazy var cachedItemsInfoFileURL: URL = {
     return URL(fileURLWithPath: cacheFileManager.cacheFolder + CacheConstant.kCachedItemsInfoFile)
@@ -25,7 +26,8 @@ internal class CZCachedItemsInfoManager: NSObject {
   private(set) var maxCacheSize: Int
   
   public init(cacheFileManager: CZCacheFileManager,
-                maxCacheAge: TimeInterval = CacheConstant.kMaxFileAge,
+              httpFileCache: CZBaseHttpFileCache<DataType>,
+              maxCacheAge: TimeInterval = CacheConstant.kMaxFileAge,
               maxCacheSize: Int = CacheConstant.kMaxCacheSize) {
     operationQueue = OperationQueue()
     operationQueue.maxConcurrentOperationCount = 60
@@ -48,32 +50,32 @@ internal class CZCachedItemsInfoManager: NSObject {
     } ?? 0
   }
 }
-
-// MARK: - Helper methods
-
-extension CZCachedItemsInfoManager {
-  typealias CacheFileInfo = (fileURL: URL, cacheKey: String)
-  
-  /**
-   Returns cached file URL if has been downloaded, otherwise nil.
-   */
-  func cachedFileURL(forURL httpURL: URL?) -> (fileURL: URL?, isExisting: Bool) {
-    guard let httpURL = httpURL else {
-      return (nil, false)
-    }
-    let cacheFileInfo = getCacheFileInfo(forURL: httpURL)
-    let fileURL = cacheFileInfo.fileURL
-    let isExisting = urlExistsInCache(httpURL)
-    return (fileURL, isExisting)
-  }
-  
-  func getCacheFileInfo(forURL url: URL) -> CacheFileInfo {
-    let urlString = url.absoluteString
-    let cacheKey = urlString.MD5 + urlString.fileType(includingDot: true)
-    let fileURL = URL(fileURLWithPath: cacheFileManager.cacheFolder + cacheKey)
-    return (fileURL: fileURL, cacheKey: cacheKey)
-  }
-}
+//
+//// MARK: - Helper methods
+//
+//extension CZCachedItemsInfoManager {
+//  typealias CacheFileInfo = (fileURL: URL, cacheKey: String)
+//
+//  /**
+//   Returns cached file URL if has been downloaded, otherwise nil.
+//   */
+//  func cachedFileURL(forURL httpURL: URL?) -> (fileURL: URL?, isExisting: Bool) {
+//    guard let httpURL = httpURL else {
+//      return (nil, false)
+//    }
+//    let cacheFileInfo = getCacheFileInfo(forURL: httpURL)
+//    let fileURL = cacheFileInfo.fileURL
+//    let isExisting = urlExistsInCache(httpURL)
+//    return (fileURL, isExisting)
+//  }
+//
+//  func getCacheFileInfo(forURL url: URL) -> CacheFileInfo {
+//    let urlString = url.absoluteString
+//    let cacheKey = urlString.MD5 + urlString.fileType(includingDot: true)
+//    let fileURL = URL(fileURLWithPath: cacheFileManager.cacheFolder + cacheKey)
+//    return (fileURL: fileURL, cacheKey: cacheKey)
+//  }
+//}
 
 // MARK: - CachedItemsInfo
 
@@ -93,7 +95,7 @@ internal extension CZCachedItemsInfoManager {
     return cachedItemsInfoLock.readLock { [weak self] (cachedItemsInfo) -> Bool? in
       guard let `self` = self else { return false}
       
-      let (_, cacheKey) = self.getCacheFileInfo(forURL: httpURL)
+      let (_, cacheKey) = self.httpFileCache.getCacheFileInfo(forURL: httpURL)
       let urlExistsInCache = (cachedItemsInfo[cacheKey] != nil)
       return urlExistsInCache
     } ?? false
@@ -123,7 +125,7 @@ internal extension CZCachedItemsInfoManager {
   }
   
   func removeCachedItemsInfo(forUrl url: URL) {
-    let cacheFileInfo = self.getCacheFileInfo(forURL: url)
+    let cacheFileInfo = httpFileCache.getCacheFileInfo(forURL: url)
     removeCachedItemsInfo(forKey: cacheFileInfo.cacheKey)
   }
   
