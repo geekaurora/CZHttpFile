@@ -4,18 +4,17 @@ import CZHttpFile
 import CZAVPlayer
 
 struct MultiDownloadsView: View {
-  //  let feeds: [Feed] = [
-  //    .init(id: 0, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!),
-  //    .init(id: 1, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!),
-  //    .init(id: 2, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!),
-  //    .init(id: 3, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!),
-  //    .init(id: 4, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!),
-  //    .init(id: 5, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!),
-  //    .init(id: 6, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!),
-  //    .init(id: 7, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!),
-  //    ]
-  //
-  
+//    let feeds: [Feed] = [
+//      .init(id: 0, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!),
+//      .init(id: 1, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!),
+//      .init(id: 2, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!),
+//      .init(id: 3, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!),
+//      .init(id: 4, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!),
+//      .init(id: 5, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!),
+//      .init(id: 6, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!),
+//      .init(id: 7, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!),
+//      ]
+    
   let feeds: [Feed] = [
     .init(id: 0, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!),
     .init(id: 1, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter02.m4a")!),

@@ -58,12 +58,29 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
   public func cancelDownload(with url: URL) {
     downloader.cancelDownload(with: url)
   }
-  
+}
+
+// MARK: - Helper methods
+
+public extension CZHttpFileManager {
   /**
    Returns cached file URL if has been downloaded, otherwise nil.
    */
-  public func cachedFileURL(forURL httpURL: URL?) -> URL? {
+  func cachedFileURL(forURL httpURL: URL?) -> URL? {
     let (fileURL, isExisting) = cache.cachedFileURL(forURL: httpURL)
     return isExisting ? fileURL: nil
+  }
+  
+  /**
+   Returns the download state of `url`.
+   */
+  func downloadState(forURL httpURL: URL?) -> CZHttpFileDownloadState {
+    if let _ = cachedFileURL(forURL:httpURL) {
+      return .downloaded
+    }
+    if downloader.downloadingURLs.contains(where: { $0 == httpURL }) {
+      return .downloading
+    }
+    return .none
   }
 }
