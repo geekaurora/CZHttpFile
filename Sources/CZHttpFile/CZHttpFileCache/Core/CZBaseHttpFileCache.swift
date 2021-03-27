@@ -81,11 +81,6 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
     return cachedItemsInfoManager
   }()
   
-//  private lazy var cachedItemsInfoLock: CZMutexLock<CachedItemsInfo> = {
-//    let cachedItemsInfo: CachedItemsInfo = loadCachedItemsInfo() ?? [:]
-//    return CZMutexLock(cachedItemsInfo)
-//  }()
-    
   private(set) var maxCacheAge: TimeInterval
   private(set) var maxCacheSize: Int
   
