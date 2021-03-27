@@ -3,7 +3,7 @@ import CZUtils
 import CZHttpFile
 import CZAVPlayer
 
-struct FeedCell: View {
+struct DownloadCell: View {
   @State private var downloadAmount = 0.0
   
   let feed: Feed
