@@ -109,6 +109,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   public func setCacheFile(withUrl url: URL, data: Data?) {
     guard let data = data.assertIfNil else { return }
     let (fileURL, cacheKey) = getCacheFileInfo(forURL: url)
+    
     // Mem cache
     // `transformMetadataToCachedData` is to transform `Data` to real Data type.
     // e.g. let image = UIImage(data: data)
@@ -189,8 +190,8 @@ public extension CZBaseHttpFileCache {
     }
     let cacheFileInfo = getCacheFileInfo(forURL: httpURL)
     let fileURL = cacheFileInfo.fileURL
-    // let isExisting = cachedItemsInfoLock.readLock()
-    return (fileURL, false)
+    let isExisting = urlExistsInCache(httpURL)
+    return (fileURL, isExisting)
   }
   
   func getCacheFileInfo(forURL url: URL) -> CacheFileInfo {
@@ -204,6 +205,7 @@ public extension CZBaseHttpFileCache {
 // MARK: - CachedItemsInfo
 
 internal extension CZBaseHttpFileCache {
+  /// Get total cache size with `cachedItemsInfo`.
   func getSizeWithoutLock(cachedItemsInfo: CachedItemsInfo) -> Int {
     var totalCacheSize: Int = 0
     for (_, value) in cachedItemsInfo {
@@ -211,6 +213,17 @@ internal extension CZBaseHttpFileCache {
       totalCacheSize += oneFileSize
     }
     return totalCacheSize
+  }
+  
+  /// Get total cache size with `cachedItemsInfo`.
+  func urlExistsInCache(_ httpURL: URL) -> Bool {
+    return cachedItemsInfoLock.readLock { [weak self] (cachedItemsInfo) -> Bool? in
+      guard let `self` = self else { return false}
+      
+      let (_, cacheKey) = self.getCacheFileInfo(forURL: httpURL)
+      let urlExistsInCache = (cachedItemsInfo[cacheKey] != nil)
+      return urlExistsInCache
+    } ?? false
   }
   
   func loadCachedItemsInfo() -> CachedItemsInfo? {
