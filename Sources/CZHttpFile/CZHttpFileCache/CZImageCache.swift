@@ -10,6 +10,10 @@ public class CZImageCache: CZBaseHttpFileCache<UIImage> {
   public static let shared = CZImageCache()
   
   // MARK: - Override methods
+
+  public override var cacheFolderName: String {
+    return "CZImageCache"
+  }
   
   /**
    Data transformer that transforms from `data` to  UIImage.

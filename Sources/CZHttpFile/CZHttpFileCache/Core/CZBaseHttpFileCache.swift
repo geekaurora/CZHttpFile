@@ -33,7 +33,7 @@ import CZUtils
  
  4. Override `cacheFolderName`
  ```
- public static var cacheFolderName: String {
+ public var cacheFolderName: String {
    return "CZCache"
  }
  ```
@@ -56,8 +56,8 @@ public enum CacheConstant {
 open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   public typealias CleanDiskCacheCompletion = () -> Void
   
-  public static var cacheFolderName: String {
-    return "CZHttpFileCache"
+  public var cacheFolderName: String {
+    return "CZBaseHttpFileCache"
   }
   
   private var ioQueue: DispatchQueue
@@ -68,7 +68,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   internal typealias CachedItemsInfo = [String: [String: Any]]
   
   private lazy var cacheFileManager: CZCacheFileManager = {
-    return CZCacheFileManager(cacheFolderName: Self.cacheFolderName)
+    return CZCacheFileManager(cacheFolderName: cacheFolderName)
   }()
   private lazy var cachedItemsInfoFileURL: URL = {
     return URL(fileURLWithPath: cacheFileManager.cacheFolder + CacheConstant.kCachedItemsInfoFile)

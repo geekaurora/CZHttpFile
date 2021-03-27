@@ -11,6 +11,10 @@ public class CZHttpFileCache: CZBaseHttpFileCache<NSData> {
   
   // MARK: - Override methods
   
+  public override var cacheFolderName: String {
+    return "CZHttpFileCache"
+  }
+  
   /**
    Data transformer that transforms from `data` to  NSData.
    */
