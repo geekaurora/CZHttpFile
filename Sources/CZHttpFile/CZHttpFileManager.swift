@@ -11,9 +11,17 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
  */
 @objc open class CZHttpFileManager: NSObject {
   
-  public static let shared: CZHttpFileManager = CZHttpFileManager()
+  public static let shared: CZHttpFileManager = {
+    CZHTTPManager.Config.maxConcurrencies = Config.maxConcurrencies
+    let shared = CZHttpFileManager()
+    return shared
+  }()
   private var downloader: CZHttpFileDownloader<NSData>
   public internal(set) var cache: CZHttpFileCache
+
+  public enum Config {
+    public static var maxConcurrencies = 5
+  }
   
   public override init() {
     cache = CZHttpFileCache()
@@ -49,5 +57,13 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
   @objc(cancelDownloadWithURL:)
   public func cancelDownload(with url: URL) {
     downloader.cancelDownload(with: url)
+  }
+  
+  /**
+   Returns cached file URL if has been downloaded, otherwise nil.
+   */
+  public func cachedFileURL(forURL httpURL: URL?) -> URL? {
+    let (fileURL, isExisting) = cache.cachedFileURL(forURL: httpURL)
+    return isExisting ? fileURL: nil
   }
 }

@@ -109,6 +109,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   public func setCacheFile(withUrl url: URL, data: Data?) {
     guard let data = data.assertIfNil else { return }
     let (fileURL, cacheKey) = getCacheFileInfo(forURL: url)
+    
     // Mem cache
     // `transformMetadataToCachedData` is to transform `Data` to real Data type.
     // e.g. let image = UIImage(data: data)
@@ -175,9 +176,36 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   }
 }
 
-// MARK: - Private methods
+// MARK: - Helper methods
+
+public extension CZBaseHttpFileCache {
+  typealias CacheFileInfo = (fileURL: URL, cacheKey: String)
+  
+  /**
+   Returns cached file URL if has been downloaded, otherwise nil.
+   */
+  func cachedFileURL(forURL httpURL: URL?) -> (fileURL: URL?, isExisting: Bool) {
+    guard let httpURL = httpURL else {
+      return (nil, false)
+    }
+    let cacheFileInfo = getCacheFileInfo(forURL: httpURL)
+    let fileURL = cacheFileInfo.fileURL
+    let isExisting = urlExistsInCache(httpURL)
+    return (fileURL, isExisting)
+  }
+  
+  func getCacheFileInfo(forURL url: URL) -> CacheFileInfo {
+    let urlString = url.absoluteString
+    let cacheKey = urlString.MD5 + urlString.fileType(includingDot: true)
+    let fileURL = URL(fileURLWithPath: cacheFileManager.cacheFolder + cacheKey)
+    return (fileURL: fileURL, cacheKey: cacheKey)
+  }
+}
+
+// MARK: - CachedItemsInfo
 
 internal extension CZBaseHttpFileCache {
+  /// Get total cache size with `cachedItemsInfo`.
   func getSizeWithoutLock(cachedItemsInfo: CachedItemsInfo) -> Int {
     var totalCacheSize: Int = 0
     for (_, value) in cachedItemsInfo {
@@ -185,6 +213,17 @@ internal extension CZBaseHttpFileCache {
       totalCacheSize += oneFileSize
     }
     return totalCacheSize
+  }
+  
+  /// Get total cache size with `cachedItemsInfo`.
+  func urlExistsInCache(_ httpURL: URL) -> Bool {
+    return cachedItemsInfoLock.readLock { [weak self] (cachedItemsInfo) -> Bool? in
+      guard let `self` = self else { return false}
+      
+      let (_, cacheKey) = self.getCacheFileInfo(forURL: httpURL)
+      let urlExistsInCache = (cachedItemsInfo[cacheKey] != nil)
+      return urlExistsInCache
+    } ?? false
   }
   
   func loadCachedItemsInfo() -> CachedItemsInfo? {
@@ -218,7 +257,11 @@ internal extension CZBaseHttpFileCache {
   func flushCachedItemsInfoToDisk(_ cachedItemsInfo: CachedItemsInfo) {
     (cachedItemsInfo as NSDictionary).write(to: cachedItemsInfoFileURL, atomically: true)
   }
-  
+}
+
+// MARK: - Private methods
+
+internal extension CZBaseHttpFileCache {
   func getMemCache(forKey key: String) -> DataType? {
     return memCache.object(forKey: NSString(string: key))
   }
@@ -230,14 +273,6 @@ internal extension CZBaseHttpFileCache {
       forKey: NSString(string: key),
       cost: cost)
   }
-  
-  public typealias CacheFileInfo = (fileURL: URL, cacheKey: String)
-  public func getCacheFileInfo(forURL url: URL) -> CacheFileInfo {
-    let urlString = url.absoluteString
-    let cacheKey = urlString.MD5 + urlString.fileType(includingDot: true)
-    let fileURL = URL(fileURLWithPath: cacheFileManager.cacheFolder + cacheKey)
-    return (fileURL: fileURL, cacheKey: cacheKey)
-  } 
   
   func cacheFileURL(forKey key: String) -> URL {
     return URL(fileURLWithPath: cacheFileManager.cacheFolder + key)
