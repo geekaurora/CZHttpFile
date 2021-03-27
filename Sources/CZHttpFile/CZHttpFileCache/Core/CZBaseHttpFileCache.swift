@@ -175,7 +175,33 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   }
 }
 
-// MARK: - Private methods
+// MARK: - Helper methods
+
+public extension CZBaseHttpFileCache {
+  typealias CacheFileInfo = (fileURL: URL, cacheKey: String)
+  
+  /**
+   Returns cached file URL if has been downloaded, otherwise nil.
+   */
+  func cachedFileURL(httpURL: URL?) -> (fileURL: URL?, isExisting: Bool) {
+    guard let httpURL = httpURL else {
+      return (nil, false)
+    }
+    let cacheFileInfo = getCacheFileInfo(forURL: httpURL)
+    let fileURL = cacheFileInfo.fileURL
+    // let isExisting = cachedItemsInfoLock.readLock()
+    return (fileURL, false)
+  }
+  
+  func getCacheFileInfo(forURL url: URL) -> CacheFileInfo {
+    let urlString = url.absoluteString
+    let cacheKey = urlString.MD5 + urlString.fileType(includingDot: true)
+    let fileURL = URL(fileURLWithPath: cacheFileManager.cacheFolder + cacheKey)
+    return (fileURL: fileURL, cacheKey: cacheKey)
+  }
+}
+
+// MARK: - CachedItemsInfo
 
 internal extension CZBaseHttpFileCache {
   func getSizeWithoutLock(cachedItemsInfo: CachedItemsInfo) -> Int {
@@ -218,7 +244,11 @@ internal extension CZBaseHttpFileCache {
   func flushCachedItemsInfoToDisk(_ cachedItemsInfo: CachedItemsInfo) {
     (cachedItemsInfo as NSDictionary).write(to: cachedItemsInfoFileURL, atomically: true)
   }
-  
+}
+
+// MARK: - Private methods
+
+internal extension CZBaseHttpFileCache {
   func getMemCache(forKey key: String) -> DataType? {
     return memCache.object(forKey: NSString(string: key))
   }
@@ -230,14 +260,6 @@ internal extension CZBaseHttpFileCache {
       forKey: NSString(string: key),
       cost: cost)
   }
-  
-  public typealias CacheFileInfo = (fileURL: URL, cacheKey: String)
-  public func getCacheFileInfo(forURL url: URL) -> CacheFileInfo {
-    let urlString = url.absoluteString
-    let cacheKey = urlString.MD5 + urlString.fileType(includingDot: true)
-    let fileURL = URL(fileURLWithPath: cacheFileManager.cacheFolder + cacheKey)
-    return (fileURL: fileURL, cacheKey: cacheKey)
-  } 
   
   func cacheFileURL(forKey key: String) -> URL {
     return URL(fileURLWithPath: cacheFileManager.cacheFolder + key)
