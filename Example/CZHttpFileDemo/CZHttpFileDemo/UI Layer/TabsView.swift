@@ -3,7 +3,7 @@ import CZUtils
 import CZHttpFile
 import CZAVPlayer
 
-struct ContentView: View {
+struct TabsView: View {
   
   var body: some View {
     // SingleDownloadView()

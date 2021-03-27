@@ -17,7 +17,7 @@
 		C3E72DB6260F20F7000DDA72 /* SingleDownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3E72DB5260F20F7000DDA72 /* SingleDownloadView.swift */; };
 		C3E72DBE260F21AA000DDA72 /* Feed.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3E72DBD260F21AA000DDA72 /* Feed.swift */; };
 		C3FDAB4C260779CA004BE699 /* CZHttpFileDemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3FDAB4B260779CA004BE699 /* CZHttpFileDemoApp.swift */; };
-		C3FDAB4E260779CA004BE699 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3FDAB4D260779CA004BE699 /* ContentView.swift */; };
+		C3FDAB4E260779CA004BE699 /* TabsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3FDAB4D260779CA004BE699 /* TabsView.swift */; };
 		C3FDAB50260779CC004BE699 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C3FDAB4F260779CC004BE699 /* Assets.xcassets */; };
 		C3FDAB53260779CC004BE699 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C3FDAB52260779CC004BE699 /* Preview Assets.xcassets */; };
 		C3FDAB5E260779CD004BE699 /* CZHttpFileDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3FDAB5D260779CD004BE699 /* CZHttpFileDemoTests.swift */; };
@@ -76,7 +76,7 @@
 		C3E72DBD260F21AA000DDA72 /* Feed.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Feed.swift; sourceTree = "<group>"; };
 		C3FDAB48260779CA004BE699 /* CZHttpFileDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CZHttpFileDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C3FDAB4B260779CA004BE699 /* CZHttpFileDemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CZHttpFileDemoApp.swift; sourceTree = "<group>"; };
-		C3FDAB4D260779CA004BE699 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		C3FDAB4D260779CA004BE699 /* TabsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabsView.swift; sourceTree = "<group>"; };
 		C3FDAB4F260779CC004BE699 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C3FDAB52260779CC004BE699 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		C3FDAB54260779CC004BE699 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -140,7 +140,7 @@
 		C3E72DC2260F2229000DDA72 /* UI Layer */ = {
 			isa = PBXGroup;
 			children = (
-				C3FDAB4D260779CA004BE699 /* ContentView.swift */,
+				C3FDAB4D260779CA004BE699 /* TabsView.swift */,
 				C3E72DB5260F20F7000DDA72 /* SingleDownloadView.swift */,
 				C3E72DB1260F20ED000DDA72 /* MultiDownloadsView.swift */,
 				C3E72DAD260F20A8000DDA72 /* FeedCell.swift */,
@@ -363,7 +363,7 @@
 			files = (
 				C3E72DB2260F20ED000DDA72 /* MultiDownloadsView.swift in Sources */,
 				C3E72DBE260F21AA000DDA72 /* Feed.swift in Sources */,
-				C3FDAB4E260779CA004BE699 /* ContentView.swift in Sources */,
+				C3FDAB4E260779CA004BE699 /* TabsView.swift in Sources */,
 				C3FDAB4C260779CA004BE699 /* CZHttpFileDemoApp.swift in Sources */,
 				C3E72DB6260F20F7000DDA72 /* SingleDownloadView.swift in Sources */,
 				C3E72DAE260F20A8000DDA72 /* FeedCell.swift in Sources */,
