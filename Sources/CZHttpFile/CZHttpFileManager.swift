@@ -63,7 +63,7 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
    Returns cached file URL if has been downloaded, otherwise nil.
    */
   public func cachedFileURL(forURL httpURL: URL?) -> URL? {
-    let (fileURL, isExisting) = cache.cachedFileURL(httpURL: httpURL)
+    let (fileURL, isExisting) = cache.cachedFileURL(forURL: httpURL)
     return isExisting ? fileURL: nil
   }
 }

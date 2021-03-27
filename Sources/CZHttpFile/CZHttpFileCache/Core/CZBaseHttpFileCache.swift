@@ -184,7 +184,7 @@ public extension CZBaseHttpFileCache {
   /**
    Returns cached file URL if has been downloaded, otherwise nil.
    */
-  func cachedFileURL(httpURL: URL?) -> (fileURL: URL?, isExisting: Bool) {
+  func cachedFileURL(forURL httpURL: URL?) -> (fileURL: URL?, isExisting: Bool) {
     guard let httpURL = httpURL else {
       return (nil, false)
     }
