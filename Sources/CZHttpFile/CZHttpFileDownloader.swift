@@ -15,6 +15,9 @@ private var kvoContext: UInt8 = 0
  */
 public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
   public typealias Completion = (_ httpFile: DataType?, _ error: Error?, _ fromCache: Bool) -> Void
+  /// Closure that decodes `inputData` to `(decodedData: DataType?, decodedMetadata: Data?)` tuple.
+  /// - Note: `decodedData` is  final decoded data type `DataType`. e.g. UIImage.
+  ///         `decodedMetadata` is NSData of `decodedData`.
   public typealias DecodeData = (_ inputData: Data) -> (decodedData: DataType?, decodedMetadata: Data?)?
   
   private let httpFileDownloadQueue: OperationQueue
