@@ -67,7 +67,6 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   private var fileManager: FileManager
   private var operationQueue: OperationQueue
   private var hasCachedItemsInfoToFlushToDisk: Bool = false
-  internal typealias CachedItemsInfo = [String: [String: Any]]
   
   private lazy var cacheFileManager: CZCacheFileManager = {
     return CZCacheFileManager(cacheFolderName: cacheFolderName)
