@@ -18,13 +18,27 @@ struct FeedCell: View {
           progress: { (currSize: Int64, totalSize: Int64, downloadURL: URL) in
             self.downloadAmount = Double(currSize) / Double(totalSize)
             dbgPrint("Downloaded url - downloadAmount = \(downloadAmount), currSize = \(currSize), totalSize = \(totalSize)")
-
+            
           }) { (data: Data?, error: Error?, fromCache: Bool) in
           dbgPrint("Downloaded url - \(feed.url)")
-
+          
         }
         
       }
+    }
+    .onAppear {
+      
+      CZHttpFileManager.shared.downloadFile(
+        url: feed.url,
+        progress: { (currSize: Int64, totalSize: Int64, downloadURL: URL) in
+          self.downloadAmount = Double(currSize) / Double(totalSize)
+          dbgPrint("Downloaded url - downloadAmount = \(downloadAmount), currSize = \(currSize), totalSize = \(totalSize)")
+          
+        }) { (data: Data?, error: Error?, fromCache: Bool) in
+        dbgPrint("Downloaded url - \(feed.url)")
+        
+      }
+      
     }
   }
 }

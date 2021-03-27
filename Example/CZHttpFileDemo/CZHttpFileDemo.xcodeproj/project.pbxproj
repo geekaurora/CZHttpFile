@@ -141,8 +141,8 @@
 			isa = PBXGroup;
 			children = (
 				C3FDAB4D260779CA004BE699 /* TabsView.swift */,
-				C3E72DB5260F20F7000DDA72 /* SingleDownloadView.swift */,
 				C3E72DB1260F20ED000DDA72 /* MultiDownloadsView.swift */,
+				C3E72DB5260F20F7000DDA72 /* SingleDownloadView.swift */,
 				C3E72DAD260F20A8000DDA72 /* FeedCell.swift */,
 			);
 			path = "UI Layer";
