@@ -14,6 +14,9 @@ private var kvoContext: UInt8 = 0
  Asynchronous httpFile downloading class on top of OperationQueue
  */
 public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
+  public typealias Completion = (_ httpFile: DataType?, _ error: Error?, _ fromCache: Bool) -> Void
+  public typealias DecodeData = (_ inputData: Data) -> (decodedData: DataType?, decodedMetadata: Data?)?
+  
   private let httpFileDownloadQueue: OperationQueue
   private let httpFileDecodeQueue: OperationQueue
   private let shouldObserveOperations: Bool
@@ -57,8 +60,8 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
   ///   - decodeData: Closure used to decode `Data` to tuple (DataType?, Data?). If is nil, then returns `Data` directly.
   public func downloadHttpFile(url: URL?,
                                priority: Operation.QueuePriority = .normal,
-                               decodeData: ((Data) -> (DataType?, Data?)?)? = nil,
-                               completion: @escaping (_ httpFile: DataType?, _ error: Error?, _ fromCache: Bool) -> Void) {
+                               decodeData: DecodeData? = nil,
+                               completion: @escaping Completion) {
     guard let url = url else { return }
     cancelDownload(with: url)
     
