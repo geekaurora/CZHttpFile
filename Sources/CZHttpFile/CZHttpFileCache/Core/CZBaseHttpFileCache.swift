@@ -32,6 +32,8 @@ import CZUtils
  ```
  
  4. Override `cacheFolderName`
+ - Note: should override `cacheFolderName` to avoid conflicts. e.g. CacheItenInfo.plist.
+ 
  ```
  public var cacheFolderName: String {
    return "CZCache"
