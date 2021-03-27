@@ -4,7 +4,7 @@ import CZHttpFile
 import CZAVPlayer
 
 struct ContentView: View {
-  let url = URL(string: "")!
+  let url = URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!
   
   var cacheFileUrl: URL? {
       let cacheFileInfo = CZHttpFileManager.shared.cache.getCacheFileInfo(forURL: url)
@@ -12,13 +12,14 @@ struct ContentView: View {
   }
 
   var body: some View {
-    let audioInfo = CZAudioInfo(url: cacheFileUrl, title: "TestAudio")
-    AVPlayerView(audioInfo: audioInfo)
+//    let audioInfo = CZAudioInfo(url: cacheFileUrl, title: "TestAudio")
+//    AVPlayerView(audioInfo: audioInfo)
     
     Button("Download") {
       CZHttpFileManager.shared.downloadFile(
         url: url) { (data: Data?, error: Error?, fromCache: Bool) in
           dbgPrint("Downloaded url - \(url)")
+        
       }
     }
   }
