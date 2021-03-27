@@ -6,6 +6,7 @@ import CZAVPlayer
 struct ContentView: View {
   
   var body: some View {
-    SingleFileView()
+    // SingleDownloadView()
+    MultiDownloadsView()
   }
 }

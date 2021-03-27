@@ -3,7 +3,7 @@ import CZUtils
 import CZHttpFile
 import CZAVPlayer
 
-struct MultiFilesView: View {
+struct MultiDownloadsView: View {
   @State private var downloadAmount = 0.0
   
   let url = URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!
