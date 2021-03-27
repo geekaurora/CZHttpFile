@@ -28,7 +28,7 @@ struct FeedCell: View {
     }
     .onAppear {
       let cachedFileURL =  CZHttpFileManager.shared.cachedFileURL(forURL: feed.url)
-      dbgPrint("cachedFileURL = \(cachedFileURL)")
+      // dbgPrint("cachedFileURL = \(cachedFileURL)")
       CZHttpFileManager.shared.downloadFile(
         url: feed.url,
         progress: { (currSize: Int64, totalSize: Int64, downloadURL: URL) in
