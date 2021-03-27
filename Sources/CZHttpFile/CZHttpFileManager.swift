@@ -27,21 +27,22 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
                            completion: @escaping CZHttpFileDownloderCompletion) {
     cache.getCachedFile(withUrl: url) { [weak self] (data: NSData?) in
       guard let `self` = self else { return }
-//      if let data = data as Data? {
-//        // Load from local disk.
-//        MainQueueScheduler.sync {
-//          completion(data, nil, true)
-//        }
-//        return
-//      }
+      //      if let data = data as Data? {
+      //        // Load from local disk.
+      //        MainQueueScheduler.sync {
+      //          completion(data, nil, true)
+      //        }
+      //        return
+      //      }
       
       // Load from http service.
       self.downloader.downloadHttpFile(
         url: url,
         priority: priority,
-        progress: progress) { (data: NSData?, error: Error?, fromCache: Bool) in
-        completion(data as Data?, error, fromCache)
-      }
+        progress: progress,
+        completion: { (data: NSData?, error: Error?, fromCache: Bool) in
+          completion(data as Data?, error, fromCache)
+        })
     }
   }
   
