@@ -64,6 +64,7 @@
 /* Begin PBXFileReference section */
 		C3076C9626078EB50039D545 /* a25fb258deab6f447a400683739521e6 */ = {isa = PBXFileReference; lastKnownFileType = file; path = a25fb258deab6f447a400683739521e6; sourceTree = "<group>"; };
 		C3076C9C260799CE0039D545 /* CZUtils */ = {isa = PBXFileReference; lastKnownFileType = folder; name = CZUtils; path = ../../../CZUtils; sourceTree = "<group>"; };
+		C31EA0F3260F1BFB00EFDBA9 /* CZNetworking */ = {isa = PBXFileReference; lastKnownFileType = folder; name = CZNetworking; path = ../../../CZNetworking; sourceTree = "<group>"; };
 		C33BAF3C2607823A00B12A48 /* CZAVPlayer */ = {isa = PBXFileReference; lastKnownFileType = folder; name = CZAVPlayer; path = ../../../CZAVPlayer; sourceTree = "<group>"; };
 		C3FDAB48260779CA004BE699 /* CZHttpFileDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CZHttpFileDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C3FDAB4B260779CA004BE699 /* CZHttpFileDemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CZHttpFileDemoApp.swift; sourceTree = "<group>"; };
@@ -123,6 +124,7 @@
 		C3FDAB3F260779CA004BE699 = {
 			isa = PBXGroup;
 			children = (
+				C31EA0F3260F1BFB00EFDBA9 /* CZNetworking */,
 				C3076C9C260799CE0039D545 /* CZUtils */,
 				C33BAF3C2607823A00B12A48 /* CZAVPlayer */,
 				C3FDAB7926077A08004BE699 /* CZHttpFile */,

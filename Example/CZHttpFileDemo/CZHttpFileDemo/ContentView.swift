@@ -15,9 +15,14 @@ struct ContentView: View {
 //    let audioInfo = CZAudioInfo(url: cacheFileUrl, title: "TestAudio")
 //    AVPlayerView(audioInfo: audioInfo)
     
+    
     Button("Download") {
       CZHttpFileManager.shared.downloadFile(
-        url: url) { (data: Data?, error: Error?, fromCache: Bool) in
+        url: url,
+        progress: { (currSize: Int64, totalSize: Int64, downloadURL: URL) in
+          dbgPrint("Downloaded url - currSize = \(currSize), totalSize = \(totalSize)")
+          
+        }) { (data: Data?, error: Error?, fromCache: Bool) in
           dbgPrint("Downloaded url - \(url)")
         
       }
