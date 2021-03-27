@@ -15,9 +15,10 @@ private var kvoContext: UInt8 = 0
  */
 public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
   public typealias Completion = (_ httpFile: DataType?, _ error: Error?, _ fromCache: Bool) -> Void
+  
   /// Closure that decodes `inputData` to `(decodedData: DataType?, decodedMetadata: Data?)` tuple.
-  /// - Note: `decodedData` is  final decoded data type `DataType`. e.g. UIImage.
-  ///         `decodedMetadata` is NSData of `decodedData`.
+  /// - Note: `decodedData` is  the decoded data type `DataType`. e.g. UIImage.
+  ///         `decodedMetadata` is NSData format of `decodedData`.
   public typealias DecodeData = (_ inputData: Data) -> (decodedData: DataType?, decodedMetadata: Data?)?
   
   private let httpFileDownloadQueue: OperationQueue
@@ -64,13 +65,14 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
   public func downloadHttpFile(url: URL?,
                                priority: Operation.QueuePriority = .normal,
                                decodeData: DecodeData? = nil,
+                               progress: HTTPRequestWorker.Progress? = nil,
                                completion: @escaping Completion) {
     guard let url = url else { return }
     cancelDownload(with: url)
     
     let operation = HttpFileDownloadOperation(
       url: url,
-      progress: nil,
+      progress: progress,
       success: { [weak self] (task, data) in
         guard let `self` = self, let data = data else {
           completion(nil, WebHttpFileError.invalidData, false)
