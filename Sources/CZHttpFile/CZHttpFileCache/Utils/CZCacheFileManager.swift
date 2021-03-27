@@ -15,6 +15,7 @@ internal class CZCacheFileManager: NSObject {
         assertionFailure("Failed to create CacheFolder! Error - \(error.localizedDescription); Folder - \(cacheFolder)")
       }
     }
+    dbgPrint("\(type(of: self)) - \(#function): cacheFolder = \(cacheFolder)")
     return cacheFolder
   }()
   private var cacheFolderName: String
