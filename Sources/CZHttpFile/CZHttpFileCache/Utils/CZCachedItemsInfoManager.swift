@@ -12,6 +12,7 @@ internal class CZCachedItemsInfoManager<DataType: NSObjectProtocol>: NSObject {
   private lazy var cachedItemsInfoFileURL: URL = {
     return URL(fileURLWithPath: cacheFileManager.cacheFolder + CacheConstant.kCachedItemsInfoFile)
   }()
+  
   internal lazy var cachedItemsInfoLock: CZMutexLock<CachedItemsInfo> = {
     let cachedItemsInfo: CachedItemsInfo = loadCachedItemsInfo() ?? [:]
     return CZMutexLock(cachedItemsInfo)
@@ -52,10 +53,6 @@ internal class CZCachedItemsInfoManager<DataType: NSObjectProtocol>: NSObject {
     } ?? false
   }
   
-  func loadCachedItemsInfo() -> CachedItemsInfo? {
-    return NSDictionary(contentsOf: cachedItemsInfoFileURL) as? CachedItemsInfo
-  }
-  
   func setCachedItemsInfo(key: String, subkey: String, value: Any) {
     cachedItemsInfoLock.writeLock { [weak self] (cachedItemsInfo) -> Void in
       guard let `self` = self else { return }
@@ -82,5 +79,13 @@ internal class CZCachedItemsInfoManager<DataType: NSObjectProtocol>: NSObject {
   
   func flushCachedItemsInfoToDisk(_ cachedItemsInfo: CachedItemsInfo) {
     (cachedItemsInfo as NSDictionary).write(to: cachedItemsInfoFileURL, atomically: true)
+  }
+}
+
+// MARK: - Private methods
+
+private extension CZCachedItemsInfoManager {
+  func loadCachedItemsInfo() -> CachedItemsInfo? {
+    return NSDictionary(contentsOf: cachedItemsInfoFileURL) as? CachedItemsInfo
   }
 }

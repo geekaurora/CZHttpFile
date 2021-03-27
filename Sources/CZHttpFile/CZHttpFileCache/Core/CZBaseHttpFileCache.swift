@@ -66,13 +66,9 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   private var memCache: NSCache<NSString, DataType>
   private var fileManager: FileManager
   private var operationQueue: OperationQueue
-  private var hasCachedItemsInfoToFlushToDisk: Bool = false
   
   private lazy var cacheFileManager: CZCacheFileManager = {
     return CZCacheFileManager(cacheFolderName: cacheFolderName)
-  }()
-  private lazy var cachedItemsInfoFileURL: URL = {
-    return URL(fileURLWithPath: cacheFileManager.cacheFolder + CacheConstant.kCachedItemsInfoFile)
   }()
   private lazy var cachedItemsInfoManager: CZCachedItemsInfoManager<DataType> = {
     let cachedItemsInfoManager = CZCachedItemsInfoManager(
@@ -89,9 +85,10 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
     operationQueue = OperationQueue()
     operationQueue.maxConcurrentOperationCount = 60
     
-    ioQueue = DispatchQueue(label: CacheConstant.ioQueueLabel,
-                            qos: .userInitiated,
-                            attributes: .concurrent)
+    ioQueue = DispatchQueue(
+      label: CacheConstant.ioQueueLabel,
+      qos: .userInitiated,
+      attributes: .concurrent)
     fileManager = FileManager()
     
     // Memory cache
