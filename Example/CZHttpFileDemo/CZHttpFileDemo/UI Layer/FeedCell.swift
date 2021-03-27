@@ -10,7 +10,7 @@ struct FeedCell: View {
   
   var body: some View {
     VStack {
-      ProgressView(value: downloadAmount, total: 1)
+      ProgressView(feed.url.absoluteString, value: downloadAmount, total: 1)
       
       Button("Download") {
         CZHttpFileManager.shared.downloadFile(
