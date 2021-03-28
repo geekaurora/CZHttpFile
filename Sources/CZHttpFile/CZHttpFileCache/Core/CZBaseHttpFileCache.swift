@@ -124,9 +124,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
     var image = self.getMemCache(forKey: cacheKey)
     
     // Read data from disk cache
-    if image == nil {
-      dbgPrint("\(type(of: self)).getCachedFile() - Read from disk cache. url = \(url)")
-      
+    if image == nil {      
       diskCacheManager.getCachedFile(withUrl: url) { (decodedData) in
         // Assign decodedData from disk cache.
         image = decodedData
