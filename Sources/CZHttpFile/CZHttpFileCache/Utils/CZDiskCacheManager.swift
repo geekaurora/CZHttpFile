@@ -181,22 +181,23 @@ extension CZDiskCacheManager {
     let result = cachedItemsDictLock.writeLock(closure)
     
     // Publish DownloadedURLs.
-    if isInInitializer {
-      // Should async in the next runloop, otherwise it will crash as it's in CZHttpFileManager initializer.
-      // TODO: `observers` of observersMananger on background queue isn't correct.
-      MainQueueScheduler.async {
-        self.publishDownloadedURLs()
-      }
-    } else {
-      publishDownloadedURLs()
-    }
+//    if isInInitializer {
+//      // Should async in the next runloop, otherwise it will crash as it's in CZHttpFileManager initializer.
+//      // TODO: `observers` of observersMananger on background queue isn't correct.
+//      MainQueueScheduler.async {
+//        self.publishDownloadedURLs()
+//      }
+//    } else {
+//      publishDownloadedURLs()
+//    }
+    publishDownloadedURLs()
     
     return result
   }
   
   func publishDownloadedURLs() {
     let cachedFileHttpURLs = self.cachedFileHttpURLs().map { URL(string: $0)! }
-    CZHttpFileManager.shared.downloadedObserverManager.publishDownloadedURLs(cachedFileHttpURLs)
+    downloadedObserverManager?.publishDownloadedURLs(cachedFileHttpURLs)
   }
 }
 
