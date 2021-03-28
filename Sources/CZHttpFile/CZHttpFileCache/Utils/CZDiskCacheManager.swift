@@ -143,11 +143,7 @@ extension CZDiskCacheManager {
     setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate())
     setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileSize, value: fileSize)
   }
-  
-  func cachedItemsDictLockWrite<Result>(_ closure: @escaping (inout CachedItemsDict) -> Result?) -> Result? {
-    return cachedItemsDictLock.writeLock(closure)
-  }
-  
+   
   func setCachedItemsDict(key: String, subkey: String, value: Any) {
     cachedItemsDictLockWrite { [weak self] (cachedItemsDict) -> Void in
       guard let `self` = self else { return }
@@ -175,6 +171,10 @@ extension CZDiskCacheManager {
   func flushCachedItemsDictToDisk(_ cachedItemsDict: CachedItemsDict) {
     (cachedItemsDict as NSDictionary).write(to: cachedItemsDictFileURL, atomically: true)
   }
+  
+  func cachedItemsDictLockWrite<Result>(_ closure: @escaping (inout CachedItemsDict) -> Result?) -> Result? {
+    return cachedItemsDictLock.writeLock(closure)
+  }  
 }
 
 // MARK: - Helper methods
