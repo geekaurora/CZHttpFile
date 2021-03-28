@@ -2,6 +2,7 @@ import SwiftUI
 import CZUtils
 import CZHttpFile
 import CZAVPlayer
+import CZHttpFileListSwiftUI
 
 struct DownloadCell: View {
   @State private var downloadAmount = 0.0

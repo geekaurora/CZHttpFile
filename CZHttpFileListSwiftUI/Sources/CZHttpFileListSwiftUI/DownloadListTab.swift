@@ -2,10 +2,12 @@ import SwiftUI
 import CZUtils
 import CZHttpFile
 
-struct DownloadListTab: View {
+public struct DownloadListTab: View {
   @State private var selectedIndex = 0
   
-  var body: some View {
+  public init() {}
+  
+  public var body: some View {
     VStack {
       Picker(selection: $selectedIndex, label: Text("What is your favorite color?")) {
         Text("Downloaded").tag(0)
