@@ -15,13 +15,14 @@ let package = Package(
       targets: ["CZHttpFileListSwiftUI"]),
   ],
   dependencies: [
-    .package(url: "https://github.com/geekaurora/CZHttpFile.git", from: "1.7.1"),
+    .package(url: "https://github.com/geekaurora/CZUtils.git", from: "3.4.9"),
+    .package(url: "https://github.com/geekaurora/CZHttpFile.git", from: "1.8.0"),
     .package(url: "https://github.com/geekaurora/SwiftUIKit.git", from: "1.2.0"),
   ],
   targets: [
     .target(
       name: "CZHttpFileListSwiftUI",
-      dependencies: ["CZHttpFile", "SwiftUIKit"]),
+      dependencies: ["CZUtils", "CZHttpFile", "SwiftUIKit"]),
     .testTarget(
       name: "CZHttpFileListSwiftUITests",
       dependencies: ["CZHttpFileListSwiftUI"]),
