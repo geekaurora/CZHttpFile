@@ -33,6 +33,12 @@ struct TabsView: View {
           Text("Downloading")
         }
       
+      CZDownloadedList()
+        .tabItem {
+          Image(systemName: "square.and.arrow.down")
+          Text("Downloaded")
+        }
+            
     }
     
   }
