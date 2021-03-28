@@ -46,6 +46,7 @@ public enum CacheConstant {
   public static let kCachedItemsDictFile = "cachedItemsDict.plist"
   public static let kFileModifiedDate = "modifiedDate"
   public static let kFileVisitedDate = "visitedDate"
+  public static let kFileHttpUrl = "url"
   public static let kFileSize = "size"
   public static let ioQueueLabel = "com.tony.cache.ioQueue"
 }
@@ -56,21 +57,21 @@ public enum CacheConstant {
  Constraining `DataType` with `NSObjectProtocol` because NSCache requires its Value type to be Class.
  */
 open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
-  public typealias CleanDiskCacheCompletion = () -> Void
   
   public var cacheFolderName: String {
     return "CZBaseHttpFileCache"
   }
   
-  private var ioQueue: DispatchQueue
   private var memCache: NSCache<NSString, DataType>
-  private var fileManager: FileManager
   private var operationQueue: OperationQueue
   
   private lazy var diskCacheManager: CZDiskCacheManager<DataType> = {
     let diskCacheManager = CZDiskCacheManager(
+      maxCacheAge: maxCacheAge,
+      maxCacheSize: maxCacheSize,
       cacheFolderName: cacheFolderName,
-      httpFileCache: self)
+      httpFileCache: self,
+      transformMetadataToCachedData: transformMetadataToCachedData)
     return diskCacheManager
   }()
   
@@ -81,12 +82,6 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
               maxCacheSize: Int = CacheConstant.kMaxCacheSize) {
     operationQueue = OperationQueue()
     operationQueue.maxConcurrentOperationCount = 60
-    
-    ioQueue = DispatchQueue(
-      label: CacheConstant.ioQueueLabel,
-      qos: .userInitiated,
-      attributes: .concurrent)
-    fileManager = FileManager()
     
     // Memory cache
     memCache = NSCache()
@@ -101,58 +96,49 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
     cleanDiskCacheIfNeeded()
   }
   
+  var size: Int {
+    return diskCacheManager.totalCachedFileSize
+  }
+  
+  // MARK: - Set / Get Cache
+  
   public func setCacheFile(withUrl url: URL, data: Data?) {
     guard let data = data.assertIfNil else { return }
-    let (fileURL, cacheKey) = diskCacheManager.getCacheFileInfo(forURL: url)
+    let (_, cacheKey) = diskCacheManager.getCacheFileInfo(forURL: url)
     
-    // Mem cache
+    // Mem Cache.
     // `transformMetadataToCachedData` is to transform `Data` to real Data type.
     // e.g. let image = UIImage(data: data)
     if let image = transformMetadataToCachedData(data) {
       setMemCache(image: image, forKey: cacheKey)
     }
     
-    // Disk cache
-    ioQueue.async(flags: .barrier) { [weak self] in
-      guard let `self` = self else { return }
-      do {
-        try data.write(to: fileURL)
-        self.diskCacheManager.setCachedItemsDictForNewURL(url, fileSize: data.count)
-      } catch {
-        assertionFailure("Failed to write file. Error - \(error.localizedDescription)")
-      }
-    }
+    // Disk Cache.
+    diskCacheManager.setCacheFile(withUrl: url, data: data)
   }
   
   public func getCachedFile(withUrl url: URL,
                             completion: @escaping (DataType?) -> Void)  {
-    let (fileURL, cacheKey) = diskCacheManager.getCacheFileInfo(forURL: url)
+    let (_, cacheKey) = diskCacheManager.getCacheFileInfo(forURL: url)
     // Read data from mem cache
     var image = self.getMemCache(forKey: cacheKey)
     
     // Read data from disk cache
-    if image == nil {
-      image = self.ioQueue.sync {
-        if let data = try? Data(contentsOf: fileURL),
-           // let image = UIImage(data: data)
-           let image = transformMetadataToCachedData(data).assertIfNil {
-          // Update last visited date
-          self.diskCacheManager.setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate())
-          // Set mem cache after loading data from local drive
+    if image == nil {      
+      diskCacheManager.getCachedFile(withUrl: url) { (decodedData) in
+        // Set decodedData from the disk cache.
+        image = decodedData
+        // Set mem cache after loading data from local drive
+        if let image = image {
           self.setMemCache(image: image, forKey: cacheKey)
-          return image
         }
-        return nil
       }
     }
+    
     // Completion callback
     MainQueueScheduler.sync {
       completion(image)
     }
-  }
-  
-  var size: Int {
-    return diskCacheManager.totalCachedFileSize
   }
   
   // MARK: - Overriden methods
@@ -196,83 +182,7 @@ internal extension CZBaseHttpFileCache {
       cost: cost)
   }
   
-  func cleanDiskCacheIfNeeded(completion: CleanDiskCacheCompletion? = nil){
-    let currDate = Date()
-    
-    // 1. Clean disk by age
-    let removeFileURLs = diskCacheManager.cachedItemsDictLock.writeLock { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
-      var removedKeys = [String]()
-      
-      // Remove key if its fileModifiedDate exceeds maxCacheAge
-      cachedItemsDict.forEach { (keyValue: (key: String, value: [String : Any])) in
-        if let modifiedDate = keyValue.value[CacheConstant.kFileModifiedDate] as? Date,
-           currDate.timeIntervalSince(modifiedDate) > self.maxCacheAge {
-          removedKeys.append(keyValue.key)
-          cachedItemsDict.removeValue(forKey: keyValue.key)
-        }
-      }
-      self.diskCacheManager.flushCachedItemsDictToDisk(cachedItemsDict)
-      let removeFileURLs = removedKeys.compactMap{ self.diskCacheManager.cacheFileURL(forKey: $0) }
-      return removeFileURLs
-    }
-    // Remove corresponding files from disk
-    self.ioQueue.async(flags: .barrier) { [weak self] in
-      guard let `self` = self else { return }
-      removeFileURLs?.forEach {
-        do {
-          try self.fileManager.removeItem(at: $0)
-        } catch {
-          assertionFailure("Failed to remove file. Error - \(error.localizedDescription)")
-        }
-      }
-    }
-    
-    // 2. Clean disk by maxSize setting: based on visited date - simple LRU
-    if self.size > self.maxCacheSize {
-      let expectedCacheSize = self.maxCacheSize / 2
-      let expectedReduceSize = self.size - expectedCacheSize
-      
-      let removeFileURLs = diskCacheManager.cachedItemsDictLock.writeLock { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
-        // Sort files with last visted date
-        let sortedItemsInfo = cachedItemsDict.sorted { (keyValue1: (key: String, value: [String : Any]),
-                                                        keyValue2: (key: String, value: [String : Any])) -> Bool in
-          if let modifiedDate1 = keyValue1.value[CacheConstant.kFileVisitedDate] as? Date,
-             let modifiedDate2 = keyValue2.value[CacheConstant.kFileVisitedDate] as? Date {
-            return modifiedDate1.timeIntervalSince(modifiedDate2) < 0
-          } else {
-            fatalError()
-          }
-        }
-        
-        var removedFilesSize: Int = 0
-        var removedKeys = [String]()
-        for (key, value) in sortedItemsInfo {
-          if removedFilesSize >= expectedReduceSize {
-            break
-          }
-          cachedItemsDict.removeValue(forKey: key)
-          removedKeys.append(key)
-          let oneFileSize = (value[CacheConstant.kFileSize] as? Int) ?? 0
-          removedFilesSize += oneFileSize
-        }
-        self.diskCacheManager.flushCachedItemsDictToDisk(cachedItemsDict)
-        return removedKeys.compactMap { self.diskCacheManager.cacheFileURL(forKey: $0) }
-      }
-      
-      // Remove corresponding files from disk
-      self.ioQueue.async(flags: .barrier) { [weak self] in
-        guard let `self` = self else { return }
-        removeFileURLs?.forEach {
-          do {
-            try self.fileManager.removeItem(at: $0)
-          } catch {
-            assertionFailure("Failed to remove file. Error - \(error.localizedDescription)")
-          }
-        }
-      }
-    }
-    
-    completion?()
+  func cleanDiskCacheIfNeeded(completion: CleanDiskCacheCompletion? = nil) {
+    diskCacheManager.cleanDiskCacheIfNeeded(completion: completion)    
   }
-  
 }
