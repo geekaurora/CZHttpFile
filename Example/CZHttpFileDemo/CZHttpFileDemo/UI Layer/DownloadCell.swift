@@ -5,44 +5,37 @@ import CZAVPlayer
 
 struct DownloadCell: View {
   @State private var downloadAmount = 0.0
+  @State private var downloadState = ""
   
   let feed: Feed
+  
+  func downloadFile() {
+    CZHttpFileManager.shared.downloadFile(
+      url: feed.url,
+      progress: { (currSize: Int64, totalSize: Int64, downloadURL: URL) in
+        self.downloadState = CZHttpFileManager.shared.downloadState(forURL: feed.url).rawValue
+        self.downloadAmount = Double(currSize) / Double(totalSize)
+        // dbgPrint("downloadAmount = \(downloadAmount), currSize = \(currSize), totalSize = \(totalSize)")
+        
+      }) { (data: Data?, error: Error?, fromCache: Bool) in
+      self.downloadState = CZHttpFileManager.shared.downloadState(forURL: feed.url).rawValue
+      dbgPrint("Downloaded url - \(feed.url), downloadState = \(downloadState)")
+
+    }
+  }
   
   var body: some View {
     VStack {
       ProgressView(feed.url.absoluteString, value: downloadAmount, total: 1)
       
-      // Text("test")
-      Text(CZHttpFileManager.shared.downloadState(forURL: feed.url).rawValue)
+      Text(downloadState)
       
       Button("Download") {
-        CZHttpFileManager.shared.downloadFile(
-          url: feed.url,
-          progress: { (currSize: Int64, totalSize: Int64, downloadURL: URL) in
-            self.downloadAmount = Double(currSize) / Double(totalSize)
-            // dbgPrint("Downloaded url - downloadAmount = \(downloadAmount), currSize = \(currSize), totalSize = \(totalSize)")
-            
-          }) { (data: Data?, error: Error?, fromCache: Bool) in
-          dbgPrint("Downloaded url - \(feed.url)")
-          
-        }
-        
+        downloadFile()
       }
     }
     .onAppear {
-      // let cachedFileURL =  CZHttpFileManager.shared.cachedFileURL(forURL: feed.url)
-      // dbgPrint("cachedFileURL = \(cachedFileURL)")
-      CZHttpFileManager.shared.downloadFile(
-        url: feed.url,
-        progress: { (currSize: Int64, totalSize: Int64, downloadURL: URL) in
-          self.downloadAmount = Double(currSize) / Double(totalSize)
-          // dbgPrint("Downloaded url - downloadAmount = \(downloadAmount), currSize = \(currSize), totalSize = \(totalSize)")
-          
-        }) { (data: Data?, error: Error?, fromCache: Bool) in
-        dbgPrint("Downloaded url - \(feed.url)")
-        
-      }
-      
+      downloadFile()
     }
   }
 }

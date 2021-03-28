@@ -3,6 +3,7 @@ import CZUtils
 
 public typealias CacheFileInfo = (fileURL: URL, cacheKey: String)
 public typealias CleanDiskCacheCompletion = () -> Void
+public typealias SetCacheFileCompletion = () -> Void
 internal typealias CachedItemsDict = [String: [String: Any]]
 
 /**
@@ -15,8 +16,6 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
   
   internal typealias TransformMetadataToCachedData = (_ data: Data) -> DataType?
   
-  // TODO: move helper methods to CZCacheUtils to untangle deps on CZBaseHttpFileCache.
-  private weak var httpFileCache: CZBaseHttpFileCache<DataType>!
   private var cacheFolderName: String
   
   private lazy var cachedItemsDictFileURL: URL = {
@@ -38,13 +37,11 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
   public init(maxCacheAge: TimeInterval,
               maxCacheSize: Int,
               cacheFolderName: String,
-              httpFileCache: CZBaseHttpFileCache<DataType>,
               transformMetadataToCachedData: @escaping TransformMetadataToCachedData) {
     self.maxCacheAge = maxCacheAge
     self.maxCacheSize = maxCacheSize
     self.cacheFolderName = cacheFolderName
     self.fileManager = FileManager()
-    self.httpFileCache = httpFileCache
     self.transformMetadataToCachedData = transformMetadataToCachedData
         
     self.ioQueue = DispatchQueue(
@@ -87,8 +84,20 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
 // MARK: - Set / Get Cache file
   
 extension CZDiskCacheManager {
-  
-  public func setCacheFile(withUrl url: URL, data: Data?) {
+  /**
+   Set the cache file for `url`.
+   - Note: there're two completions for different usages.
+   Should wait for `completeSetCachedItemsDict` before completes downloading to ensure downloaded state correct,
+   which repies on `cachedItemsDict`.
+   
+   - Parameters:
+     - completeSetCachedItemsDict: called when completes setting CachedItemsDict.
+     - completeSaveCachedFile: called when completes saving file.
+   */
+  public func setCacheFile(withUrl url: URL,
+                           data: Data?,
+                           completeSetCachedItemsDict: SetCacheFileCompletion? = nil,
+                           completeSaveCachedFile: SetCacheFileCompletion? = nil) {
     guard let data = data.assertIfNil else { return }
     let (fileURL, cacheKey) = getCacheFileInfo(forURL: url)
     
@@ -96,8 +105,10 @@ extension CZDiskCacheManager {
     ioQueue.async(flags: .barrier) { [weak self] in
       guard let `self` = self else { return }
       do {
-        try data.write(to: fileURL)
         self.setCachedItemsDictForNewURL(url, fileSize: data.count)
+        completeSetCachedItemsDict?()
+        try data.write(to: fileURL)
+        completeSaveCachedFile?()
       } catch {
         assertionFailure("Failed to write file. Error - \(error.localizedDescription)")
       }
@@ -127,6 +138,7 @@ extension CZDiskCacheManager {
 extension CZDiskCacheManager {
   func setCachedItemsDictForNewURL(_ httpURL: URL, fileSize: Int) {
     let (_, cacheKey) = getCacheFileInfo(forURL: httpURL)
+    setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kHttpUrlString, value: httpURL.absoluteString)
     setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileModifiedDate, value: NSDate())
     setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate())
     setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileSize, value: fileSize)
@@ -171,10 +183,20 @@ extension CZDiskCacheManager {
     guard let httpURL = httpURL else {
       return (nil, false)
     }
+    dbgPrint("CZDiskCacheManager.cachedFileURL() - cacheFileURLs = \(cachedFileURLs())")
+    
     let cacheFileInfo = getCacheFileInfo(forURL: httpURL)
     let fileURL = cacheFileInfo.fileURL
     let isExisting = urlExistsInCache(httpURL)
     return (fileURL, isExisting)
+  }
+  
+  func cachedFileURLs() -> [String] {
+    return cachedItemsDictLock.readLock { (cachedItemsDict) -> [String] in
+      cachedItemsDict.keys.compactMap {
+        return cachedItemsDict[$0]?[CacheConstant.kHttpUrlString] as? String
+      }
+    } ?? []
   }
   
   func cacheFileURL(forKey key: String) -> URL {
