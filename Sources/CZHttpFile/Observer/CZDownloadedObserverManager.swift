@@ -20,8 +20,8 @@ public class CZDownloadedObserverManager {
   private var downloadedURLs: [URL] = []
   
   public func publishDownloadedURLs(_ downloadedURLs: [URL]) {
-    dbgPrint("\(type(of: self)).\(#function) - observers = \(observers.allObjects.count), downloadedURLs = \(downloadedURLs)")
-    
+    dbgPrintWithFunc(self, "observers = \(observers.allObjects.count), downloadedURLs = \(downloadedURLs)")
+
     self._downloadedURLs.threadLock({ (actualDownloadedURLs) -> Void in
       actualDownloadedURLs = downloadedURLs
     })
@@ -34,8 +34,11 @@ public class CZDownloadedObserverManager {
   }
   
   public func addObserver(_ observer: CZDownloadedObserverProtocol) {
+    dbgPrintWithFunc(self, "observer = \(observer)")
+    
     // Append the observer.
     observers.append(observer)
+    
     // Publish the latest state to observer.
     observer.downloadedURLsDidUpdate(downloadedURLs)
   }
