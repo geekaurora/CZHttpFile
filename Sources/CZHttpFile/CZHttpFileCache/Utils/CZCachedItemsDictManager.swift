@@ -1,15 +1,17 @@
 import UIKit
 import CZUtils
 
+public typealias CacheFileInfo = (fileURL: URL, cacheKey: String)
 internal typealias CachedItemsDict = [String: [String: Any]]
 
-/**
- 
- */
 internal class CZCachedItemsDictManager<DataType: NSObjectProtocol>: NSObject {
-  private var cacheFileManager: CZCacheFileManager
+  private(set) lazy var cacheFileManager: CZCacheFileManager = {
+    return CZCacheFileManager(cacheFolderName: cacheFolderName)
+  }()
+  
   // TODO: move helper methods to CZCacheUtils to untangle deps on CZBaseHttpFileCache.
   private weak var httpFileCache: CZBaseHttpFileCache<DataType>!
+  private var cacheFolderName: String
   
   private lazy var cachedItemsDictFileURL: URL = {
     return URL(fileURLWithPath: cacheFileManager.cacheFolder + CacheConstant.kCachedItemsDictFile)
@@ -20,9 +22,9 @@ internal class CZCachedItemsDictManager<DataType: NSObjectProtocol>: NSObject {
     return CZMutexLock(cachedItemsDict)
   }()
       
-  public init(cacheFileManager: CZCacheFileManager,
+  public init(cacheFolderName: String,
               httpFileCache: CZBaseHttpFileCache<DataType>) {
-    self.cacheFileManager = cacheFileManager
+    self.cacheFolderName = cacheFolderName
     self.httpFileCache = httpFileCache
     super.init()
   }
@@ -49,7 +51,7 @@ internal class CZCachedItemsDictManager<DataType: NSObjectProtocol>: NSObject {
     return cachedItemsDictLock.readLock { [weak self] (cachedItemsDict) -> Bool? in
       guard let `self` = self else { return false}
       
-      let (_, cacheKey) = self.httpFileCache.getCacheFileInfo(forURL: httpURL)
+      let (_, cacheKey) = self.getCacheFileInfo(forURL: httpURL)
       let urlExistsInCache = (cachedItemsDict[cacheKey] != nil)
       return urlExistsInCache
     } ?? false
@@ -75,12 +77,40 @@ internal class CZCachedItemsDictManager<DataType: NSObjectProtocol>: NSObject {
   }
   
   func removeCachedItemsDict(forUrl url: URL) {
-    let cacheFileInfo = httpFileCache.getCacheFileInfo(forURL: url)
+    let cacheFileInfo = getCacheFileInfo(forURL: url)
     removeCachedItemsDict(forKey: cacheFileInfo.cacheKey)
   }
   
   func flushCachedItemsDictToDisk(_ cachedItemsDict: CachedItemsDict) {
     (cachedItemsDict as NSDictionary).write(to: cachedItemsDictFileURL, atomically: true)
+  }
+}
+
+// MARK: - Helper methods
+
+extension CZCachedItemsDictManager {
+  /**
+   Returns cached file URL if has been downloaded, otherwise nil.
+   */
+  func cachedFileURL(forURL httpURL: URL?) -> (fileURL: URL?, isExisting: Bool) {
+    guard let httpURL = httpURL else {
+      return (nil, false)
+    }
+    let cacheFileInfo = getCacheFileInfo(forURL: httpURL)
+    let fileURL = cacheFileInfo.fileURL
+    let isExisting = urlExistsInCache(httpURL)
+    return (fileURL, isExisting)
+  }
+  
+  func cacheFileURL(forKey key: String) -> URL {
+    return URL(fileURLWithPath: cacheFileManager.cacheFolder + key)
+  }
+    
+  func getCacheFileInfo(forURL url: URL) -> CacheFileInfo {
+    let urlString = url.absoluteString
+    let cacheKey = urlString.MD5 + urlString.fileType(includingDot: true)
+    let fileURL = URL(fileURLWithPath: cacheFileManager.cacheFolder + cacheKey)
+    return (fileURL: fileURL, cacheKey: cacheKey)
   }
 }
 

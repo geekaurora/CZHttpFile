@@ -67,12 +67,9 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   private var fileManager: FileManager
   private var operationQueue: OperationQueue
   
-  private lazy var cacheFileManager: CZCacheFileManager = {
-    return CZCacheFileManager(cacheFolderName: cacheFolderName)
-  }()
   private lazy var cachedItemsDictManager: CZCachedItemsDictManager<DataType> = {
     let cachedItemsDictManager = CZCachedItemsDictManager(
-      cacheFileManager: cacheFileManager,
+      cacheFolderName: cacheFolderName,
       httpFileCache: self)
     return cachedItemsDictManager
   }()
@@ -106,7 +103,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   
   public func setCacheFile(withUrl url: URL, data: Data?) {
     guard let data = data.assertIfNil else { return }
-    let (fileURL, cacheKey) = getCacheFileInfo(forURL: url)
+    let (fileURL, cacheKey) = cachedItemsDictManager.getCacheFileInfo(forURL: url)
     
     // Mem cache
     // `transformMetadataToCachedData` is to transform `Data` to real Data type.
@@ -131,7 +128,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   
   public func getCachedFile(withUrl url: URL,
                             completion: @escaping (DataType?) -> Void)  {
-    let (fileURL, cacheKey) = self.getCacheFileInfo(forURL: url)
+    let (fileURL, cacheKey) = cachedItemsDictManager.getCacheFileInfo(forURL: url)
     // Read data from mem cache
     var image = self.getMemCache(forKey: cacheKey)
     
@@ -174,27 +171,16 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
 // MARK: - Helper methods
 
 public extension CZBaseHttpFileCache {
-  typealias CacheFileInfo = (fileURL: URL, cacheKey: String)
-  
   /**
    Returns cached file URL if has been downloaded, otherwise nil.
    */
   func cachedFileURL(forURL httpURL: URL?) -> (fileURL: URL?, isExisting: Bool) {
-    guard let httpURL = httpURL else {
-      return (nil, false)
-    }
-    let cacheFileInfo = getCacheFileInfo(forURL: httpURL)
-    let fileURL = cacheFileInfo.fileURL
-    let isExisting = cachedItemsDictManager.urlExistsInCache(httpURL)
-    return (fileURL, isExisting)
+    return cachedItemsDictManager.cachedFileURL(forURL: httpURL)
   }
   
   func getCacheFileInfo(forURL url: URL) -> CacheFileInfo {
-    let urlString = url.absoluteString
-    let cacheKey = urlString.MD5 + urlString.fileType(includingDot: true)
-    let fileURL = URL(fileURLWithPath: cacheFileManager.cacheFolder + cacheKey)
-    return (fileURL: fileURL, cacheKey: cacheKey)
-  }
+    return cachedItemsDictManager.getCacheFileInfo(forURL: url)
+  }  
 }
 
 // MARK: - Private methods
@@ -212,9 +198,9 @@ internal extension CZBaseHttpFileCache {
       cost: cost)
   }
   
-  func cacheFileURL(forKey key: String) -> URL {
-    return URL(fileURLWithPath: cacheFileManager.cacheFolder + key)
-  }
+//  func cacheFileURL(forKey key: String) -> URL {
+//    return URL(fileURLWithPath: cacheFileManager.cacheFolder + key)
+//  }
   
   func cleanDiskCacheIfNeeded(completion: CleanDiskCacheCompletion? = nil){
     let currDate = Date()
@@ -232,7 +218,7 @@ internal extension CZBaseHttpFileCache {
         }
       }
       self.cachedItemsDictManager.flushCachedItemsDictToDisk(cachedItemsDict)
-      let removeFileURLs = removedKeys.compactMap{ self.cacheFileURL(forKey: $0) }
+      let removeFileURLs = removedKeys.compactMap{ self.cachedItemsDictManager.cacheFileURL(forKey: $0) }
       return removeFileURLs
     }
     // Remove corresponding files from disk
@@ -276,7 +262,7 @@ internal extension CZBaseHttpFileCache {
           removedFilesSize += oneFileSize
         }
         self.cachedItemsDictManager.flushCachedItemsDictToDisk(cachedItemsDict)
-        return removedKeys.compactMap {self.cacheFileURL(forKey: $0)}
+        return removedKeys.compactMap { self.cachedItemsDictManager.cacheFileURL(forKey: $0) }
       }
       
       // Remove corresponding files from disk
