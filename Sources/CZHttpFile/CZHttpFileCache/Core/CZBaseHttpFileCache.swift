@@ -71,7 +71,8 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
       maxCacheAge: maxCacheAge,
       maxCacheSize: maxCacheSize,
       cacheFolderName: cacheFolderName,
-      httpFileCache: self)
+      httpFileCache: self,
+      transformMetadataToCachedData: self.transformMetadataToCachedData)
     return diskCacheManager
   }()
   
@@ -124,19 +125,16 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
     
     // Read data from disk cache
     if image == nil {
-      image = self.ioQueue.sync {
-        if let data = try? Data(contentsOf: fileURL),
-           // let image = UIImage(data: data)
-           let image = transformMetadataToCachedData(data).assertIfNil {
-          // Update last visited date
-          self.diskCacheManager.setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate())
-          // Set mem cache after loading data from local drive
+      diskCacheManager.getCachedFile(withUrl: url) { (decodedData) in
+        // Assign decodedData from disk cache.
+        image = decodedData
+        // Set mem cache after loading data from local drive
+        if let image = image {
           self.setMemCache(image: image, forKey: cacheKey)
-          return image
         }
-        return nil
       }
     }
+    
     // Completion callback
     MainQueueScheduler.sync {
       completion(image)

@@ -13,6 +13,8 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
     return CZCacheFolderHelper(cacheFolderName: cacheFolderName)
   }()
   
+  internal typealias TransformMetadataToCachedData = (_ data: Data) -> DataType?
+  
   // TODO: move helper methods to CZCacheUtils to untangle deps on CZBaseHttpFileCache.
   private weak var httpFileCache: CZBaseHttpFileCache<DataType>!
   private var cacheFolderName: String
@@ -32,16 +34,19 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
     return httpFileCache.ioQueue
   }
   private var fileManager: FileManager
+  private var transformMetadataToCachedData: TransformMetadataToCachedData
 
   public init(maxCacheAge: TimeInterval,
               maxCacheSize: Int,
               cacheFolderName: String,
-              httpFileCache: CZBaseHttpFileCache<DataType>) {
+              httpFileCache: CZBaseHttpFileCache<DataType>,
+              transformMetadataToCachedData: @escaping TransformMetadataToCachedData) {
     self.maxCacheAge = maxCacheAge
     self.maxCacheSize = maxCacheSize
     self.cacheFolderName = cacheFolderName
     self.fileManager = FileManager()
     self.httpFileCache = httpFileCache
+    self.transformMetadataToCachedData = transformMetadataToCachedData
     super.init()
   }
   
@@ -74,7 +79,7 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
   }
 }
 
-// MARK: - Set / Get Cache File
+// MARK: - Set / Get Cached File
   
 extension CZDiskCacheManager {
   
@@ -90,6 +95,23 @@ extension CZDiskCacheManager {
         self.setCachedItemsDictForNewURL(url, fileSize: data.count)
       } catch {
         assertionFailure("Failed to write file. Error - \(error.localizedDescription)")
+      }
+    }
+  }
+  
+  public func getCachedFile(withUrl url: URL,
+                            completion: @escaping (DataType?) -> Void)  {
+    let (fileURL, cacheKey) = getCacheFileInfo(forURL: url)
+    
+    // Read data from disk cache
+    self.ioQueue.sync {
+      if let data = try? Data(contentsOf: fileURL),
+         let image = transformMetadataToCachedData(data).assertIfNil {
+        // Update last visited date
+        self.setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate())
+        completion(image)
+      } else {
+        completion(nil)
       }
     }
   }
