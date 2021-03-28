@@ -3,8 +3,10 @@ import CZUtils
 
 internal typealias CachedItemsDict = [String: [String: Any]]
 
+/**
+ 
+ */
 internal class CZCachedItemsDictManager<DataType: NSObjectProtocol>: NSObject {
-    
   private var cacheFileManager: CZCacheFileManager
   // TODO: move helper methods to CZCacheUtils to untangle deps on CZBaseHttpFileCache.
   private weak var httpFileCache: CZBaseHttpFileCache<DataType>!
