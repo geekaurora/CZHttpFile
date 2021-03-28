@@ -1,7 +1,7 @@
 import Foundation
 import CZUtils
 
-/// CacheFileManager helper class.
+/// DiskCacheManager helper class.
 internal class CZCacheFolderHelper: NSObject {
   
   private(set) lazy var cacheFolder: String = {
