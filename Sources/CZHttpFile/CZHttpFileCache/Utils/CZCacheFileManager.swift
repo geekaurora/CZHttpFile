@@ -4,7 +4,7 @@ import CZUtils
 public typealias CacheFileInfo = (fileURL: URL, cacheKey: String)
 internal typealias CachedItemsDict = [String: [String: Any]]
 
-internal class CZCachedItemsDictManager<DataType: NSObjectProtocol>: NSObject {
+internal class CZCacheFileManager<DataType: NSObjectProtocol>: NSObject {
   private(set) lazy var cacheFolderHelper: CZCacheFolderHelper = {
     return CZCacheFolderHelper(cacheFolderName: cacheFolderName)
   }()
@@ -90,7 +90,7 @@ internal class CZCachedItemsDictManager<DataType: NSObjectProtocol>: NSObject {
 
 // MARK: - Helper methods
 
-extension CZCachedItemsDictManager {
+extension CZCacheFileManager {
   /**
    Returns cached file URL if has been downloaded, otherwise nil.
    */
@@ -118,7 +118,7 @@ extension CZCachedItemsDictManager {
 
 // MARK: - Private methods
 
-private extension CZCachedItemsDictManager {
+private extension CZCacheFileManager {
   func loadCachedItemsDict() -> CachedItemsDict? {
     return NSDictionary(contentsOf: cachedItemsDictFileURL) as? CachedItemsDict
   }
