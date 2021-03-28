@@ -62,7 +62,6 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
     return "CZBaseHttpFileCache"
   }
   
-  private(set) var ioQueue: DispatchQueue
   private var memCache: NSCache<NSString, DataType>
   private var operationQueue: OperationQueue
   
@@ -83,11 +82,6 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
               maxCacheSize: Int = CacheConstant.kMaxCacheSize) {
     operationQueue = OperationQueue()
     operationQueue.maxConcurrentOperationCount = 60
-    
-    ioQueue = DispatchQueue(
-      label: CacheConstant.ioQueueLabel,
-      qos: .userInitiated,
-      attributes: .concurrent)
     
     // Memory cache
     memCache = NSCache()

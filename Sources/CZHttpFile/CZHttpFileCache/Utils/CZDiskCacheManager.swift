@@ -30,9 +30,8 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
       
   private(set) var maxCacheAge: TimeInterval
   private(set) var maxCacheSize: Int
-  private var ioQueue: DispatchQueue {
-    return httpFileCache.ioQueue
-  }
+  private(set) var ioQueue: DispatchQueue
+
   private var fileManager: FileManager
   private var transformMetadataToCachedData: TransformMetadataToCachedData
 
@@ -47,6 +46,12 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
     self.fileManager = FileManager()
     self.httpFileCache = httpFileCache
     self.transformMetadataToCachedData = transformMetadataToCachedData
+        
+    self.ioQueue = DispatchQueue(
+      label: CacheConstant.ioQueueLabel,
+      qos: .userInitiated,
+      attributes: .concurrent)
+    
     super.init()
   }
   
