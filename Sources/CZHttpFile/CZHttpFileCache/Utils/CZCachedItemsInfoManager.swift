@@ -1,21 +1,21 @@
 import UIKit
 import CZUtils
 
-internal typealias CachedItemsInfo = [String: [String: Any]]
+internal typealias CachedItemsDict = [String: [String: Any]]
 
-internal class CZCachedItemsInfoManager<DataType: NSObjectProtocol>: NSObject {
+internal class CZCachedItemsDictManager<DataType: NSObjectProtocol>: NSObject {
     
   private var cacheFileManager: CZCacheFileManager
   // TODO: move helper methods to CZCacheUtils to untangle deps on CZBaseHttpFileCache.
   private weak var httpFileCache: CZBaseHttpFileCache<DataType>!
   
-  private lazy var cachedItemsInfoFileURL: URL = {
-    return URL(fileURLWithPath: cacheFileManager.cacheFolder + CacheConstant.kCachedItemsInfoFile)
+  private lazy var cachedItemsDictFileURL: URL = {
+    return URL(fileURLWithPath: cacheFileManager.cacheFolder + CacheConstant.kCachedItemsDictFile)
   }()
   
-  internal lazy var cachedItemsInfoLock: CZMutexLock<CachedItemsInfo> = {
-    let cachedItemsInfo: CachedItemsInfo = loadCachedItemsInfo() ?? [:]
-    return CZMutexLock(cachedItemsInfo)
+  internal lazy var cachedItemsDictLock: CZMutexLock<CachedItemsDict> = {
+    let cachedItemsDict: CachedItemsDict = loadCachedItemsDict() ?? [:]
+    return CZMutexLock(cachedItemsDict)
   }()
       
   public init(cacheFileManager: CZCacheFileManager,
@@ -26,66 +26,66 @@ internal class CZCachedItemsInfoManager<DataType: NSObjectProtocol>: NSObject {
   }
   
   var totalCachedFileSize: Int {
-    return cachedItemsInfoLock.readLock { [weak self] (cachedItemsInfo: CachedItemsInfo) -> Int in
+    return cachedItemsDictLock.readLock { [weak self] (cachedItemsDict: CachedItemsDict) -> Int in
       guard let `self` = self else {return 0}
-      return self.getSizeWithoutLock(cachedItemsInfo: cachedItemsInfo)
+      return self.getSizeWithoutLock(cachedItemsDict: cachedItemsDict)
     } ?? 0
   }
 
-  /// Get total cache size with `cachedItemsInfo`.
-  func getSizeWithoutLock(cachedItemsInfo: CachedItemsInfo) -> Int {
+  /// Get total cache size with `cachedItemsDict`.
+  func getSizeWithoutLock(cachedItemsDict: CachedItemsDict) -> Int {
     var totalCacheSize: Int = 0
-    for (_, value) in cachedItemsInfo {
+    for (_, value) in cachedItemsDict {
       let oneFileSize = (value[CacheConstant.kFileSize] as? Int)  ?? 0
       totalCacheSize += oneFileSize
     }
     return totalCacheSize
   }
   
-  /// Get total cache size with `cachedItemsInfo`.
+  /// Get total cache size with `cachedItemsDict`.
   func urlExistsInCache(_ httpURL: URL) -> Bool {
-    return cachedItemsInfoLock.readLock { [weak self] (cachedItemsInfo) -> Bool? in
+    return cachedItemsDictLock.readLock { [weak self] (cachedItemsDict) -> Bool? in
       guard let `self` = self else { return false}
       
       let (_, cacheKey) = self.httpFileCache.getCacheFileInfo(forURL: httpURL)
-      let urlExistsInCache = (cachedItemsInfo[cacheKey] != nil)
+      let urlExistsInCache = (cachedItemsDict[cacheKey] != nil)
       return urlExistsInCache
     } ?? false
   }
   
-  func setCachedItemsInfo(key: String, subkey: String, value: Any) {
-    cachedItemsInfoLock.writeLock { [weak self] (cachedItemsInfo) -> Void in
+  func setCachedItemsDict(key: String, subkey: String, value: Any) {
+    cachedItemsDictLock.writeLock { [weak self] (cachedItemsDict) -> Void in
       guard let `self` = self else { return }
-      if cachedItemsInfo[key] == nil {
-        cachedItemsInfo[key] = [:]
+      if cachedItemsDict[key] == nil {
+        cachedItemsDict[key] = [:]
       }
-      cachedItemsInfo[key]?[subkey] = value
-      self.flushCachedItemsInfoToDisk(cachedItemsInfo)
+      cachedItemsDict[key]?[subkey] = value
+      self.flushCachedItemsDictToDisk(cachedItemsDict)
     }
   }
   
-  func removeCachedItemsInfo(forKey key: String) {
-    cachedItemsInfoLock.writeLock { [weak self] (cachedItemsInfo) -> Void in
+  func removeCachedItemsDict(forKey key: String) {
+    cachedItemsDictLock.writeLock { [weak self] (cachedItemsDict) -> Void in
       guard let `self` = self else { return }
-      cachedItemsInfo.removeValue(forKey: key)
-      self.flushCachedItemsInfoToDisk(cachedItemsInfo)
+      cachedItemsDict.removeValue(forKey: key)
+      self.flushCachedItemsDictToDisk(cachedItemsDict)
     }
   }
   
-  func removeCachedItemsInfo(forUrl url: URL) {
+  func removeCachedItemsDict(forUrl url: URL) {
     let cacheFileInfo = httpFileCache.getCacheFileInfo(forURL: url)
-    removeCachedItemsInfo(forKey: cacheFileInfo.cacheKey)
+    removeCachedItemsDict(forKey: cacheFileInfo.cacheKey)
   }
   
-  func flushCachedItemsInfoToDisk(_ cachedItemsInfo: CachedItemsInfo) {
-    (cachedItemsInfo as NSDictionary).write(to: cachedItemsInfoFileURL, atomically: true)
+  func flushCachedItemsDictToDisk(_ cachedItemsDict: CachedItemsDict) {
+    (cachedItemsDict as NSDictionary).write(to: cachedItemsDictFileURL, atomically: true)
   }
 }
 
 // MARK: - Private methods
 
-private extension CZCachedItemsInfoManager {
-  func loadCachedItemsInfo() -> CachedItemsInfo? {
-    return NSDictionary(contentsOf: cachedItemsInfoFileURL) as? CachedItemsInfo
+private extension CZCachedItemsDictManager {
+  func loadCachedItemsDict() -> CachedItemsDict? {
+    return NSDictionary(contentsOf: cachedItemsDictFileURL) as? CachedItemsDict
   }
 }
