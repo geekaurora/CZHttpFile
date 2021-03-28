@@ -65,7 +65,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   private var memCache: NSCache<NSString, DataType>
   private var operationQueue: OperationQueue
   
-  private lazy var diskCacheManager: CZDiskCacheManager<DataType> = {
+  private(set) lazy var diskCacheManager: CZDiskCacheManager<DataType> = {
     let diskCacheManager = CZDiskCacheManager(
       maxCacheAge: maxCacheAge,
       maxCacheSize: maxCacheSize,

@@ -168,10 +168,20 @@ extension CZDiskCacheManager {
     guard let httpURL = httpURL else {
       return (nil, false)
     }
+    dbgPrint("CZDiskCacheManager.cachedFileURL() - cacheFileURLs = \(cachedFileURLs())")
+    
     let cacheFileInfo = getCacheFileInfo(forURL: httpURL)
     let fileURL = cacheFileInfo.fileURL
     let isExisting = urlExistsInCache(httpURL)
     return (fileURL, isExisting)
+  }
+  
+  func cachedFileURLs() -> [String] {
+    return cachedItemsDictLock.readLock { (cachedItemsDict) -> [String] in
+      cachedItemsDict.keys.compactMap {
+        return cachedItemsDict[$0]?[CacheConstant.kHttpUrlString] as? String
+      }
+    } ?? []
   }
   
   func cacheFileURL(forKey key: String) -> URL {
