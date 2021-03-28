@@ -30,7 +30,13 @@ final class CZHttpFileCacheTests: XCTestCase {
     let data = CZHTTPJsonSerializer.jsonData(with: MockData.dict)!
     httpFileCache.setCacheFile(withUrl: MockData.testUrl, data: data)
     
-    Thread.sleep(forTimeInterval: 0.01)
+    Thread.sleep(forTimeInterval: 0.05)
+    
+    // Verify file exists with `cachedFileURL(:)`.
+    let (fileURL, isExisting) = httpFileCache.cachedFileURL(forURL: MockData.testUrl)
+    XCTAssert(fileURL != nil, "File should have been saved on disk and cacheItemsDict. url = \(MockData.testUrl), fileURL = \(fileURL)")
+    XCTAssert(isExisting, "File should have been saved on disk and cacheItemsDict. url = \(MockData.testUrl)")
+
     httpFileCache.getCachedFile(withUrl: MockData.testUrl) { (readData: NSData?) in
       let readData = readData as Data?
       XCTAssert(data == readData, "Actual result = \(readData), Expected result = \(data)")
