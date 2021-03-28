@@ -144,8 +144,12 @@ extension CZDiskCacheManager {
     setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileSize, value: fileSize)
   }
   
+  func cachedItemsDictLockWrite<Result>(_ closure: @escaping (inout CachedItemsDict) -> Result?) -> Result? {
+    return cachedItemsDictLock.writeLock(closure)
+  }
+  
   func setCachedItemsDict(key: String, subkey: String, value: Any) {
-    cachedItemsDictLock.writeLock { [weak self] (cachedItemsDict) -> Void in
+    cachedItemsDictLockWrite { [weak self] (cachedItemsDict) -> Void in
       guard let `self` = self else { return }
       if cachedItemsDict[key] == nil {
         cachedItemsDict[key] = [:]
@@ -156,7 +160,7 @@ extension CZDiskCacheManager {
   }
   
   func removeCachedItemsDict(forKey key: String) {
-    cachedItemsDictLock.writeLock { [weak self] (cachedItemsDict) -> Void in
+    cachedItemsDictLockWrite { [weak self] (cachedItemsDict) -> Void in
       guard let `self` = self else { return }
       cachedItemsDict.removeValue(forKey: key)
       self.flushCachedItemsDictToDisk(cachedItemsDict)
@@ -216,7 +220,7 @@ internal extension CZDiskCacheManager {
     let currDate = Date()
     
     // 1. Clean disk by age
-    let removeFileURLs = cachedItemsDictLock.writeLock { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
+    let removeFileURLs = cachedItemsDictLockWrite { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
       var removedKeys = [String]()
       
       // Remove key if its fileModifiedDate exceeds maxCacheAge
@@ -248,7 +252,7 @@ internal extension CZDiskCacheManager {
       let expectedCacheSize = self.maxCacheSize / 2
       let expectedReduceSize = self.totalCachedFileSize - expectedCacheSize
       
-      let removeFileURLs = cachedItemsDictLock.writeLock { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
+      let removeFileURLs = cachedItemsDictLockWrite { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
         // Sort files with last visted date
         let sortedItemsInfo = cachedItemsDict.sorted { (keyValue1: (key: String, value: [String : Any]),
                                                         keyValue2: (key: String, value: [String : Any])) -> Bool in
