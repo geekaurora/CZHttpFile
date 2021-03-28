@@ -30,7 +30,7 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
     downloadingObserverManager = CZDownloadingObserverManager()
     downloadedObserverManager = CZDownloadedObserverManager()
     cache = CZHttpFileCache(downloadedObserverManager: downloadedObserverManager)
-    downloader = CZHttpFileDownloader(cache: cache)
+    downloader = CZHttpFileDownloader(cache: cache, downloadingObserverManager: downloadingObserverManager)
     super.init()    
   }
   
