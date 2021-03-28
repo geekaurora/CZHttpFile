@@ -18,7 +18,7 @@ struct CZDownloadingList: View {
 //  ]
   
   var body: some View {
-    List(listState.downloads, id: \.id) {
+    List(listState.downloads, id: \.diffId) {
       CZDownloadingCell(download: $0)
     }
     .onAppear() {      

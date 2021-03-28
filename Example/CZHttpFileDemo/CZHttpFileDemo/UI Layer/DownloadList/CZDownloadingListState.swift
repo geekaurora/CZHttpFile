@@ -3,11 +3,9 @@ import CZUtils
 import CZHttpFile
 import CZAVPlayer
 
-private var kvoContext: UInt8 = 0
-
 class CZDownloadingListState: NSObject, ObservableObject {
   @Published
-  var downloads: [Download] = []
+  var downloads: [CZDownload] = []
   
   override init() {
     super.init()    
@@ -21,9 +19,9 @@ extension CZDownloadingListState: CZDownloadingObserverProtocol {
   func downloadingURLsDidUpdate(_ downloadingURLs: [URL]) {
     dbgPrint("\(type(of: self)).downloadingURLsDidUpdate() - downloadingURLs = \n\(downloadingURLs)")
     
-    var downloads: [Download] = []
+    var downloads: [CZDownload] = []
     for (id, url) in downloadingURLs.enumerated() {
-      downloads.append(Download(id: id, url: url))
+      downloads.append(CZDownload(url: url))
     }
     self.downloads = downloads
   }

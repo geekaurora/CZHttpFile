@@ -7,7 +7,7 @@ struct CZDownloadingCell: View {
   @State private var downloadAmount = 0.0
   @State private var downloadState = ""
   
-  let download: Download
+  let download: CZDownload
   
   func downloadFile() {
     CZHttpFileManager.shared.downloadFile(
@@ -29,7 +29,7 @@ struct CZDownloadingCell: View {
       ProgressView(download.url.absoluteString, value: downloadAmount, total: 1)
       Text(downloadState)
       
-//      Button("Download")
+//      Button("CZDownload")
 //      {
 //        downloadFile()
 //      }

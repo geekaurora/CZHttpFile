@@ -1,9 +1,9 @@
 import SwiftUI
+import SwiftUIKit
 import CZUtils
 import CZHttpFile
 import CZAVPlayer
 
-struct CZDownload {
-  let id: Int
+struct CZDownload: ListDiffCodable {
   let url: URL
 }
