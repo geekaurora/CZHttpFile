@@ -65,20 +65,13 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   private var memCache: NSCache<NSString, DataType>
   private var operationQueue: OperationQueue
   
-  private(set) lazy var diskCacheManager: CZDiskCacheManager<DataType> = {
-    let diskCacheManager = CZDiskCacheManager(
-      maxCacheAge: maxCacheAge,
-      maxCacheSize: maxCacheSize,
-      cacheFolderName: cacheFolderName,
-      transformMetadataToCachedData: transformMetadataToCachedData)
-    return diskCacheManager
-  }()
-  
+  private(set) var diskCacheManager: CZDiskCacheManager<DataType>!
   private(set) var maxCacheAge: TimeInterval
   private(set) var maxCacheSize: Int
   
   public init(maxCacheAge: TimeInterval = CacheConstant.kMaxFileAge,
-              maxCacheSize: Int = CacheConstant.kMaxCacheSize) {
+              maxCacheSize: Int = CacheConstant.kMaxCacheSize,
+              downloadedObserverManager: CZDownloadedObserverManager? = nil) {
     operationQueue = OperationQueue()
     operationQueue.maxConcurrentOperationCount = 60
     
@@ -90,6 +83,13 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
     self.maxCacheAge = maxCacheAge
     self.maxCacheSize = maxCacheSize
     super.init()
+    
+    diskCacheManager = CZDiskCacheManager(
+      maxCacheAge: maxCacheAge,
+      maxCacheSize: maxCacheSize,
+      cacheFolderName: cacheFolderName,
+      transformMetadataToCachedData: transformMetadataToCachedData,
+      downloadedObserverManager: downloadedObserverManager)
     
     // Clean cache
     cleanDiskCacheIfNeeded()

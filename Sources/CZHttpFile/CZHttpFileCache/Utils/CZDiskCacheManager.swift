@@ -30,20 +30,23 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
   private(set) var maxCacheAge: TimeInterval
   private(set) var maxCacheSize: Int
   private(set) var ioQueue: DispatchQueue
+  private(set) weak var downloadedObserverManager: CZDownloadedObserverManager?
 
   private var fileManager: FileManager
   private var transformMetadataToCachedData: TransformMetadataToCachedData
-
+  
   public init(maxCacheAge: TimeInterval,
               maxCacheSize: Int,
               cacheFolderName: String,
-              transformMetadataToCachedData: @escaping TransformMetadataToCachedData) {
+              transformMetadataToCachedData: @escaping TransformMetadataToCachedData,
+              downloadedObserverManager: CZDownloadedObserverManager? = nil) {
     self.maxCacheAge = maxCacheAge
     self.maxCacheSize = maxCacheSize
     self.cacheFolderName = cacheFolderName
-    self.fileManager = FileManager()
+    self.downloadedObserverManager = downloadedObserverManager
     self.transformMetadataToCachedData = transformMetadataToCachedData
-        
+    self.fileManager = FileManager()
+
     self.ioQueue = DispatchQueue(
       label: CacheConstant.ioQueueLabel,
       qos: .userInitiated,
@@ -178,22 +181,23 @@ extension CZDiskCacheManager {
     let result = cachedItemsDictLock.writeLock(closure)
     
     // Publish DownloadedURLs.
-    if isInInitializer {
-      // Should async in the next runloop, otherwise it will crash as it's in CZHttpFileManager initializer.
-      // TODO: `observers` of observersMananger on background queue isn't correct.
-      MainQueueScheduler.async {
-        self.publishDownloadedURLs()
-      }
-    } else {
-      publishDownloadedURLs()
-    }
+//    if isInInitializer {
+//      // Should async in the next runloop, otherwise it will crash as it's in CZHttpFileManager initializer.
+//      // TODO: `observers` of observersMananger on background queue isn't correct.
+//      MainQueueScheduler.async {
+//        self.publishDownloadedURLs()
+//      }
+//    } else {
+//      publishDownloadedURLs()
+//    }
+    publishDownloadedURLs()
     
     return result
   }
   
   func publishDownloadedURLs() {
     let cachedFileHttpURLs = self.cachedFileHttpURLs().map { URL(string: $0)! }
-    CZHttpFileManager.shared.downloadedObserverManager.publishDownloadedURLs(cachedFileHttpURLs)
+    downloadedObserverManager?.publishDownloadedURLs(cachedFileHttpURLs)
   }
 }
 
