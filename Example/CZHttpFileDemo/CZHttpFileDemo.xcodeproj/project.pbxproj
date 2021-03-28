@@ -156,7 +156,6 @@
 			children = (
 				C326E35526108EF900693C77 /* DownloadingList */,
 				C326E35626108EFE00693C77 /* DownloadedList */,
-				C326E35726108F2700693C77 /* Other */,
 			);
 			path = "UI Layer";
 			sourceTree = "<group>";
@@ -178,15 +177,6 @@
 				C3C4C57B2610786E00D3937A /* CZDownloadedListState.swift */,
 			);
 			path = DownloadedList;
-			sourceTree = "<group>";
-		};
-		C326E35726108F2700693C77 /* Other */ = {
-			isa = PBXGroup;
-			children = (
-				C3C4C56D2610772C00D3937A /* DownloadCell.swift */,
-				C3C4C5712610772C00D3937A /* MultiDownloadsView.swift */,
-			);
-			path = Other;
 			sourceTree = "<group>";
 		};
 		C34204F326079D440072F209 /* Supported_Files */ = {
@@ -213,6 +203,8 @@
 				C30B711B261076FB004B4AE2 /* DownloadList */,
 				C3FDAB4D260779CA004BE699 /* TabsView.swift */,
 				C3E72DB5260F20F7000DDA72 /* SingleDownloadView.swift */,
+				C3C4C56D2610772C00D3937A /* DownloadCell.swift */,
+				C3C4C5712610772C00D3937A /* MultiDownloadsView.swift */,
 			);
 			path = "UI Layer";
 			sourceTree = "<group>";
