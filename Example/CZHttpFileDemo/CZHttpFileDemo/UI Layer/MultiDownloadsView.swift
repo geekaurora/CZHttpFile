@@ -3,8 +3,13 @@ import CZUtils
 import CZHttpFile
 import CZAVPlayer
 
+struct Download {
+  let id: Int
+  let url: URL
+}
+
 struct MultiDownloadsView: View {
-//    let feeds: [Feed] = [
+//    let downloads: [Download] = [
 //      .init(id: 0, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!),
 //      .init(id: 1, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!),
 //      .init(id: 2, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!),
@@ -15,7 +20,7 @@ struct MultiDownloadsView: View {
 //      .init(id: 7, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!),
 //      ]
     
-  let feeds: [Feed] = [
+  let downloads: [Download] = [
     .init(id: 0, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!),
     .init(id: 1, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter02.m4a")!),
     .init(id: 2, url: URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter03.m4a")!),
@@ -26,8 +31,8 @@ struct MultiDownloadsView: View {
   ]
   
   var body: some View {
-    List(feeds, id: \.id) {
-      DownloadCell(feed: $0)
+    List(downloads, id: \.id) {
+      DownloadCell(download: $0)
     }
   }
 }
