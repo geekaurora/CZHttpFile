@@ -28,14 +28,17 @@ struct TabsView: View {
   var body: some View {
     VStack {
         Picker(selection: $favoriteColor, label: Text("What is your favorite color?")) {
-            Text("Red").tag(0)
-            Text("Green").tag(1)
-            Text("Blue").tag(2)
+            Text("Downloading").tag(0)
+            Text("Downloaded").tag(1)
         }
         .pickerStyle(SegmentedPickerStyle())
 
-      //CZDownloadingList()
-      CZDownloadedList()
+      if favoriteColor == 0 {
+        CZDownloadedList()
+        
+      } else {
+        CZDownloadingList()
+      }
     }
     
 //    TabView {
