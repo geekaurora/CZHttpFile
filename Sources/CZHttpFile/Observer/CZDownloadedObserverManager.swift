@@ -20,7 +20,7 @@ public class CZDownloadedObserverManager {
   private var downloadedURLs: [URL] = []
   
   public func publishDownloadedURLs(_ downloadedURLs: [URL]) {
-    dbgPrint("\(type(of: self)).\(#function) - observers = \(observers.allObjects), downloadedURLs = \(downloadedURLs)")
+    dbgPrint("\(type(of: self)).\(#function) - observers = \(observers.allObjects.count), downloadedURLs = \(downloadedURLs)")
     
     self._downloadedURLs.threadLock({ (actualDownloadedURLs) -> Void in
       actualDownloadedURLs = downloadedURLs

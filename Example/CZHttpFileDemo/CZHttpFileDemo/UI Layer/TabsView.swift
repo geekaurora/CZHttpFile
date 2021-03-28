@@ -5,37 +5,36 @@ import CZAVPlayer
 
 /*
  struct TabsView: View {
-     @State private var favoriteColor = 0
+     @State private var selectedIndex = 0
 
      var body: some View {
          VStack {
-             Picker(selection: $favoriteColor, label: Text("What is your favorite color?")) {
+             Picker(selection: $selectedIndex, label: Text("What is your favorite color?")) {
                  Text("Red").tag(0)
                  Text("Green").tag(1)
                  Text("Blue").tag(2)
              }
              .pickerStyle(SegmentedPickerStyle())
 
-             Text("Value: \(favoriteColor)")
+             Text("Value: \(selectedIndex)")
          }
      }
  }
 
  */
 struct TabsView: View {
-  @State private var favoriteColor = 0
+  @State private var selectedIndex = 0
 
   var body: some View {
     VStack {
-        Picker(selection: $favoriteColor, label: Text("What is your favorite color?")) {
-            Text("Downloading").tag(0)
-            Text("Downloaded").tag(1)
+        Picker(selection: $selectedIndex, label: Text("What is your favorite color?")) {
+            Text("Downloaded").tag(0)
+            Text("Downloading").tag(1)
         }
         .pickerStyle(SegmentedPickerStyle())
 
-      if favoriteColor == 0 {
-        CZDownloadedList()
-        
+      if selectedIndex == 0 {
+        CZDownloadedList()        
       } else {
         CZDownloadingList()
       }

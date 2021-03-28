@@ -179,7 +179,9 @@ extension CZDiskCacheManager {
     
     // Publish DownloadedURLs.
     if isInInitializer {
-      DispatchQueue.global(qos: .default).async {
+      // Should async in the next runloop, otherwise it will crash as it's in CZHttpFileManager initializer.
+      // TODO: `observers` of observersMananger on background queue isn't correct.
+      MainQueueScheduler.async {
         self.publishDownloadedURLs()
       }
     } else {
