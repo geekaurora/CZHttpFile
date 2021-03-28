@@ -15,8 +15,6 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
   
   internal typealias TransformMetadataToCachedData = (_ data: Data) -> DataType?
   
-  // TODO: move helper methods to CZCacheUtils to untangle deps on CZBaseHttpFileCache.
-  private weak var httpFileCache: CZBaseHttpFileCache<DataType>!
   private var cacheFolderName: String
   
   private lazy var cachedItemsDictFileURL: URL = {
@@ -38,13 +36,11 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
   public init(maxCacheAge: TimeInterval,
               maxCacheSize: Int,
               cacheFolderName: String,
-              httpFileCache: CZBaseHttpFileCache<DataType>,
               transformMetadataToCachedData: @escaping TransformMetadataToCachedData) {
     self.maxCacheAge = maxCacheAge
     self.maxCacheSize = maxCacheSize
     self.cacheFolderName = cacheFolderName
     self.fileManager = FileManager()
-    self.httpFileCache = httpFileCache
     self.transformMetadataToCachedData = transformMetadataToCachedData
         
     self.ioQueue = DispatchQueue(
@@ -127,6 +123,7 @@ extension CZDiskCacheManager {
 extension CZDiskCacheManager {
   func setCachedItemsDictForNewURL(_ httpURL: URL, fileSize: Int) {
     let (_, cacheKey) = getCacheFileInfo(forURL: httpURL)
+    setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kHttpUrlString, value: httpURL.absoluteString)
     setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileModifiedDate, value: NSDate())
     setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate())
     setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileSize, value: fileSize)

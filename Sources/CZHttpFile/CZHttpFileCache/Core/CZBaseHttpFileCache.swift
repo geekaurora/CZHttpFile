@@ -46,7 +46,7 @@ public enum CacheConstant {
   public static let kCachedItemsDictFile = "cachedItemsDict.plist"
   public static let kFileModifiedDate = "modifiedDate"
   public static let kFileVisitedDate = "visitedDate"
-  public static let kFileHttpUrl = "url"
+  public static let kHttpUrlString = "url"
   public static let kFileSize = "size"
   public static let ioQueueLabel = "com.tony.cache.ioQueue"
 }
@@ -70,7 +70,6 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
       maxCacheAge: maxCacheAge,
       maxCacheSize: maxCacheSize,
       cacheFolderName: cacheFolderName,
-      httpFileCache: self,
       transformMetadataToCachedData: transformMetadataToCachedData)
     return diskCacheManager
   }()
