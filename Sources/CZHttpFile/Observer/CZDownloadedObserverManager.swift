@@ -16,8 +16,14 @@ public protocol CZDownloadedObserverProtocol: class {
  */
 public class CZDownloadedObserverManager {
   private lazy var observers = ThreadSafeWeakArray<CZDownloadedObserverProtocol>()
+  @ThreadSafe
+  private var downloadedURLs: [URL] = []
   
   public func publishDownloadedURLs(_ downloadedURLs: [URL]) {
+    self._downloadedURLs.threadLock({ (actualDownloadedURLs) -> Void in
+      actualDownloadedURLs = downloadedURLs
+    })
+    
     MainQueueScheduler.safeAsync {
       self.observers.allObjects.forEach {
         $0.downloadedURLsDidUpdate(downloadedURLs)
@@ -26,6 +32,9 @@ public class CZDownloadedObserverManager {
   }
   
   public func addObserver(_ observer: CZDownloadedObserverProtocol) {
+    // Publish the latest state to observer.
+    observer.downloadedURLsDidUpdate(downloadedURLs)
+    // Append the observer.
     observers.append(observer)
   }
   

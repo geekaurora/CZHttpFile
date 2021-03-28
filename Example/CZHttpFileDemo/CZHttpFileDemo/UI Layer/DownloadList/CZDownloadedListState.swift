@@ -8,7 +8,8 @@ class CZDownloadedListState: NSObject, ObservableObject {
   var downloads: [CZDownload] = []
   
   override init() {
-    super.init()    
+    super.init()
+    
     CZHttpFileManager.shared.downloadedObserverManager.addObserver(self)
   }
 }
@@ -17,8 +18,17 @@ class CZDownloadedListState: NSObject, ObservableObject {
 
 extension CZDownloadedListState: CZDownloadedObserverProtocol {
   func downloadedURLsDidUpdate(_ downloadedURLs: [URL]) {
-    dbgPrint("\(type(of: self)).downloadedURLsDidUpdate() - downloadedURLs = \n\(downloadedURLs)")
-    
+    dbgPrint("\(type(of: self)).\(#function) - downloadedURLs = \n\(downloadedURLs)")
+    updateWithDownloadedURLs(downloadedURLs)
+  }
+}
+
+// MARK: - Private methods
+
+extension CZDownloadedListState {
+  func updateWithDownloadedURLs(_ downloadedURLs: [URL]) {
+    // dbgPrint("\(type(of: self)).\(#function) - downloadedURLs = \n\(downloadedURLs)")
+
     var downloads: [CZDownload] = []
     for (id, url) in downloadedURLs.enumerated() {
       downloads.append(CZDownload(url: url))
