@@ -11,18 +11,18 @@ class CZDownloadedListState: NSObject, ObservableObject {
   
   override init() {
     super.init()    
-    CZHttpFileManager.shared.downloadingObserverManager.addObserver(self)
+    CZHttpFileManager.shared.downloadedObserverManager.addObserver(self)
   }
 }
 
-// MARK: - CZDownloadingObserverProtocol
+// MARK: - CZDownloadedObserverProtocol
 
-extension CZDownloadedListState: CZDownloadingObserverProtocol {
-  func downloadingURLsDidUpdate(_ downloadingURLs: [URL]) {
-    dbgPrint("\(type(of: self)).downloadingURLsDidUpdate() - downloadingURLs = \n\(downloadingURLs)")
+extension CZDownloadedListState: CZDownloadedObserverProtocol {
+  func downloadedURLsDidUpdate(_ downloadedURLs: [URL]) {
+    dbgPrint("\(type(of: self)).downloadedURLsDidUpdate() - downloadedURLs = \n\(downloadedURLs)")
     
     var downloads: [Download] = []
-    for (id, url) in downloadingURLs.enumerated() {
+    for (id, url) in downloadedURLs.enumerated() {
       downloads.append(Download(id: id, url: url))
     }
     self.downloads = downloads

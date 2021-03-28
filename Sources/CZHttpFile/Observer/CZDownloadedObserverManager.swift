@@ -3,10 +3,10 @@ import CZUtils
 import CZNetworking
 
 /**
- Protocol defines observer that observes downloading tasks.
+ Protocol defines observer that observes downloaded tasks.
  */
 public protocol CZDownloadedObserverProtocol: class {
-  func downloadingURLsDidUpdate(_ downloadingURLs: [URL])
+  func downloadedURLsDidUpdate(_ downloadedURLs: [URL])
 }
 
 /**
@@ -17,10 +17,10 @@ public protocol CZDownloadedObserverProtocol: class {
 public class CZDownloadedObserverManager {
   private lazy var observers = ThreadSafeWeakArray<CZDownloadedObserverProtocol>()
   
-  public func publishDownloadedURLs(_ downloadingURLs: [URL]) {
+  public func publishDownloadedURLs(_ downloadedURLs: [URL]) {
     MainQueueScheduler.safeAsync {
       self.observers.allObjects.forEach {
-        $0.downloadingURLsDidUpdate(downloadingURLs)
+        $0.downloadedURLsDidUpdate(downloadedURLs)
       }
     }
   }
