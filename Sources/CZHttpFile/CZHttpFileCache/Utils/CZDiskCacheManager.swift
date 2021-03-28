@@ -3,6 +3,7 @@ import CZUtils
 
 public typealias CacheFileInfo = (fileURL: URL, cacheKey: String)
 public typealias CleanDiskCacheCompletion = () -> Void
+public typealias SetCacheFileCompletion = () -> Void
 internal typealias CachedItemsDict = [String: [String: Any]]
 
 /**
@@ -83,8 +84,20 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
 // MARK: - Set / Get Cache file
   
 extension CZDiskCacheManager {
-  
-  public func setCacheFile(withUrl url: URL, data: Data?) {
+  /**
+   Set the cache file for `url`.
+   - Note: there're two completions for different usages.
+   Should wait for `completeSetCachedItemsDict` before completes downloading to ensure downloaded state correct,
+   which repies on `cachedItemsDict`.
+   
+   - Parameters:
+     - completeSetCachedItemsDict: called when completes setting CachedItemsDict.
+     - completeSaveCachedFile: called when completes saving file.
+   */
+  public func setCacheFile(withUrl url: URL,
+                           data: Data?,
+                           completeSetCachedItemsDict: SetCacheFileCompletion? = nil,
+                           completeSaveCachedFile: SetCacheFileCompletion? = nil) {
     guard let data = data.assertIfNil else { return }
     let (fileURL, cacheKey) = getCacheFileInfo(forURL: url)
     
@@ -92,8 +105,10 @@ extension CZDiskCacheManager {
     ioQueue.async(flags: .barrier) { [weak self] in
       guard let `self` = self else { return }
       do {
-        try data.write(to: fileURL)
         self.setCachedItemsDictForNewURL(url, fileSize: data.count)
+        completeSetCachedItemsDict?()
+        try data.write(to: fileURL)
+        completeSaveCachedFile?()
       } catch {
         assertionFailure("Failed to write file. Error - \(error.localizedDescription)")
       }

@@ -101,19 +101,34 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   
   // MARK: - Set / Get Cache
   
-  public func setCacheFile(withUrl url: URL, data: Data?) {
+  /**
+   Should wait for `completeSetCachedItemsDict` before completes downloading to ensure downloaded state correct,
+   which repies on `cachedItemsDict`.
+   
+   - Parameters:
+     - completeSetCachedItemsDict: called when completes setting CachedItemsDict.
+     - completeSaveCachedFile: called when completes saving file.
+   */
+  public func setCacheFile(withUrl url: URL,
+                           data: Data?,
+                           completeSetCachedItemsDict: @escaping SetCacheFileCompletion,
+                           completeSaveCachedFile: SetCacheFileCompletion? = nil) {
     guard let data = data.assertIfNil else { return }
     let (_, cacheKey) = diskCacheManager.getCacheFileInfo(forURL: url)
     
+    // Disk Cache.
+    diskCacheManager.setCacheFile(
+      withUrl: url,
+      data: data,
+      completeSetCachedItemsDict: completeSetCachedItemsDict,
+      completeSaveCachedFile: completeSaveCachedFile)
+
     // Mem Cache.
     // `transformMetadataToCachedData` is to transform `Data` to real Data type.
     // e.g. let image = UIImage(data: data)
     if let image = transformMetadataToCachedData(data) {
       setMemCache(image: image, forKey: cacheKey)
     }
-    
-    // Disk Cache.
-    diskCacheManager.setCacheFile(withUrl: url, data: data)
   }
   
   public func getCachedFile(withUrl url: URL,
