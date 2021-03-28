@@ -2,7 +2,7 @@ import Foundation
 import CZUtils
 
 /// CacheFileManager helper class.
-internal class CZCacheFileManager: NSObject {
+internal class CZCacheFolderHelper: NSObject {
   
   private(set) lazy var cacheFolder: String = {
     let cacheFolder = CZFileHelper.documentDirectory + cacheFolderName + "/"

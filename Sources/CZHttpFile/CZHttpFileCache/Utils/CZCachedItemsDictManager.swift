@@ -5,8 +5,8 @@ public typealias CacheFileInfo = (fileURL: URL, cacheKey: String)
 internal typealias CachedItemsDict = [String: [String: Any]]
 
 internal class CZCachedItemsDictManager<DataType: NSObjectProtocol>: NSObject {
-  private(set) lazy var cacheFileManager: CZCacheFileManager = {
-    return CZCacheFileManager(cacheFolderName: cacheFolderName)
+  private(set) lazy var cacheFolderHelper: CZCacheFolderHelper = {
+    return CZCacheFolderHelper(cacheFolderName: cacheFolderName)
   }()
   
   // TODO: move helper methods to CZCacheUtils to untangle deps on CZBaseHttpFileCache.
@@ -14,7 +14,7 @@ internal class CZCachedItemsDictManager<DataType: NSObjectProtocol>: NSObject {
   private var cacheFolderName: String
   
   private lazy var cachedItemsDictFileURL: URL = {
-    return URL(fileURLWithPath: cacheFileManager.cacheFolder + CacheConstant.kCachedItemsDictFile)
+    return URL(fileURLWithPath: cacheFolderHelper.cacheFolder + CacheConstant.kCachedItemsDictFile)
   }()
   
   internal lazy var cachedItemsDictLock: CZMutexLock<CachedItemsDict> = {
@@ -56,6 +56,8 @@ internal class CZCachedItemsDictManager<DataType: NSObjectProtocol>: NSObject {
       return urlExistsInCache
     } ?? false
   }
+  
+  // MARK: - cachedItemsDict
   
   func setCachedItemsDict(key: String, subkey: String, value: Any) {
     cachedItemsDictLock.writeLock { [weak self] (cachedItemsDict) -> Void in
@@ -103,13 +105,13 @@ extension CZCachedItemsDictManager {
   }
   
   func cacheFileURL(forKey key: String) -> URL {
-    return URL(fileURLWithPath: cacheFileManager.cacheFolder + key)
+    return URL(fileURLWithPath: cacheFolderHelper.cacheFolder + key)
   }
     
   func getCacheFileInfo(forURL url: URL) -> CacheFileInfo {
     let urlString = url.absoluteString
     let cacheKey = urlString.MD5 + urlString.fileType(includingDot: true)
-    let fileURL = URL(fileURLWithPath: cacheFileManager.cacheFolder + cacheKey)
+    let fileURL = URL(fileURLWithPath: cacheFolderHelper.cacheFolder + cacheKey)
     return (fileURL: fileURL, cacheKey: cacheKey)
   }
 }
