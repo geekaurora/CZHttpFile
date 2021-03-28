@@ -29,7 +29,7 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
   public override init() {
     cache = CZHttpFileCache()
     downloader = CZHttpFileDownloader(cache: cache)
-    super.init()
+    super.init()    
   }
   
   // MARK: - Download
