@@ -1,0 +1,52 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "CZHttpFile",
+        "repositoryURL": "https://github.com/geekaurora/CZHttpFile.git",
+        "state": {
+          "branch": null,
+          "revision": "dcaf68c29f304e1c92aff483027ba82cd385969d",
+          "version": "1.7.1"
+        }
+      },
+      {
+        "package": "CZNetworking",
+        "repositoryURL": "https://github.com/geekaurora/CZNetworking.git",
+        "state": {
+          "branch": null,
+          "revision": "e3cf18bd67b66e427d135de891ff989f9aaf7848",
+          "version": "3.3.5"
+        }
+      },
+      {
+        "package": "CZTestUtils",
+        "repositoryURL": "https://github.com/geekaurora/CZTestUtils.git",
+        "state": {
+          "branch": null,
+          "revision": "fee1c04183de55cf07ce699e25bc6d27e308f49b",
+          "version": "1.1.2"
+        }
+      },
+      {
+        "package": "CZUtils",
+        "repositoryURL": "https://github.com/geekaurora/CZUtils.git",
+        "state": {
+          "branch": null,
+          "revision": "60fa953610114b8b7c6dbe310514d4c16e9205cb",
+          "version": "3.4.9"
+        }
+      },
+      {
+        "package": "SwiftUIKit",
+        "repositoryURL": "https://github.com/geekaurora/SwiftUIKit.git",
+        "state": {
+          "branch": null,
+          "revision": "35b4e4134f3f55bd9eaa360886f1fc6ef0b3eb99",
+          "version": "1.2.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

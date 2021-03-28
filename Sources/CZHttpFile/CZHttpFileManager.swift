@@ -16,9 +16,12 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
     let shared = CZHttpFileManager()
     return shared
   }()
-  private var downloader: CZHttpFileDownloader<NSData>
+  public private(set) var downloader: CZHttpFileDownloader<NSData>
   public internal(set) var cache: CZHttpFileCache
-
+  
+  public internal(set) lazy var downloadingObserverManager = CZDownloadingObserverManager()
+  public internal(set) lazy var downloadedObserverManager = CZDownloadedObserverManager()
+  
   public enum Config {
     public static var maxConcurrencies = 5
   }
@@ -26,8 +29,10 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
   public override init() {
     cache = CZHttpFileCache()
     downloader = CZHttpFileDownloader(cache: cache)
-    super.init()
+    super.init()    
   }
+  
+  // MARK: - Download
   
   public func downloadFile(url: URL,
                            priority: Operation.QueuePriority = .normal,

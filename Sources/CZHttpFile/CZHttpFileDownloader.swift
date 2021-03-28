@@ -25,8 +25,7 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
   private let httpFileDecodeQueue: OperationQueue
   private let shouldObserveOperations: Bool
   private let cache: CZBaseHttpFileCache<DataType>
-  @ThreadSafe
-  private(set) var downloadingURLs: [URL] = []
+  @ThreadSafe public private(set) var downloadingURLs: [URL] = []
 
   public init(cache: CZBaseHttpFileCache<DataType>,
               downloadQueueMaxConcurrent: Int = CZHttpFileDownloaderConstant.downloadQueueMaxConcurrent,
@@ -142,8 +141,9 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
     if object === httpFileDownloadQueue {
       if let fileDownloadOperations = object.operations as? [HttpFileDownloadOperation] {
         _downloadingURLs.threadLock { downloadingURLs in
-          downloadingURLs = fileDownloadOperations.map(\.url)          
+          downloadingURLs = fileDownloadOperations.map(\.url)
         }
+        CZHttpFileManager.shared.downloadingObserverManager.publishDownloadingURLs(downloadingURLs)
       }
       
       if shouldObserveOperations {

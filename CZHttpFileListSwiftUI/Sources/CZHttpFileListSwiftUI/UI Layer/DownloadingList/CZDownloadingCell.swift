@@ -1,9 +1,8 @@
 import SwiftUI
 import CZUtils
 import CZHttpFile
-import CZAVPlayer
 
-struct DownloadCell: View {
+struct CZDownloadingCell: View {
   @State private var downloadAmount = 0.0
   @State private var downloadState = ""
   
@@ -27,15 +26,15 @@ struct DownloadCell: View {
   var body: some View {
     VStack {
       ProgressView(download.url.absoluteString, value: downloadAmount, total: 1)
-      
       Text(downloadState)
       
-      Button("Download") {
-        downloadFile()
-      }
+//      Button("CZDownload")
+//      {
+//        downloadFile()
+//      }
     }
     .onAppear {
-      downloadFile()
+      // downloadFile()
     }
   }
 }

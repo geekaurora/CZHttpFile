@@ -22,7 +22,7 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
     return URL(fileURLWithPath: cacheFolderHelper.cacheFolder + CacheConstant.kCachedItemsDictFile)
   }()
   
-  internal lazy var cachedItemsDictLock: CZMutexLock<CachedItemsDict> = {
+  lazy var cachedItemsDictLock: CZMutexLock<CachedItemsDict> = {
     let cachedItemsDict: CachedItemsDict = loadCachedItemsDict() ?? [:]
     return CZMutexLock(cachedItemsDict)
   }()
@@ -143,9 +143,9 @@ extension CZDiskCacheManager {
     setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate())
     setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileSize, value: fileSize)
   }
-  
+   
   func setCachedItemsDict(key: String, subkey: String, value: Any) {
-    cachedItemsDictLock.writeLock { [weak self] (cachedItemsDict) -> Void in
+    cachedItemsDictLockWrite { [weak self] (cachedItemsDict) -> Void in
       guard let `self` = self else { return }
       if cachedItemsDict[key] == nil {
         cachedItemsDict[key] = [:]
@@ -156,7 +156,7 @@ extension CZDiskCacheManager {
   }
   
   func removeCachedItemsDict(forKey key: String) {
-    cachedItemsDictLock.writeLock { [weak self] (cachedItemsDict) -> Void in
+    cachedItemsDictLockWrite { [weak self] (cachedItemsDict) -> Void in
       guard let `self` = self else { return }
       cachedItemsDict.removeValue(forKey: key)
       self.flushCachedItemsDictToDisk(cachedItemsDict)
@@ -170,6 +170,30 @@ extension CZDiskCacheManager {
   
   func flushCachedItemsDictToDisk(_ cachedItemsDict: CachedItemsDict) {
     (cachedItemsDict as NSDictionary).write(to: cachedItemsDictFileURL, atomically: true)
+  }
+  
+  func cachedItemsDictLockWrite<Result>(isInInitializer: Bool = true,
+                                        closure: @escaping (inout CachedItemsDict) -> Result?) -> Result? {
+    // Get result throught write lock.
+    let result = cachedItemsDictLock.writeLock(closure)
+    
+    // Publish DownloadedURLs.
+    if isInInitializer {
+      // Should async in the next runloop, otherwise it will crash as it's in CZHttpFileManager initializer.
+      // TODO: `observers` of observersMananger on background queue isn't correct.
+      MainQueueScheduler.async {
+        self.publishDownloadedURLs()
+      }
+    } else {
+      publishDownloadedURLs()
+    }
+    
+    return result
+  }
+  
+  func publishDownloadedURLs() {
+    let cachedFileHttpURLs = self.cachedFileHttpURLs().map { URL(string: $0)! }
+    CZHttpFileManager.shared.downloadedObserverManager.publishDownloadedURLs(cachedFileHttpURLs)
   }
 }
 
@@ -189,7 +213,8 @@ extension CZDiskCacheManager {
     return (fileURL, isExisting)
   }
   
-  func cachedFileURLs() -> [String] {
+  /// Http URLs of downloaded files.
+  func cachedFileHttpURLs() -> [String] {
     return cachedItemsDictLock.readLock { (cachedItemsDict) -> [String] in
       cachedItemsDict.keys.compactMap {
         return cachedItemsDict[$0]?[CacheConstant.kHttpUrlString] as? String
@@ -216,7 +241,8 @@ internal extension CZDiskCacheManager {
     let currDate = Date()
     
     // 1. Clean disk by age
-    let removeFileURLs = cachedItemsDictLock.writeLock { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
+    // - Note: shouldn't publish DownloadedURLs as CZHttpFileManager isn't initialized yet.
+    let removeFileURLs = cachedItemsDictLockWrite(isInInitializer: true) { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
       var removedKeys = [String]()
       
       // Remove key if its fileModifiedDate exceeds maxCacheAge
@@ -248,7 +274,7 @@ internal extension CZDiskCacheManager {
       let expectedCacheSize = self.maxCacheSize / 2
       let expectedReduceSize = self.totalCachedFileSize - expectedCacheSize
       
-      let removeFileURLs = cachedItemsDictLock.writeLock { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
+      let removeFileURLs = cachedItemsDictLockWrite(isInInitializer: true) { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
         // Sort files with last visted date
         let sortedItemsInfo = cachedItemsDict.sorted { (keyValue1: (key: String, value: [String : Any]),
                                                         keyValue2: (key: String, value: [String : Any])) -> Bool in
