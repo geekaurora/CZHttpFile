@@ -17,7 +17,11 @@ public class CZDownloadingObserverManager {
   private lazy var observers = ThreadSafeWeakArray<CZDownloadingObserverProtocol>()
   
   public func publishDownloadingURLs(_ downloadingURLs: [URL]) {
-    observers.allObjects.forEach { $0.downloadingURLsDidUpdate(downloadingURLs) }
+    MainQueueScheduler.safeAsync {
+      self.observers.allObjects.forEach {
+        $0.downloadingURLsDidUpdate(downloadingURLs)
+      }
+    }
   }
   
   public func addObserver(_ observer: CZDownloadingObserverProtocol) {
