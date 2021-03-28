@@ -19,14 +19,16 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
   public private(set) var downloader: CZHttpFileDownloader<NSData>
   public internal(set) var cache: CZHttpFileCache
   
-  public internal(set) lazy var downloadingObserverManager = CZDownloadingObserverManager()
-  public internal(set) lazy var downloadedObserverManager = CZDownloadedObserverManager()
+  public internal(set) var downloadingObserverManager: CZDownloadingObserverManager
+  public internal(set) var downloadedObserverManager: CZDownloadedObserverManager
   
   public enum Config {
     public static var maxConcurrencies = 5
   }
   
   public override init() {
+    downloadingObserverManager = CZDownloadingObserverManager()
+    downloadedObserverManager = CZDownloadedObserverManager()
     cache = CZHttpFileCache()
     downloader = CZHttpFileDownloader(cache: cache)
     super.init()    

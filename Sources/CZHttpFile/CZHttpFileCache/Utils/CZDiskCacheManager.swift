@@ -30,20 +30,23 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
   private(set) var maxCacheAge: TimeInterval
   private(set) var maxCacheSize: Int
   private(set) var ioQueue: DispatchQueue
+  private(set) weak var downloadedObserverManager: CZDownloadedObserverManager?
 
   private var fileManager: FileManager
   private var transformMetadataToCachedData: TransformMetadataToCachedData
-
+  
   public init(maxCacheAge: TimeInterval,
               maxCacheSize: Int,
               cacheFolderName: String,
-              transformMetadataToCachedData: @escaping TransformMetadataToCachedData) {
+              transformMetadataToCachedData: @escaping TransformMetadataToCachedData,
+              downloadedObserverManager: CZDownloadedObserverManager? = nil) {
     self.maxCacheAge = maxCacheAge
     self.maxCacheSize = maxCacheSize
     self.cacheFolderName = cacheFolderName
-    self.fileManager = FileManager()
+    self.downloadedObserverManager = downloadedObserverManager
     self.transformMetadataToCachedData = transformMetadataToCachedData
-        
+    self.fileManager = FileManager()
+
     self.ioQueue = DispatchQueue(
       label: CacheConstant.ioQueueLabel,
       qos: .userInitiated,
