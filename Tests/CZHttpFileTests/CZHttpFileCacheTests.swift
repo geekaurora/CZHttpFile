@@ -28,7 +28,7 @@ final class CZHttpFileCacheTests: XCTestCase {
     let (waitForExpectatation, expectation) = CZTestUtils.waitWithInterval(1, testCase: self)
     
     let data = CZHTTPJsonSerializer.jsonData(with: MockData.dict)!
-    httpFileCache.setCacheFile(withUrl: MockData.testUrl, data: data)
+    httpFileCache.setCacheFile(withUrl: MockData.testUrl, data: data, completeSetCachedItemsDict: nil)
     
     Thread.sleep(forTimeInterval: 0.05)
     

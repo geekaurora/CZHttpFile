@@ -111,7 +111,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
    */
   public func setCacheFile(withUrl url: URL,
                            data: Data?,
-                           completeSetCachedItemsDict: @escaping SetCacheFileCompletion,
+                           completeSetCachedItemsDict: SetCacheFileCompletion?,
                            completeSaveCachedFile: SetCacheFileCompletion? = nil) {
     guard let data = data.assertIfNil else { return }
     let (_, cacheKey) = diskCacheManager.getCacheFileInfo(forURL: url)
