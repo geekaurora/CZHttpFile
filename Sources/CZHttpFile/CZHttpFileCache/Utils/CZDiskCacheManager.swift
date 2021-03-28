@@ -141,21 +141,29 @@ extension CZDiskCacheManager {
 extension CZDiskCacheManager {
   func setCachedItemsDictForNewURL(_ httpURL: URL, fileSize: Int) {
     let (_, cacheKey) = getCacheFileInfo(forURL: httpURL)
-    setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kHttpUrlString, value: httpURL.absoluteString)
-    setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileModifiedDate, value: NSDate())
-    setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate())
-    setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileSize, value: fileSize)
+    
+    cachedItemsDictLockWrite { [weak self] (cachedItemsDict) -> Void in
+      guard let `self` = self else { return }
+      self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: cacheKey, subkey: CacheConstant.kHttpUrlString, value: httpURL.absoluteString)
+      self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: cacheKey, subkey: CacheConstant.kFileModifiedDate, value: NSDate())
+      self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate())
+      self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: cacheKey, subkey: CacheConstant.kFileSize, value: fileSize)
+    }
   }
    
   func setCachedItemsDict(key: String, subkey: String, value: Any) {
     cachedItemsDictLockWrite { [weak self] (cachedItemsDict) -> Void in
       guard let `self` = self else { return }
+      self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: key, subkey: subkey, value: value)
+    }
+  }
+  
+  func setCachedItemsDictWithoutLock(cachedItemsDict: inout CachedItemsDict, key: String, subkey: String, value: Any) {
       if cachedItemsDict[key] == nil {
         cachedItemsDict[key] = [:]
       }
       cachedItemsDict[key]?[subkey] = value
       self.flushCachedItemsDictToDisk(cachedItemsDict)
-    }
   }
   
   func removeCachedItemsDict(forKey key: String) {
@@ -181,15 +189,6 @@ extension CZDiskCacheManager {
     let result = cachedItemsDictLock.writeLock(closure)
     
     // Publish DownloadedURLs.
-//    if isInInitializer {
-//      // Should async in the next runloop, otherwise it will crash as it's in CZHttpFileManager initializer.
-//      // TODO: `observers` of observersMananger on background queue isn't correct.
-//      MainQueueScheduler.async {
-//        self.publishDownloadedURLs()
-//      }
-//    } else {
-//      publishDownloadedURLs()
-//    }
     publishDownloadedURLs()
     
     return result
@@ -220,7 +219,14 @@ extension CZDiskCacheManager {
   /// Http URLs of downloaded files.
   func cachedFileHttpURLs() -> [String] {
     return cachedItemsDictLock.readLock { (cachedItemsDict) -> [String] in
-      cachedItemsDict.keys.compactMap {
+      cachedItemsDict
+        .keys
+        .sorted(by: { (key0, key1) -> Bool in
+          let modifiedDate0 = cachedItemsDict[key0]?[CacheConstant.kFileModifiedDate] as? Date
+          let modifiedDate1 = cachedItemsDict[key1]?[CacheConstant.kFileModifiedDate] as? Date
+          return modifiedDate1!.timeIntervalSince(modifiedDate0!)  > 0
+        })
+        .compactMap {
         return cachedItemsDict[$0]?[CacheConstant.kHttpUrlString] as? String
       }
     } ?? []
