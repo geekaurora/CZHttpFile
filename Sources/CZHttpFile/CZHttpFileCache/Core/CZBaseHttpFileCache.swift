@@ -102,7 +102,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   // MARK: - Set / Get Cache
   
   /**
-   Should wait for `completeSetCachedItemsDict` before completes downloading to ensure downloaded state correct,
+   - Note: Should wait for `completeSetCachedItemsDict` before completes downloading to ensure downloaded state correct,
    which repies on `cachedItemsDict`.
    
    - Parameters:

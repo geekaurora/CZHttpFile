@@ -182,9 +182,7 @@ extension CZDiskCacheManager {
   func cachedFileURL(forURL httpURL: URL?) -> (fileURL: URL?, isExisting: Bool) {
     guard let httpURL = httpURL else {
       return (nil, false)
-    }
-    dbgPrint("CZDiskCacheManager.cachedFileURL() - cacheFileURLs = \(cachedFileURLs())")
-    
+    }    
     let cacheFileInfo = getCacheFileInfo(forURL: httpURL)
     let fileURL = cacheFileInfo.fileURL
     let isExisting = urlExistsInCache(httpURL)
