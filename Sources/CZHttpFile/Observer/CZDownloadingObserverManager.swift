@@ -3,14 +3,8 @@ import CZUtils
 import CZNetworking
 
 /**
- Protocol defines observer that observes downloading tasks.
- */
-public protocol CZDownloadingObserverProtocol: class {
-  func downloadingURLsDidUpdate(_ downloadingURLs: [URL])
-}
-
-/**
- Manager maintains observers of download states.
+ Manager maintains observers of downloading states.
+ 
  - Note: It only holds weak reference to observers.
  */
 public class CZDownloadingObserverManager {

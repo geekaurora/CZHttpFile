@@ -18,6 +18,8 @@
 		C3C4C5762610772C00D3937A /* CZDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3C4C5702610772C00D3937A /* CZDownload.swift */; };
 		C3C4C5772610772C00D3937A /* MultiDownloadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3C4C5712610772C00D3937A /* MultiDownloadsView.swift */; };
 		C3C4C5782610772C00D3937A /* CZDownloadingListState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3C4C5722610772C00D3937A /* CZDownloadingListState.swift */; };
+		C3C4C57D2610786E00D3937A /* CZDownloadedListState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3C4C57B2610786E00D3937A /* CZDownloadedListState.swift */; };
+		C3C4C57E2610786E00D3937A /* CZDownloadedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3C4C57C2610786E00D3937A /* CZDownloadedList.swift */; };
 		C3E72DB6260F20F7000DDA72 /* SingleDownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3E72DB5260F20F7000DDA72 /* SingleDownloadView.swift */; };
 		C3E72DBE260F21AA000DDA72 /* Feed.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3E72DBD260F21AA000DDA72 /* Feed.swift */; };
 		C3FDAB4C260779CA004BE699 /* CZHttpFileDemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3FDAB4B260779CA004BE699 /* CZHttpFileDemoApp.swift */; };
@@ -80,6 +82,8 @@
 		C3C4C5702610772C00D3937A /* CZDownload.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CZDownload.swift; sourceTree = "<group>"; };
 		C3C4C5712610772C00D3937A /* MultiDownloadsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultiDownloadsView.swift; sourceTree = "<group>"; };
 		C3C4C5722610772C00D3937A /* CZDownloadingListState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CZDownloadingListState.swift; sourceTree = "<group>"; };
+		C3C4C57B2610786E00D3937A /* CZDownloadedListState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CZDownloadedListState.swift; sourceTree = "<group>"; };
+		C3C4C57C2610786E00D3937A /* CZDownloadedList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CZDownloadedList.swift; sourceTree = "<group>"; };
 		C3E72DB5260F20F7000DDA72 /* SingleDownloadView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SingleDownloadView.swift; sourceTree = "<group>"; };
 		C3E72DBD260F21AA000DDA72 /* Feed.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Feed.swift; sourceTree = "<group>"; };
 		C3FDAB48260779CA004BE699 /* CZHttpFileDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CZHttpFileDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -134,6 +138,8 @@
 				C3C4C56F2610772C00D3937A /* CZDownloadingCell.swift */,
 				C3C4C56E2610772C00D3937A /* CZDownloadingList.swift */,
 				C3C4C5722610772C00D3937A /* CZDownloadingListState.swift */,
+				C3C4C57C2610786E00D3937A /* CZDownloadedList.swift */,
+				C3C4C57B2610786E00D3937A /* CZDownloadedListState.swift */,
 				C3C4C56D2610772C00D3937A /* DownloadCell.swift */,
 				C3C4C5712610772C00D3937A /* MultiDownloadsView.swift */,
 			);
@@ -388,7 +394,9 @@
 				C3C4C5742610772C00D3937A /* CZDownloadingList.swift in Sources */,
 				C3C4C5782610772C00D3937A /* CZDownloadingListState.swift in Sources */,
 				C3FDAB4E260779CA004BE699 /* TabsView.swift in Sources */,
+				C3C4C57D2610786E00D3937A /* CZDownloadedListState.swift in Sources */,
 				C3FDAB4C260779CA004BE699 /* CZHttpFileDemoApp.swift in Sources */,
+				C3C4C57E2610786E00D3937A /* CZDownloadedList.swift in Sources */,
 				C3C4C5732610772C00D3937A /* DownloadCell.swift in Sources */,
 				C3E72DB6260F20F7000DDA72 /* SingleDownloadView.swift in Sources */,
 			);
