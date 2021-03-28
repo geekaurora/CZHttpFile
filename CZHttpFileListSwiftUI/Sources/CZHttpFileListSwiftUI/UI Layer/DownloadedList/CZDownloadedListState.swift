@@ -17,7 +17,7 @@ class CZDownloadedListState: NSObject, ObservableObject {
 
 extension CZDownloadedListState: CZDownloadedObserverProtocol {
   func downloadedURLsDidUpdate(_ downloadedURLs: [URL]) {
-    //dbgPrint("\(type(of: self)).\(#function) - downloadedURLs = \n\(downloadedURLs)")
+    dbgPrint("\(type(of: self)).\(#function) - downloadedURLs = \n\(downloadedURLs)")
     updateWithDownloadedURLs(downloadedURLs)
   }
 }
