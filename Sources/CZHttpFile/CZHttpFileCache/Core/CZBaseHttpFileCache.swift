@@ -103,7 +103,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   
   public func setCacheFile(withUrl url: URL, data: Data?) {
     guard let data = data.assertIfNil else { return }
-    let (fileURL, cacheKey) = diskCacheManager.getCacheFileInfo(forURL: url)
+    let (_, cacheKey) = diskCacheManager.getCacheFileInfo(forURL: url)
     
     // Mem cache
     // `transformMetadataToCachedData` is to transform `Data` to real Data type.
@@ -113,15 +113,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
     }
     
     // Disk cache
-    ioQueue.async(flags: .barrier) { [weak self] in
-      guard let `self` = self else { return }
-      do {
-        try data.write(to: fileURL)
-        self.diskCacheManager.setCachedItemsDictForNewURL(url, fileSize: data.count)
-      } catch {
-        assertionFailure("Failed to write file. Error - \(error.localizedDescription)")
-      }
-    }
+    diskCacheManager.setCacheFile(withUrl: url, data: data)
   }
   
   public func getCachedFile(withUrl url: URL,

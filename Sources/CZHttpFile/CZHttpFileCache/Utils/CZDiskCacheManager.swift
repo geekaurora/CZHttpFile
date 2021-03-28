@@ -72,9 +72,32 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
       return urlExistsInCache
     } ?? false
   }
+}
+
+// MARK: - Set / Get Cache File
   
-  // MARK: - cachedItemsDict
+extension CZDiskCacheManager {
   
+  public func setCacheFile(withUrl url: URL, data: Data?) {
+    guard let data = data.assertIfNil else { return }
+    let (fileURL, cacheKey) = getCacheFileInfo(forURL: url)
+    
+    // Disk cache
+    ioQueue.async(flags: .barrier) { [weak self] in
+      guard let `self` = self else { return }
+      do {
+        try data.write(to: fileURL)
+        self.setCachedItemsDictForNewURL(url, fileSize: data.count)
+      } catch {
+        assertionFailure("Failed to write file. Error - \(error.localizedDescription)")
+      }
+    }
+  }
+}
+
+// MARK: - cachedItemsDict
+  
+extension CZDiskCacheManager {
   func setCachedItemsDictForNewURL(_ httpURL: URL, fileSize: Int) {
     let (_, cacheKey) = getCacheFileInfo(forURL: httpURL)
     setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileModifiedDate, value: NSDate())
