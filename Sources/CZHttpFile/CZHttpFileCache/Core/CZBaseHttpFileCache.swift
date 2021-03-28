@@ -71,7 +71,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
       maxCacheSize: maxCacheSize,
       cacheFolderName: cacheFolderName,
       httpFileCache: self,
-      transformMetadataToCachedData: self.transformMetadataToCachedData)
+      transformMetadataToCachedData: transformMetadataToCachedData)
     return diskCacheManager
   }()
   
@@ -96,29 +96,37 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
     cleanDiskCacheIfNeeded()
   }
   
+  var size: Int {
+    return diskCacheManager.totalCachedFileSize
+  }
+  
+  // MARK: - Set / Get Cache
+  
   public func setCacheFile(withUrl url: URL, data: Data?) {
     guard let data = data.assertIfNil else { return }
     let (_, cacheKey) = diskCacheManager.getCacheFileInfo(forURL: url)
     
-    // Mem cache
+    // Mem Cache.
     // `transformMetadataToCachedData` is to transform `Data` to real Data type.
     // e.g. let image = UIImage(data: data)
     if let image = transformMetadataToCachedData(data) {
       setMemCache(image: image, forKey: cacheKey)
     }
     
-    // Disk cache
+    // Disk Cache.
     diskCacheManager.setCacheFile(withUrl: url, data: data)
   }
   
   public func getCachedFile(withUrl url: URL,
                             completion: @escaping (DataType?) -> Void)  {
-    let (fileURL, cacheKey) = diskCacheManager.getCacheFileInfo(forURL: url)
+    let (_, cacheKey) = diskCacheManager.getCacheFileInfo(forURL: url)
     // Read data from mem cache
     var image = self.getMemCache(forKey: cacheKey)
     
     // Read data from disk cache
     if image == nil {
+      dbgPrint("\(type(of: self)).getCachedFile() - Read from disk cache. url = \(url)")
+      
       diskCacheManager.getCachedFile(withUrl: url) { (decodedData) in
         // Assign decodedData from disk cache.
         image = decodedData
@@ -133,10 +141,6 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
     MainQueueScheduler.sync {
       completion(image)
     }
-  }
-  
-  var size: Int {
-    return diskCacheManager.totalCachedFileSize
   }
   
   // MARK: - Overriden methods
@@ -183,5 +187,4 @@ internal extension CZBaseHttpFileCache {
   func cleanDiskCacheIfNeeded(completion: CleanDiskCacheCompletion? = nil) {
     diskCacheManager.cleanDiskCacheIfNeeded(completion: completion)    
   }
-  
 }

@@ -84,7 +84,7 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
   }
 }
 
-// MARK: - Set / Get Cached File
+// MARK: - Set / Get Cache file
   
 extension CZDiskCacheManager {
   
