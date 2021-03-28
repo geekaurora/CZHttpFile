@@ -117,9 +117,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
       guard let `self` = self else { return }
       do {
         try data.write(to: fileURL)
-        self.diskCacheManager.setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileModifiedDate, value: NSDate())
-        self.diskCacheManager.setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate())
-        self.diskCacheManager.setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileSize, value: data.count)
+        self.diskCacheManager.setCachedItemsDictForNewURL(url, fileSize: data.count)
       } catch {
         assertionFailure("Failed to write file. Error - \(error.localizedDescription)")
       }
@@ -197,10 +195,6 @@ internal extension CZBaseHttpFileCache {
       forKey: NSString(string: key),
       cost: cost)
   }
-  
-//  func cacheFileURL(forKey key: String) -> URL {
-//    return URL(fileURLWithPath: diskCacheManager.cacheFolder + key)
-//  }
   
   func cleanDiskCacheIfNeeded(completion: CleanDiskCacheCompletion? = nil){
     let currDate = Date()

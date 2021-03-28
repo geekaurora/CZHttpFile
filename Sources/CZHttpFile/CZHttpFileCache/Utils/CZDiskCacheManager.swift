@@ -62,6 +62,13 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
   
   // MARK: - cachedItemsDict
   
+  func setCachedItemsDictForNewURL(_ httpURL: URL, fileSize: Int) {
+    let (fileURL, cacheKey) = getCacheFileInfo(forURL: httpURL)
+    setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileModifiedDate, value: NSDate())
+    setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate())
+    setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileSize, value: fileSize)
+  }
+  
   func setCachedItemsDict(key: String, subkey: String, value: Any) {
     cachedItemsDictLock.writeLock { [weak self] (cachedItemsDict) -> Void in
       guard let `self` = self else { return }
