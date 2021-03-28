@@ -43,7 +43,7 @@ import CZUtils
 public enum CacheConstant {
   public static let kMaxFileAge: TimeInterval = 60 * 24 * 60 * 60
   public static let kMaxCacheSize: Int = 500 * 1024 * 1024
-  public static let kCachedItemsInfoFile = "cachedItemsInfo.plist"
+  public static let kCachedItemsDictFile = "cachedItemsDict.plist"
   public static let kFileModifiedDate = "modifiedDate"
   public static let kFileVisitedDate = "visitedDate"
   public static let kFileSize = "size"
@@ -70,11 +70,11 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   private lazy var cacheFileManager: CZCacheFileManager = {
     return CZCacheFileManager(cacheFolderName: cacheFolderName)
   }()
-  private lazy var cachedItemsInfoManager: CZCachedItemsInfoManager<DataType> = {
-    let cachedItemsInfoManager = CZCachedItemsInfoManager(
+  private lazy var cachedItemsDictManager: CZCachedItemsDictManager<DataType> = {
+    let cachedItemsDictManager = CZCachedItemsDictManager(
       cacheFileManager: cacheFileManager,
       httpFileCache: self)
-    return cachedItemsInfoManager
+    return cachedItemsDictManager
   }()
   
   private(set) var maxCacheAge: TimeInterval
@@ -120,9 +120,9 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
       guard let `self` = self else { return }
       do {
         try data.write(to: fileURL)
-        self.cachedItemsInfoManager.setCachedItemsInfo(key: cacheKey, subkey: CacheConstant.kFileModifiedDate, value: NSDate())
-        self.cachedItemsInfoManager.setCachedItemsInfo(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate())
-        self.cachedItemsInfoManager.setCachedItemsInfo(key: cacheKey, subkey: CacheConstant.kFileSize, value: data.count)
+        self.cachedItemsDictManager.setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileModifiedDate, value: NSDate())
+        self.cachedItemsDictManager.setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate())
+        self.cachedItemsDictManager.setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileSize, value: data.count)
       } catch {
         assertionFailure("Failed to write file. Error - \(error.localizedDescription)")
       }
@@ -142,7 +142,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
            // let image = UIImage(data: data)
            let image = transformMetadataToCachedData(data).assertIfNil {
           // Update last visited date
-          self.cachedItemsInfoManager.setCachedItemsInfo(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate())
+          self.cachedItemsDictManager.setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate())
           // Set mem cache after loading data from local drive
           self.setMemCache(image: image, forKey: cacheKey)
           return image
@@ -157,7 +157,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   }
   
   var size: Int {
-    return cachedItemsInfoManager.totalCachedFileSize
+    return cachedItemsDictManager.totalCachedFileSize
   }
   
   // MARK: - Overriden methods
@@ -185,7 +185,7 @@ public extension CZBaseHttpFileCache {
     }
     let cacheFileInfo = getCacheFileInfo(forURL: httpURL)
     let fileURL = cacheFileInfo.fileURL
-    let isExisting = cachedItemsInfoManager.urlExistsInCache(httpURL)
+    let isExisting = cachedItemsDictManager.urlExistsInCache(httpURL)
     return (fileURL, isExisting)
   }
   
@@ -220,18 +220,18 @@ internal extension CZBaseHttpFileCache {
     let currDate = Date()
     
     // 1. Clean disk by age
-    let removeFileURLs = cachedItemsInfoManager.cachedItemsInfoLock.writeLock { (cachedItemsInfo: inout CachedItemsInfo) -> [URL] in
+    let removeFileURLs = cachedItemsDictManager.cachedItemsDictLock.writeLock { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
       var removedKeys = [String]()
       
       // Remove key if its fileModifiedDate exceeds maxCacheAge
-      cachedItemsInfo.forEach { (keyValue: (key: String, value: [String : Any])) in
+      cachedItemsDict.forEach { (keyValue: (key: String, value: [String : Any])) in
         if let modifiedDate = keyValue.value[CacheConstant.kFileModifiedDate] as? Date,
            currDate.timeIntervalSince(modifiedDate) > self.maxCacheAge {
           removedKeys.append(keyValue.key)
-          cachedItemsInfo.removeValue(forKey: keyValue.key)
+          cachedItemsDict.removeValue(forKey: keyValue.key)
         }
       }
-      self.cachedItemsInfoManager.flushCachedItemsInfoToDisk(cachedItemsInfo)
+      self.cachedItemsDictManager.flushCachedItemsDictToDisk(cachedItemsDict)
       let removeFileURLs = removedKeys.compactMap{ self.cacheFileURL(forKey: $0) }
       return removeFileURLs
     }
@@ -252,9 +252,9 @@ internal extension CZBaseHttpFileCache {
       let expectedCacheSize = self.maxCacheSize / 2
       let expectedReduceSize = self.size - expectedCacheSize
       
-      let removeFileURLs = cachedItemsInfoManager.cachedItemsInfoLock.writeLock { (cachedItemsInfo: inout CachedItemsInfo) -> [URL] in
+      let removeFileURLs = cachedItemsDictManager.cachedItemsDictLock.writeLock { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
         // Sort files with last visted date
-        let sortedItemsInfo = cachedItemsInfo.sorted { (keyValue1: (key: String, value: [String : Any]),
+        let sortedItemsInfo = cachedItemsDict.sorted { (keyValue1: (key: String, value: [String : Any]),
                                                         keyValue2: (key: String, value: [String : Any])) -> Bool in
           if let modifiedDate1 = keyValue1.value[CacheConstant.kFileVisitedDate] as? Date,
              let modifiedDate2 = keyValue2.value[CacheConstant.kFileVisitedDate] as? Date {
@@ -270,12 +270,12 @@ internal extension CZBaseHttpFileCache {
           if removedFilesSize >= expectedReduceSize {
             break
           }
-          cachedItemsInfo.removeValue(forKey: key)
+          cachedItemsDict.removeValue(forKey: key)
           removedKeys.append(key)
           let oneFileSize = (value[CacheConstant.kFileSize] as? Int) ?? 0
           removedFilesSize += oneFileSize
         }
-        self.cachedItemsInfoManager.flushCachedItemsInfoToDisk(cachedItemsInfo)
+        self.cachedItemsDictManager.flushCachedItemsDictToDisk(cachedItemsDict)
         return removedKeys.compactMap {self.cacheFileURL(forKey: $0)}
       }
       

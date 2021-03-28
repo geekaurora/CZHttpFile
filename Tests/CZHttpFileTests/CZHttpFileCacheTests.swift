@@ -19,7 +19,7 @@ final class CZHttpFileCacheTests: XCTestCase {
   
   override func setUp() {
     httpFileCache = CZHttpFileCache()
-    // httpFileCache.removeCachedItemsInfo(forUrl: MockData.testUrl)
+    // httpFileCache.removeCachedItemsDict(forUrl: MockData.testUrl)
     Thread.sleep(forTimeInterval: 0.01)
   }
   
