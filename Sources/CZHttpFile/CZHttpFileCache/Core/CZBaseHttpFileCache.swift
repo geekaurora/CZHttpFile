@@ -126,7 +126,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
     // Read data from disk cache
     if image == nil {      
       diskCacheManager.getCachedFile(withUrl: url) { (decodedData) in
-        // Assign decodedData from disk cache.
+        // Set decodedData from the disk cache.
         image = decodedData
         // Set mem cache after loading data from local drive
         if let image = image {
