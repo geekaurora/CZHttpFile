@@ -306,18 +306,19 @@ internal extension CZDiskCacheManager {
             removedFilesSize += oneFileSize
             return true
           }
-        },
-        
-        completion: completion)
+        })
     }
+    
+    // TODO: call completion after removing files.
+    completion?()
   }
       
   /**
    Clean cache by removing files and items from CachedItemsDict with input params.
    
    - Parameters:
-   - sortCachedItemsDictClosure: Closure that  sorts scachedItemsDict.
-   - shouldRemoveItem: Closure that returns whether to remove item with its info dictionary.
+     - sortCachedItemsDictClosure: Closure that  sorts scachedItemsDict.
+     - shouldRemoveItemClosure: Closure that returns whether to remove item with its info dictionary.
    */
   typealias CachedItemsDictKeyValueTuple = (key: String, value: [String : Any])
   typealias SortCachedItemsDictClosure = (CachedItemsDictKeyValueTuple, CachedItemsDictKeyValueTuple) -> Bool
