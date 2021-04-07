@@ -274,11 +274,12 @@ internal extension CZDiskCacheManager {
   
   /**
     - Parameters:
-      - shouldRemoveItem: Closure that returns whether to remove item with its info dictionary.
+   - sortCachedItemsDictClosure: Closure that  sorts scachedItemsDict.
+   - shouldRemoveItem: Closure that returns whether to remove item with its info dictionary.
    */
-  func cleanDiskCache(shouldRemoveItemClosure: @escaping ([String: Any]) -> Bool,
-                      sortCachedItemsDictClosure: SortCachedItemsDictClosure? = nil,
-                      completion: CleanDiskCacheCompletion? = nil){
+  func cleanDiskCache(sortCachedItemsDictClosure: SortCachedItemsDictClosure? = nil,
+                      shouldRemoveItemClosure: @escaping ([String: Any]) -> Bool,
+                      completion: CleanDiskCacheCompletion? = nil) {
     // 1. Remove items from cachedItemsDict.
     let removeFileURLs = cachedItemsDictLockWrite { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
       var removedKeys = [String]()
@@ -319,7 +320,7 @@ internal extension CZDiskCacheManager {
     }
   }
   
-  func cleanDiskCacheIfNeeded(completion: CleanDiskCacheCompletion? = nil){
+  func cleanDiskCacheIfNeeded(completion: CleanDiskCacheCompletion? = nil) {
     // 1. Clean disk by age
     let currDate = Date()
     cleanDiskCache { (itemInfo: [String : Any]) -> Bool in
@@ -334,8 +335,11 @@ internal extension CZDiskCacheManager {
       let expectedCacheSize = self.maxCacheSize / 2
       let expectedReduceSize = self.totalCachedFileSize - expectedCacheSize
       
-      let sortCachedItemsDictClosure = { (keyValue1: (key: String, value: [String : Any]),
-                                         keyValue2: (key: String, value: [String : Any])) -> Bool in
+      var removedFilesSize: Int = 0
+      
+      self.cleanDiskCache(
+        sortCachedItemsDictClosure: { (keyValue1: (key: String, value: [String : Any]),
+                                       keyValue2: (key: String, value: [String : Any])) -> Bool in
           // Sort files with last visted date
           if let modifiedDate1 = keyValue1.value[CacheConstant.kFileVisitedDate] as? Date,
              let modifiedDate2 = keyValue2.value[CacheConstant.kFileVisitedDate] as? Date {
@@ -343,65 +347,23 @@ internal extension CZDiskCacheManager {
           } else {
             fatalError()
           }
-        }
-      
-      var removedFilesSize: Int = 0
-      cleanDiskCache(shouldRemoveItemClosure: { (itemInfo: [String : Any]) -> Bool in
-        if removedFilesSize >= expectedReduceSize {
-          return false
-        } else {
-          let oneFileSize = (itemInfo[CacheConstant.kFileSize] as? Int) ?? 0
-          removedFilesSize += oneFileSize
-          return true
-        }
-      },
-      sortCachedItemsDictClosure: sortCachedItemsDictClosure,
-      completion: completion)
-
-      
-      let removeFileURLs = cachedItemsDictLockWrite { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
-        // Sort files with last visted date
-        let sortedItemsInfo = cachedItemsDict.sorted { (keyValue1: (key: String, value: [String : Any]),
-                                                        keyValue2: (key: String, value: [String : Any])) -> Bool in
-          if let modifiedDate1 = keyValue1.value[CacheConstant.kFileVisitedDate] as? Date,
-             let modifiedDate2 = keyValue2.value[CacheConstant.kFileVisitedDate] as? Date {
-            return modifiedDate1.timeIntervalSince(modifiedDate2) < 0
-          } else {
-            fatalError()
-          }
-        }
+        },
         
-        var removedFilesSize: Int = 0
-        var removedKeys = [String]()
-        for (key, value) in sortedItemsInfo {
+        shouldRemoveItemClosure: { (itemInfo: [String : Any]) -> Bool in
           if removedFilesSize >= expectedReduceSize {
-            break
+            return false
+          } else {
+            let oneFileSize = (itemInfo[CacheConstant.kFileSize] as? Int) ?? 0
+            removedFilesSize += oneFileSize
+            return true
           }
-          cachedItemsDict.removeValue(forKey: key)
-          removedKeys.append(key)
-          let oneFileSize = (value[CacheConstant.kFileSize] as? Int) ?? 0
-          removedFilesSize += oneFileSize
-        }
-        self.flushCachedItemsDictToDisk(cachedItemsDict)
-        return removedKeys.compactMap { self.cacheFileURL(forKey: $0) }
-      }
-      
-      // Remove corresponding files from disk
-      self.ioQueue.async(flags: .barrier) { [weak self] in
-        guard let `self` = self else { return }
-        removeFileURLs?.forEach {
-          do {
-            try self.fileManager.removeItem(at: $0)
-          } catch {
-            assertionFailure("Failed to remove file. Error - \(error.localizedDescription)")
-          }
-        }
-      }
+        },
+        
+        completion: completion)
     }
-    
-    completion?()
   }
 }
+
 // MARK: - Private methods
 
 private extension CZDiskCacheManager {
