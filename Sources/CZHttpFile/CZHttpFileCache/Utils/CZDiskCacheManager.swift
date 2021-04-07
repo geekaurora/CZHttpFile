@@ -190,8 +190,7 @@ extension CZDiskCacheManager {
     (cachedItemsDict as NSDictionary).write(to: cachedItemsDictFileURL, atomically: true)
   }
   
-  func cachedItemsDictLockWrite<Result>(isInInitializer: Bool = true,
-                                        closure: @escaping (inout CachedItemsDict) -> Result?) -> Result? {
+  func cachedItemsDictLockWrite<Result>(closure: @escaping (inout CachedItemsDict) -> Result?) -> Result? {
     // Get result throught write lock.
     let result = cachedItemsDictLock.writeLock(closure)
     
@@ -261,8 +260,7 @@ internal extension CZDiskCacheManager {
     let currDate = Date()
     
     // 1. Clean disk by age
-    // - Note: shouldn't publish DownloadedURLs as CZHttpFileManager isn't initialized yet.
-    let removeFileURLs = cachedItemsDictLockWrite(isInInitializer: true) { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
+    let removeFileURLs = cachedItemsDictLockWrite { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
       var removedKeys = [String]()
       
       // Remove key if its fileModifiedDate exceeds maxCacheAge
@@ -294,7 +292,7 @@ internal extension CZDiskCacheManager {
       let expectedCacheSize = self.maxCacheSize / 2
       let expectedReduceSize = self.totalCachedFileSize - expectedCacheSize
       
-      let removeFileURLs = cachedItemsDictLockWrite(isInInitializer: true) { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
+      let removeFileURLs = cachedItemsDictLockWrite { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
         // Sort files with last visted date
         let sortedItemsInfo = cachedItemsDict.sorted { (keyValue1: (key: String, value: [String : Any]),
                                                         keyValue2: (key: String, value: [String : Any])) -> Bool in
