@@ -283,17 +283,16 @@ internal extension CZDiskCacheManager {
     let removeFileURLs = cachedItemsDictLockWrite { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
       var removedKeys = [String]()
       
-      // Sort cachedItemsDict if needed.
+      // Sort cachedItemsDict if `sortCachedItemsDictClosure` isn't nil, otherwise keep the original order.
       let sortedItemsInfo: [CachedItemsDictKeyValueTuple] = {
         guard let sortCachedItemsDictClosure = sortCachedItemsDictClosure else {
-          // return Array(cachedItemsDict.enumerated())
-          return []
+          return cachedItemsDict.map { (key: $0, value: $1) }
         }
         return cachedItemsDict.sorted(by: sortCachedItemsDictClosure)
       }()
       
       // Check the condition whether to remove the key.
-      for (key, value) in cachedItemsDict {
+      for (key, value) in sortedItemsInfo {
         if shouldRemoveItemClosure(value) {
           removedKeys.append(key)
           cachedItemsDict.removeValue(forKey: key)
