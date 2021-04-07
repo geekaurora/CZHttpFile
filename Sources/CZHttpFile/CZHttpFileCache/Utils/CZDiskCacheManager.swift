@@ -7,7 +7,7 @@ public typealias SetCacheFileCompletion = () -> Void
 internal typealias CachedItemsDict = [String: [String: Any]]
 
 /**
- Manager maintains the disk cache, including files read/write, cachedItemsDict.
+ Manager that maintains the disk cache including file read/write and cachedItemsDict.
  */
 internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
   private(set) lazy var cacheFolderHelper: CZCacheFolderHelper = {
@@ -62,7 +62,9 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
     } ?? 0
   }
 
-  /// Get total cache size with `cachedItemsDict`.
+  /**
+   Get total cache size with `cachedItemsDict`.
+   */
   func getSizeWithoutLock(cachedItemsDict: CachedItemsDict) -> Int {
     var totalCacheSize: Int = 0
     for (_, value) in cachedItemsDict {
@@ -71,8 +73,10 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
     }
     return totalCacheSize
   }
-  
-  /// Get total cache size with `cachedItemsDict`.
+    
+  /**
+   Returns whether `httpURL` file has been downloaded  and exists in the cache.
+   */
   func urlExistsInCache(_ httpURL: URL) -> Bool {
     return cachedItemsDictLock.readLock { [weak self] (cachedItemsDict) -> Bool? in
       guard let `self` = self else { return false}
@@ -139,6 +143,9 @@ extension CZDiskCacheManager {
 // MARK: - cachedItemsDict
   
 extension CZDiskCacheManager {
+  /**
+   Set information for newly downloaded `httpURL` - includes urlString, modifiedDate, visitedDate, fileSize.
+   */
   func setCachedItemsDictForNewURL(_ httpURL: URL, fileSize: Int) {
     let (_, cacheKey) = getCacheFileInfo(forURL: httpURL)
     
@@ -216,12 +223,15 @@ extension CZDiskCacheManager {
     return (fileURL, isExisting)
   }
   
-  /// Http URLs of downloaded files.
+  /**
+   Returns HTTP URL strings of downloaded files.
+   */
   func cachedFileHttpURLs() -> [String] {
     return cachedItemsDictLock.readLock { (cachedItemsDict) -> [String] in
       cachedItemsDict
         .keys
         .sorted(by: { (key0, key1) -> Bool in
+          // Sort HTTP URLs by modifiedDate.
           let modifiedDate0 = cachedItemsDict[key0]?[CacheConstant.kFileModifiedDate] as? Date
           let modifiedDate1 = cachedItemsDict[key1]?[CacheConstant.kFileModifiedDate] as? Date
           return modifiedDate1!.timeIntervalSince(modifiedDate0!)  > 0
