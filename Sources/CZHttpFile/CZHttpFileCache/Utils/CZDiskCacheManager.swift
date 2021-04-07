@@ -311,12 +311,11 @@ internal extension CZDiskCacheManager {
         completion: completion)
     }
   }
-    
-  
+      
   /**
    Clean cache by removing files and items from CachedItemsDict with input params.
    
-    - Parameters:
+   - Parameters:
    - sortCachedItemsDictClosure: Closure that  sorts scachedItemsDict.
    - shouldRemoveItem: Closure that returns whether to remove item with its info dictionary.
    */
