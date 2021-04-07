@@ -155,6 +155,12 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
     }
   }
   
+  // MARK: - Clear Cache
+  
+  public func clearCache(completion: CleanDiskCacheCompletion? = nil) {
+    diskCacheManager.clearCache(completion: completion)
+  }
+  
   // MARK: - Overriden methods
   
   internal func transformMetadataToCachedData(_ data: Data) -> DataType? {
