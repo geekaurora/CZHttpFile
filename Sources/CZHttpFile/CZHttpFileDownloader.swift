@@ -95,7 +95,7 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
           
           // Decode from `data` to `(outputHttpFile, ouputData)` if applicable.
           if let decodeData = decodeData {
-            guard let (decodedHttpFile, decodedData) = (decodeData(data)).assertIfNil else {
+            guard let (decodedHttpFile, decodedData) = decodeData(data).assertIfNil else {
               completion(nil, WebHttpFileError.invalidData, false)
               return
             }
