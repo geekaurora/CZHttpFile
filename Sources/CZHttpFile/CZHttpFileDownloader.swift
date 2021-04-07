@@ -43,7 +43,8 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
     
     httpFileDownloadQueue = OperationQueue()
     httpFileDownloadQueue.name = httpFileDownloadQueueName
-    httpFileDownloadQueue.qualityOfService = .userInteractive
+    // .default QoS: between .userInteractive and .utility.
+    httpFileDownloadQueue.qualityOfService = .default
     httpFileDownloadQueue.maxConcurrentOperationCount = downloadQueueMaxConcurrent
     
     httpFileDecodeQueue = OperationQueue()
@@ -65,7 +66,7 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
     httpFileDownloadQueue.cancelAllOperations()
   }
   
-  /// Download the http file with the desired params.
+  /// Download the http file with the input params.
   ///
   /// - Parameters:
   ///   - decodeData: Closure used to decode `Data` to tuple (DataType?, Data?). If is nil, then returns `Data` directly.
@@ -88,7 +89,7 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
         
         // Decode Data to httpFile in OperationQueue.
         // If `decodeData` closure is nil, returns `data` directly without decoding.
-        // - Note: you may customize decoding with extra work. e.g. Decode to UIImage and then crop.
+        // - Note: you may customize decoding with additional work. e.g. Decode to UIImage and then crop.
         self.httpFileDecodeQueue.addOperation {
           var outputHttpFile: DataType? = data as? DataType
           var ouputData: Data? = data

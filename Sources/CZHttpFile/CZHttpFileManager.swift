@@ -16,11 +16,11 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
     let shared = CZHttpFileManager()
     return shared
   }()
-  public private(set) var downloader: CZHttpFileDownloader<NSData>
-  public internal(set) var cache: CZHttpFileCache
+  public let downloader: CZHttpFileDownloader<NSData>
+  public let cache: CZHttpFileCache
   
-  public internal(set) var downloadingObserverManager: CZDownloadingObserverManager
-  public internal(set) var downloadedObserverManager: CZDownloadedObserverManager
+  public let downloadingObserverManager: CZDownloadingObserverManager
+  public let downloadedObserverManager: CZDownloadedObserverManager
   
   public enum Config {
     public static var maxConcurrencies = 5

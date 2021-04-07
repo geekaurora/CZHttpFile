@@ -27,13 +27,13 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
     return CZMutexLock(cachedItemsDict)
   }()
       
-  private(set) var maxCacheAge: TimeInterval
-  private(set) var maxCacheSize: Int
-  private(set) var ioQueue: DispatchQueue
+  let maxCacheAge: TimeInterval
+  let maxCacheSize: Int
+  let ioQueue: DispatchQueue
   private(set) weak var downloadedObserverManager: CZDownloadedObserverManager?
 
-  private var fileManager: FileManager
-  private var transformMetadataToCachedData: TransformMetadataToCachedData
+  private let fileManager: FileManager
+  private let transformMetadataToCachedData: TransformMetadataToCachedData
   
   public init(maxCacheAge: TimeInterval,
               maxCacheSize: Int,

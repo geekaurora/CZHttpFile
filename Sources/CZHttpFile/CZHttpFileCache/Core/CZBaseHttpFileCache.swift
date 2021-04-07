@@ -62,12 +62,12 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
     return "CZBaseHttpFileCache"
   }
   
-  private var memCache: NSCache<NSString, DataType>
-  private var operationQueue: OperationQueue
+  private let memCache: NSCache<NSString, DataType>
+  private let operationQueue: OperationQueue
   
   private(set) var diskCacheManager: CZDiskCacheManager<DataType>!
-  private(set) var maxCacheAge: TimeInterval
-  private(set) var maxCacheSize: Int
+  let maxCacheAge: TimeInterval
+  let maxCacheSize: Int
   
   public init(maxCacheAge: TimeInterval = CacheConstant.kMaxFileAge,
               maxCacheSize: Int = CacheConstant.kMaxCacheSize,
