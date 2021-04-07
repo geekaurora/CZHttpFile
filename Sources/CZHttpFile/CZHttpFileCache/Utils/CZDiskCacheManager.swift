@@ -263,6 +263,8 @@ extension CZDiskCacheManager {
 
 internal extension CZDiskCacheManager {
   
+  typealias CachedItemsDictKeyValueTuple = (key: String, value: [String : Any])
+  
   func _cleanDiskCache(completion: CleanDiskCacheCompletion? = nil){
     let currDate = Date()
     
@@ -271,11 +273,11 @@ internal extension CZDiskCacheManager {
       var removedKeys = [String]()
       
       // Remove key if its fileModifiedDate exceeds maxCacheAge
-      cachedItemsDict.forEach { (keyValue: (key: String, value: [String : Any])) in
-        if let modifiedDate = keyValue.value[CacheConstant.kFileModifiedDate] as? Date,
+      for (key, value) in cachedItemsDict {        
+        if let modifiedDate = value[CacheConstant.kFileModifiedDate] as? Date,
            currDate.timeIntervalSince(modifiedDate) > self.maxCacheAge {
-          removedKeys.append(keyValue.key)
-          cachedItemsDict.removeValue(forKey: keyValue.key)
+          removedKeys.append(key)
+          cachedItemsDict.removeValue(forKey: key)
         }
       }
       self.flushCachedItemsDictToDisk(cachedItemsDict)
@@ -294,7 +296,7 @@ internal extension CZDiskCacheManager {
       }
     }
     
-    completion?()    
+    completion?()
   }
 
   
