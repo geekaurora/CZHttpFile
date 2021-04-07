@@ -273,18 +273,14 @@ internal extension CZDiskCacheManager {
     - Parameters:
       - shouldRemoveItem: Closure that returns whether to remove item with its info dictionary.
    */
-  func cleanDiskCache(
-    shouldRemoveItemClosure: @escaping ([String: Any]) -> Bool,
-    completion: CleanDiskCacheCompletion? = nil){
-    
-    // 1. Remove items from cachedItemsDict
+  func cleanDiskCache(shouldRemoveItemClosure: @escaping ([String: Any]) -> Bool,
+                      completion: CleanDiskCacheCompletion? = nil){
+    // 1. Remove items from cachedItemsDict.
     let removeFileURLs = cachedItemsDictLockWrite { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
       var removedKeys = [String]()
       
       // Check the condition whether to remove the key.
       for (key, value) in cachedItemsDict {
-//        if let modifiedDate = value[CacheConstant.kFileModifiedDate] as? Date,
-//           currDate.timeIntervalSince(modifiedDate) > self.maxCacheAge
         if shouldRemoveItemClosure(value) {
           removedKeys.append(key)
           cachedItemsDict.removeValue(forKey: key)
@@ -295,7 +291,7 @@ internal extension CZDiskCacheManager {
       return removeFileURLs
     }
     
-    // Remove corresponding files from disk
+    // 2. Remove corresponding files from disk.
     self.ioQueue.async(flags: .barrier) { [weak self] in
       guard let `self` = self else { return }
       removeFileURLs?.forEach {
@@ -306,41 +302,50 @@ internal extension CZDiskCacheManager {
         }
       }
       
+      // 3. Call `completion`.
       completion?()
     }
-    
   }
   
   func cleanDiskCacheIfNeeded(completion: CleanDiskCacheCompletion? = nil){
     let currDate = Date()
     
     // 1. Clean disk by age
-    let removeFileURLs = cachedItemsDictLockWrite { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
-      var removedKeys = [String]()
-      
-      // Remove key if its fileModifiedDate exceeds maxCacheAge
-      cachedItemsDict.forEach { (keyValue: (key: String, value: [String : Any])) in
-        if let modifiedDate = keyValue.value[CacheConstant.kFileModifiedDate] as? Date,
-           currDate.timeIntervalSince(modifiedDate) > self.maxCacheAge {
-          removedKeys.append(keyValue.key)
-          cachedItemsDict.removeValue(forKey: keyValue.key)
-        }
-      }
-      self.flushCachedItemsDictToDisk(cachedItemsDict)
-      let removeFileURLs = removedKeys.compactMap{ self.cacheFileURL(forKey: $0) }
-      return removeFileURLs
-    }
-    // Remove corresponding files from disk
-    self.ioQueue.async(flags: .barrier) { [weak self] in
-      guard let `self` = self else { return }
-      removeFileURLs?.forEach {
-        do {
-          try self.fileManager.removeItem(at: $0)
-        } catch {
-          assertionFailure("Failed to remove file. Error - \(error.localizedDescription)")
-        }
+    self.cleanDiskCache { (itemInfo: [String : Any]) -> Bool in
+      if let modifiedDate = itemInfo[CacheConstant.kFileModifiedDate] as? Date,
+         currDate.timeIntervalSince(modifiedDate) > self.maxCacheAge {
+        return true
+      } else {
+        return false
       }
     }
+//
+//    let removeFileURLs = cachedItemsDictLockWrite { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
+//      var removedKeys = [String]()
+//
+//      // Remove key if its fileModifiedDate exceeds maxCacheAge
+//      cachedItemsDict.forEach { (keyValue: (key: String, value: [String : Any])) in
+//        if let modifiedDate = keyValue.value[CacheConstant.kFileModifiedDate] as? Date,
+//           currDate.timeIntervalSince(modifiedDate) > self.maxCacheAge {
+//          removedKeys.append(keyValue.key)
+//          cachedItemsDict.removeValue(forKey: keyValue.key)
+//        }
+//      }
+//      self.flushCachedItemsDictToDisk(cachedItemsDict)
+//      let removeFileURLs = removedKeys.compactMap{ self.cacheFileURL(forKey: $0) }
+//      return removeFileURLs
+//    }
+//    // Remove corresponding files from disk
+//    self.ioQueue.async(flags: .barrier) { [weak self] in
+//      guard let `self` = self else { return }
+//      removeFileURLs?.forEach {
+//        do {
+//          try self.fileManager.removeItem(at: $0)
+//        } catch {
+//          assertionFailure("Failed to remove file. Error - \(error.localizedDescription)")
+//        }
+//      }
+//    }
     
     // 2. Clean disk by maxSize setting: based on visited date - simple LRU
     if self.totalCachedFileSize > self.maxCacheSize {
