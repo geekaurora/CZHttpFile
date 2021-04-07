@@ -269,57 +269,6 @@ internal extension CZDiskCacheManager {
     }
   }
   
-  typealias CachedItemsDictKeyValueTuple = (key: String, value: [String : Any])
-  typealias SortCachedItemsDictClosure = (CachedItemsDictKeyValueTuple, CachedItemsDictKeyValueTuple) -> Bool
-  
-  /**
-    - Parameters:
-   - sortCachedItemsDictClosure: Closure that  sorts scachedItemsDict.
-   - shouldRemoveItem: Closure that returns whether to remove item with its info dictionary.
-   */
-  func cleanDiskCache(sortCachedItemsDictClosure: SortCachedItemsDictClosure? = nil,
-                      shouldRemoveItemClosure: @escaping ([String: Any]) -> Bool,
-                      completion: CleanDiskCacheCompletion? = nil) {
-    // 1. Remove items from cachedItemsDict.
-    let removeFileURLs = cachedItemsDictLockWrite { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
-      var removedKeys = [String]()
-      
-      // Sort cachedItemsDict if `sortCachedItemsDictClosure` isn't nil, otherwise keep the original order.
-      let sortedItemsInfo: [CachedItemsDictKeyValueTuple] = {
-        guard let sortCachedItemsDictClosure = sortCachedItemsDictClosure else {
-          return cachedItemsDict.map { (key: $0, value: $1) }
-        }
-        return cachedItemsDict.sorted(by: sortCachedItemsDictClosure)
-      }()
-      
-      // Check the condition whether to remove the key.
-      for (key, value) in sortedItemsInfo {
-        if shouldRemoveItemClosure(value) {
-          removedKeys.append(key)
-          cachedItemsDict.removeValue(forKey: key)
-        }
-      }
-      self.flushCachedItemsDictToDisk(cachedItemsDict)
-      let removeFileURLs = removedKeys.compactMap { self.cacheFileURL(forKey: $0) }
-      return removeFileURLs
-    }
-    
-    // 2. Remove corresponding files from disk.
-    self.ioQueue.async(flags: .barrier) { [weak self] in
-      guard let `self` = self else { return }
-      removeFileURLs?.forEach {
-        do {
-          try self.fileManager.removeItem(at: $0)
-        } catch {
-          assertionFailure("Failed to remove file. Error - \(error.localizedDescription)")
-        }
-      }
-      
-      // 3. Call completion if applicable.
-      completion?()
-    }
-  }
-  
   func cleanDiskCacheIfNeeded(completion: CleanDiskCacheCompletion? = nil) {
     // 1. Clean disk by age
     let currDate = Date()
@@ -360,6 +309,60 @@ internal extension CZDiskCacheManager {
         },
         
         completion: completion)
+    }
+  }
+    
+  
+  /**
+   Clean cache by removing files and items from CachedItemsDict with input params.
+   
+    - Parameters:
+   - sortCachedItemsDictClosure: Closure that  sorts scachedItemsDict.
+   - shouldRemoveItem: Closure that returns whether to remove item with its info dictionary.
+   */
+  typealias CachedItemsDictKeyValueTuple = (key: String, value: [String : Any])
+  typealias SortCachedItemsDictClosure = (CachedItemsDictKeyValueTuple, CachedItemsDictKeyValueTuple) -> Bool
+  
+  private func cleanDiskCache(sortCachedItemsDictClosure: SortCachedItemsDictClosure? = nil,
+                              shouldRemoveItemClosure: @escaping ([String: Any]) -> Bool,
+                              completion: CleanDiskCacheCompletion? = nil) {
+    // 1. Remove items from cachedItemsDict.
+    let removeFileURLs = cachedItemsDictLockWrite { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
+      var removedKeys = [String]()
+      
+      // Sort cachedItemsDict if `sortCachedItemsDictClosure` isn't nil, otherwise keep the original order.
+      let sortedItemsInfo: [CachedItemsDictKeyValueTuple] = {
+        guard let sortCachedItemsDictClosure = sortCachedItemsDictClosure else {
+          return cachedItemsDict.map { (key: $0, value: $1) }
+        }
+        return cachedItemsDict.sorted(by: sortCachedItemsDictClosure)
+      }()
+      
+      // Check the condition whether to remove the key.
+      for (key, value) in sortedItemsInfo {
+        if shouldRemoveItemClosure(value) {
+          removedKeys.append(key)
+          cachedItemsDict.removeValue(forKey: key)
+        }
+      }
+      self.flushCachedItemsDictToDisk(cachedItemsDict)
+      let removeFileURLs = removedKeys.compactMap { self.cacheFileURL(forKey: $0) }
+      return removeFileURLs
+    }
+    
+    // 2. Remove corresponding files from disk.
+    self.ioQueue.async(flags: .barrier) { [weak self] in
+      guard let `self` = self else { return }
+      removeFileURLs?.forEach {
+        do {
+          try self.fileManager.removeItem(at: $0)
+        } catch {
+          assertionFailure("Failed to remove file. Error - \(error.localizedDescription)")
+        }
+      }
+      
+      // 3. Call completion if applicable.
+      completion?()
     }
   }
 }
