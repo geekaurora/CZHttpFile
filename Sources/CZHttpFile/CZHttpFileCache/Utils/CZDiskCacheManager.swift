@@ -269,15 +269,28 @@ internal extension CZDiskCacheManager {
     }
   }
   
+  typealias CachedItemsDictKeyValueTuple = (key: String, value: [String : Any])
+  typealias SortCachedItemsDictClosure = (CachedItemsDictKeyValueTuple, CachedItemsDictKeyValueTuple) -> Bool
+  
   /**
     - Parameters:
       - shouldRemoveItem: Closure that returns whether to remove item with its info dictionary.
    */
   func cleanDiskCache(shouldRemoveItemClosure: @escaping ([String: Any]) -> Bool,
+                      sortCachedItemsDictClosure: SortCachedItemsDictClosure? = nil,
                       completion: CleanDiskCacheCompletion? = nil){
     // 1. Remove items from cachedItemsDict.
     let removeFileURLs = cachedItemsDictLockWrite { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
       var removedKeys = [String]()
+      
+      // Sort cachedItemsDict if needed.
+      let sortedItemsInfo: [CachedItemsDictKeyValueTuple] = {
+        guard let sortCachedItemsDictClosure = sortCachedItemsDictClosure else {
+          // return Array(cachedItemsDict.enumerated())
+          return []
+        }
+        return cachedItemsDict.sorted(by: sortCachedItemsDictClosure)
+      }()
       
       // Check the condition whether to remove the key.
       for (key, value) in cachedItemsDict {
