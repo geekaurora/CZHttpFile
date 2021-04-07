@@ -7,7 +7,7 @@ public typealias SetCacheFileCompletion = () -> Void
 internal typealias CachedItemsDict = [String: [String: Any]]
 
 /**
- Manager maintains the disk cache, including files read/write, cachedItemsDict.
+ Manager that maintains the disk cache including file read/write and cachedItemsDict.
  */
 internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
   private(set) lazy var cacheFolderHelper: CZCacheFolderHelper = {
@@ -27,13 +27,13 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
     return CZMutexLock(cachedItemsDict)
   }()
       
-  private(set) var maxCacheAge: TimeInterval
-  private(set) var maxCacheSize: Int
-  private(set) var ioQueue: DispatchQueue
+  let maxCacheAge: TimeInterval
+  let maxCacheSize: Int
+  let ioQueue: DispatchQueue
   private(set) weak var downloadedObserverManager: CZDownloadedObserverManager?
 
-  private var fileManager: FileManager
-  private var transformMetadataToCachedData: TransformMetadataToCachedData
+  private let fileManager: FileManager
+  private let transformMetadataToCachedData: TransformMetadataToCachedData
   
   public init(maxCacheAge: TimeInterval,
               maxCacheSize: Int,
@@ -62,7 +62,9 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
     } ?? 0
   }
 
-  /// Get total cache size with `cachedItemsDict`.
+  /**
+   Get total cache size with `cachedItemsDict`.
+   */
   func getSizeWithoutLock(cachedItemsDict: CachedItemsDict) -> Int {
     var totalCacheSize: Int = 0
     for (_, value) in cachedItemsDict {
@@ -71,8 +73,10 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
     }
     return totalCacheSize
   }
-  
-  /// Get total cache size with `cachedItemsDict`.
+    
+  /**
+   Returns whether `httpURL` file has been downloaded  and exists in the cache.
+   */
   func urlExistsInCache(_ httpURL: URL) -> Bool {
     return cachedItemsDictLock.readLock { [weak self] (cachedItemsDict) -> Bool? in
       guard let `self` = self else { return false}
@@ -139,6 +143,9 @@ extension CZDiskCacheManager {
 // MARK: - cachedItemsDict
   
 extension CZDiskCacheManager {
+  /**
+   Set information for newly downloaded `httpURL` - includes urlString, modifiedDate, visitedDate, fileSize.
+   */
   func setCachedItemsDictForNewURL(_ httpURL: URL, fileSize: Int) {
     let (_, cacheKey) = getCacheFileInfo(forURL: httpURL)
     
@@ -183,8 +190,7 @@ extension CZDiskCacheManager {
     (cachedItemsDict as NSDictionary).write(to: cachedItemsDictFileURL, atomically: true)
   }
   
-  func cachedItemsDictLockWrite<Result>(isInInitializer: Bool = true,
-                                        closure: @escaping (inout CachedItemsDict) -> Result?) -> Result? {
+  func cachedItemsDictLockWrite<Result>(closure: @escaping (inout CachedItemsDict) -> Result?) -> Result? {
     // Get result throught write lock.
     let result = cachedItemsDictLock.writeLock(closure)
     
@@ -216,12 +222,15 @@ extension CZDiskCacheManager {
     return (fileURL, isExisting)
   }
   
-  /// Http URLs of downloaded files.
+  /**
+   Returns HTTP URL strings of downloaded files.
+   */
   func cachedFileHttpURLs() -> [String] {
     return cachedItemsDictLock.readLock { (cachedItemsDict) -> [String] in
       cachedItemsDict
         .keys
         .sorted(by: { (key0, key1) -> Bool in
+          // Sort HTTP URLs by modifiedDate.
           let modifiedDate0 = cachedItemsDict[key0]?[CacheConstant.kFileModifiedDate] as? Date
           let modifiedDate1 = cachedItemsDict[key1]?[CacheConstant.kFileModifiedDate] as? Date
           return modifiedDate1!.timeIntervalSince(modifiedDate0!)  > 0
@@ -251,8 +260,7 @@ internal extension CZDiskCacheManager {
     let currDate = Date()
     
     // 1. Clean disk by age
-    // - Note: shouldn't publish DownloadedURLs as CZHttpFileManager isn't initialized yet.
-    let removeFileURLs = cachedItemsDictLockWrite(isInInitializer: true) { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
+    let removeFileURLs = cachedItemsDictLockWrite { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
       var removedKeys = [String]()
       
       // Remove key if its fileModifiedDate exceeds maxCacheAge
@@ -284,7 +292,7 @@ internal extension CZDiskCacheManager {
       let expectedCacheSize = self.maxCacheSize / 2
       let expectedReduceSize = self.totalCachedFileSize - expectedCacheSize
       
-      let removeFileURLs = cachedItemsDictLockWrite(isInInitializer: true) { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
+      let removeFileURLs = cachedItemsDictLockWrite { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
         // Sort files with last visted date
         let sortedItemsInfo = cachedItemsDict.sorted { (keyValue1: (key: String, value: [String : Any]),
                                                         keyValue2: (key: String, value: [String : Any])) -> Bool in

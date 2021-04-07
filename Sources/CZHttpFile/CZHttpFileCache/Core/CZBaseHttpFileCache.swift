@@ -62,12 +62,12 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
     return "CZBaseHttpFileCache"
   }
   
-  private var memCache: NSCache<NSString, DataType>
-  private var operationQueue: OperationQueue
+  private let memCache: NSCache<NSString, DataType>
+  private let operationQueue: OperationQueue
   
   private(set) var diskCacheManager: CZDiskCacheManager<DataType>!
-  private(set) var maxCacheAge: TimeInterval
-  private(set) var maxCacheSize: Int
+  let maxCacheAge: TimeInterval
+  let maxCacheSize: Int
   
   public init(maxCacheAge: TimeInterval = CacheConstant.kMaxFileAge,
               maxCacheSize: Int = CacheConstant.kMaxCacheSize,
@@ -124,7 +124,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
       completeSaveCachedFile: completeSaveCachedFile)
 
     // Mem Cache.
-    // `transformMetadataToCachedData` is to transform `Data` to real Data type.
+    // `transformMetadataToCachedData` transforms `Data` to real Data type.
     // e.g. let image = UIImage(data: data)
     if let image = transformMetadataToCachedData(data) {
       setMemCache(image: image, forKey: cacheKey)
@@ -134,15 +134,15 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   public func getCachedFile(withUrl url: URL,
                             completion: @escaping (DataType?) -> Void)  {
     let (_, cacheKey) = diskCacheManager.getCacheFileInfo(forURL: url)
-    // Read data from mem cache
+    // Read data from mem cache.
     var image = self.getMemCache(forKey: cacheKey)
     
-    // Read data from disk cache
+    // Read data from disk cache.
     if image == nil {      
       diskCacheManager.getCachedFile(withUrl: url) { (decodedData) in
         // Set decodedData from the disk cache.
         image = decodedData
-        // Set mem cache after loading data from local drive
+        // Set mem cache after loading data from disk.
         if let image = image {
           self.setMemCache(image: image, forKey: cacheKey)
         }
@@ -170,7 +170,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
 
 public extension CZBaseHttpFileCache {
   /**
-   Returns cached file URL if has been downloaded, otherwise nil.
+   Returns cached file URL if `httpURL` has been downloaded, otherwise nil.
    */
   func cachedFileURL(forURL httpURL: URL?) -> (fileURL: URL?, isExisting: Bool) {
     return diskCacheManager.cachedFileURL(forURL: httpURL)
