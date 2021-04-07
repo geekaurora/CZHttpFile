@@ -20,6 +20,12 @@ struct SingleDownloadView: View {
       
       ProgressView(value: downloadAmount, total: 1)
       
+      Button("Clean Cache") {
+        CZHttpFileManager.shared.cache.clearCache() {
+          CZAlertManager.showAlert(message: "Cleaned Cache!")
+        }
+      }
+      
       Button("Download") {
         CZHttpFileManager.shared.downloadFile(
           url: url,
@@ -33,6 +39,7 @@ struct SingleDownloadView: View {
         }
         
       }
+      
     }
   }
 }

@@ -142,10 +142,6 @@ extension CZDiskCacheManager {
 
 // MARK: - Clear Cache
 
-public func clearCache() {
-  
-}
-
 // MARK: - cachedItemsDict
   
 extension CZDiskCacheManager {
@@ -263,27 +259,42 @@ extension CZDiskCacheManager {
 
 internal extension CZDiskCacheManager {
   
-  typealias CachedItemsDictKeyValueTuple = (key: String, value: [String : Any])
+  func clearCache(completion: CleanDiskCacheCompletion? = nil) {
+    self.cleanDiskCache { (itemInfo: [String : Any]) -> Bool in
+      true
+    } completion: {
+      MainQueueScheduler.safeAsync {
+        completion?()
+      }
+    }
+  }
   
-  func _cleanDiskCache(completion: CleanDiskCacheCompletion? = nil){
-    let currDate = Date()
+  /**
+    - Parameters:
+      - shouldRemoveItem: Closure that returns whether to remove item with its info dictionary.
+   */
+  func cleanDiskCache(
+    shouldRemoveItemClosure: @escaping ([String: Any]) -> Bool,
+    completion: CleanDiskCacheCompletion? = nil){
     
-    // 1. Clean disk by age
+    // 1. Remove items from cachedItemsDict
     let removeFileURLs = cachedItemsDictLockWrite { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
       var removedKeys = [String]()
       
-      // Remove key if its fileModifiedDate exceeds maxCacheAge
-      for (key, value) in cachedItemsDict {        
-        if let modifiedDate = value[CacheConstant.kFileModifiedDate] as? Date,
-           currDate.timeIntervalSince(modifiedDate) > self.maxCacheAge {
+      // Check the condition whether to remove the key.
+      for (key, value) in cachedItemsDict {
+//        if let modifiedDate = value[CacheConstant.kFileModifiedDate] as? Date,
+//           currDate.timeIntervalSince(modifiedDate) > self.maxCacheAge
+        if shouldRemoveItemClosure(value) {
           removedKeys.append(key)
           cachedItemsDict.removeValue(forKey: key)
         }
       }
       self.flushCachedItemsDictToDisk(cachedItemsDict)
-      let removeFileURLs = removedKeys.compactMap{ self.cacheFileURL(forKey: $0) }
+      let removeFileURLs = removedKeys.compactMap { self.cacheFileURL(forKey: $0) }
       return removeFileURLs
     }
+    
     // Remove corresponding files from disk
     self.ioQueue.async(flags: .barrier) { [weak self] in
       guard let `self` = self else { return }
@@ -294,11 +305,11 @@ internal extension CZDiskCacheManager {
           assertionFailure("Failed to remove file. Error - \(error.localizedDescription)")
         }
       }
+      
+      completion?()
     }
     
-    completion?()
   }
-
   
   func cleanDiskCacheIfNeeded(completion: CleanDiskCacheCompletion? = nil){
     let currDate = Date()
