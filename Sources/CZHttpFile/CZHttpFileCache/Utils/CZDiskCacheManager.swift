@@ -140,6 +140,12 @@ extension CZDiskCacheManager {
   }
 }
 
+// MARK: - Clear Cache
+
+public func clearCache() {
+  
+}
+
 // MARK: - cachedItemsDict
   
 extension CZDiskCacheManager {
@@ -230,7 +236,7 @@ extension CZDiskCacheManager {
       cachedItemsDict
         .keys
         .sorted(by: { (key0, key1) -> Bool in
-          // Sort HTTP URLs by modifiedDate.
+          // Sort URLs by modifiedDate.
           let modifiedDate0 = cachedItemsDict[key0]?[CacheConstant.kFileModifiedDate] as? Date
           let modifiedDate1 = cachedItemsDict[key1]?[CacheConstant.kFileModifiedDate] as? Date
           return modifiedDate1!.timeIntervalSince(modifiedDate0!)  > 0
@@ -256,6 +262,42 @@ extension CZDiskCacheManager {
 // MARK: - Clean DiskCache
 
 internal extension CZDiskCacheManager {
+  
+  func _cleanDiskCache(completion: CleanDiskCacheCompletion? = nil){
+    let currDate = Date()
+    
+    // 1. Clean disk by age
+    let removeFileURLs = cachedItemsDictLockWrite { (cachedItemsDict: inout CachedItemsDict) -> [URL] in
+      var removedKeys = [String]()
+      
+      // Remove key if its fileModifiedDate exceeds maxCacheAge
+      cachedItemsDict.forEach { (keyValue: (key: String, value: [String : Any])) in
+        if let modifiedDate = keyValue.value[CacheConstant.kFileModifiedDate] as? Date,
+           currDate.timeIntervalSince(modifiedDate) > self.maxCacheAge {
+          removedKeys.append(keyValue.key)
+          cachedItemsDict.removeValue(forKey: keyValue.key)
+        }
+      }
+      self.flushCachedItemsDictToDisk(cachedItemsDict)
+      let removeFileURLs = removedKeys.compactMap{ self.cacheFileURL(forKey: $0) }
+      return removeFileURLs
+    }
+    // Remove corresponding files from disk
+    self.ioQueue.async(flags: .barrier) { [weak self] in
+      guard let `self` = self else { return }
+      removeFileURLs?.forEach {
+        do {
+          try self.fileManager.removeItem(at: $0)
+        } catch {
+          assertionFailure("Failed to remove file. Error - \(error.localizedDescription)")
+        }
+      }
+    }
+    
+    completion?()    
+  }
+
+  
   func cleanDiskCacheIfNeeded(completion: CleanDiskCacheCompletion? = nil){
     let currDate = Date()
     
