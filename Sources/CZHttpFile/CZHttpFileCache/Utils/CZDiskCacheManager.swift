@@ -131,7 +131,7 @@ extension CZDiskCacheManager {
       if let data = try? Data(contentsOf: fileURL),
          let image = transformMetadataToCachedData(data).assertIfNil {
         // Update last visited date
-        self.setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate())
+        self.setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate(), skipIfKeyNotExists: true)
         completion(image)
       } else {
         completion(nil)
@@ -160,15 +160,31 @@ extension CZDiskCacheManager {
     }
   }
    
-  func setCachedItemsDict(key: String, subkey: String, value: Any) {
+  func setCachedItemsDict(key: String,
+                          subkey: String,
+                          value: Any,
+                          skipIfKeyNotExists: Bool = false) {
     cachedItemsDictLockWrite { [weak self] (cachedItemsDict) -> Void in
       guard let `self` = self else { return }
-      self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: key, subkey: subkey, value: value)
+      self.setCachedItemsDictWithoutLock(
+        cachedItemsDict: &cachedItemsDict,
+        key: key,
+        subkey: subkey,
+        value: value,
+        skipIfKeyNotExists: skipIfKeyNotExists)
     }
   }
   
-  func setCachedItemsDictWithoutLock(cachedItemsDict: inout CachedItemsDict, key: String, subkey: String, value: Any) {
+  func setCachedItemsDictWithoutLock(cachedItemsDict: inout CachedItemsDict,
+                                     key: String,
+                                     subkey: String,
+                                     value: Any,
+                                     skipIfKeyNotExists: Bool = false) {
       if cachedItemsDict[key] == nil {
+        // Skip writing if the corresponding key doesn't exist.
+        guard !skipIfKeyNotExists else {
+          return
+        }
         cachedItemsDict[key] = [:]
       }
       cachedItemsDict[key]?[subkey] = value

@@ -32,6 +32,9 @@ final class CZDownloadedObserverManagerIntegrationTests: XCTestCase {
   }
   
   func testDownloadFileAndPublishDownloadedURLs() {
+//    CZHttpFileManager.shared.cache.clearCache()
+//    Thread.sleep(forTimeInterval: 1)
+    
     let (waitForExpectatation, expectation) = CZTestUtils.waitWithInterval(Constant.timeOut, testCase: self)
     
     // Create mockDataMap.
@@ -47,15 +50,15 @@ final class CZDownloadedObserverManagerIntegrationTests: XCTestCase {
     // 2. Download file.
     httpFileManager.downloadFile(url: MockData.urlForGet) { (data: Data?, error: Error?, fromCache: Bool) in
       
-//      // 3. Verify downloadedURLs be published to the observer.
-//      Thread.sleep(forTimeInterval: 1)
-//      let actualDownloadedURLs = self.testDownloadedObserver.downloadedURLs
-//      let expectedDownloadedURLs = [MockData.urlForGet]
-//      XCTAssertTrue(
-//        actualDownloadedURLs == expectedDownloadedURLs,
-//        "publishDownloadedURLs doesn't work correctly. expected = \(expectedDownloadedURLs), \n actual = \(actualDownloadedURLs)")
-//      
-//      expectation.fulfill()
+      // 3. Verify downloadedURLs be published to the observer.
+      Thread.sleep(forTimeInterval: 0.1)
+      let actualDownloadedURLs = self.testDownloadedObserver.downloadedURLs
+      let expectedDownloadedURLs = [MockData.urlForGet]
+      XCTAssertTrue(
+        actualDownloadedURLs == expectedDownloadedURLs,
+        "publishDownloadedURLs doesn't work correctly. expected = \(expectedDownloadedURLs), \n actual = \(actualDownloadedURLs)")
+      
+      expectation.fulfill()
     }
     
     // Wait for expectatation.

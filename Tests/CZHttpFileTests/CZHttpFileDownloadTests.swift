@@ -20,8 +20,13 @@ final class CZHttpFileDownloadTests: XCTestCase {
   private var httpFileManager: CZHttpFileManager!
   
   override class func setUp() {
-    let httpFileManager = CZHttpFileManager()
-    httpFileManager.cache.diskCacheManager.removeCachedItemsDict(forUrl: MockData.urlForGet)
+    let httpFileManager = CZHttpFileManager()    
+    // Should call clearCache() to clear cached files, otherwise it returns the cached file directly
+    // without checking cachedItemDict.
+    httpFileManager.cache.clearCache()
+    // httpFileManager.cache.diskCacheManager.removeCachedItemsDict(forUrl: MockData.urlForGet)
+    
+    Thread.sleep(forTimeInterval: 0.1)
   }
   
   override func setUp() {
@@ -97,6 +102,7 @@ final class CZHttpFileDownloadTests: XCTestCase {
       XCTAssert(res == MockData.dictionary, "Actual result = \(res), Expected result = \(MockData.dictionary)")
       
       // Verify download state.
+      Thread.sleep(forTimeInterval: 0.1)
       let downloadState = self.httpFileManager.downloadState(forURL: MockData.urlForGet)
       XCTAssert(downloadState == .downloaded, "Incorrect downloadState. Actual result = \(downloadState), Expected result = .downloaded")
 
