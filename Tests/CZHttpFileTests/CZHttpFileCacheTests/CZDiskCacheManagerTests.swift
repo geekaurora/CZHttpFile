@@ -39,16 +39,6 @@ final class CZDiskCacheManagerTests: XCTestCase {
     // Thread.sleep(forTimeInterval: 0.01)
   }
   
-  /*
-  public enum CacheConstant {
-    public static let kFileModifiedDate = "modifiedDate"
-    public static let kFileVisitedDate = "visitedDate"
-    public static let kHttpUrlString = "url"
-    public static let kFileSize = "size"
-    public static let ioQueueLabel = "com.tony.cache.ioQueue"
-  }
- */
-  
   func testClearCache() {
     // 1. Write file to cache and cachedItemsDict.
     let data = CZHTTPJsonSerializer.jsonData(with: MockData.dict)!
@@ -66,9 +56,13 @@ final class CZDiskCacheManagerTests: XCTestCase {
       let isCachedItemsDictKeyExisting = (cachedItemsDict[cacheKey] != nil)
       XCTAssertTrue(!isCachedItemsDictKeyExisting, "CachedItemsDict key should have been removed. url = \(MockData.testUrl)")
 
-      // 3-2. Verify: file is removed.
-      let isFileExisting = CZFileHelper.fileExists(url:fileUrl)
-      XCTAssertTrue(!isFileExisting, "File should have been removed. fileUrl = \(fileUrl)")
+      // 3-2. Verify: memCache is removed.
+      let isExistingInMemCache = (self.httpFileCache.getMemCache(forKey: cacheKey) != nil)
+      XCTAssertTrue(!isExistingInMemCache, "File should have been removed. fileUrl = \(fileUrl)")
+      
+      // 3-3. Verify: cached file is removed.
+      let isExistingInDiskCache = CZFileHelper.fileExists(url:fileUrl)
+      XCTAssertTrue(!isExistingInDiskCache, "File should have been removed. fileUrl = \(fileUrl)")
 
       expectation.fulfill()
     }  
