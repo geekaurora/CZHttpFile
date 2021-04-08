@@ -32,7 +32,6 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
   let ioQueue: DispatchQueue
   private(set) weak var downloadedObserverManager: CZDownloadedObserverManager?
 
-  private let fileManager: FileManager
   private let transformMetadataToCachedData: TransformMetadataToCachedData
   
   public init(maxCacheAge: TimeInterval,
@@ -45,7 +44,6 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
     self.cacheFolderName = cacheFolderName
     self.downloadedObserverManager = downloadedObserverManager
     self.transformMetadataToCachedData = transformMetadataToCachedData
-    self.fileManager = FileManager()
 
     self.ioQueue = DispatchQueue(
       label: CacheConstant.ioQueueLabel,
@@ -131,7 +129,7 @@ extension CZDiskCacheManager {
       if let data = try? Data(contentsOf: fileURL),
          let image = transformMetadataToCachedData(data).assertIfNil {
         // Update last visited date
-        self.setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate())
+        self.setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate(), skipIfKeyNotExists: true)
         completion(image)
       } else {
         completion(nil)
@@ -152,27 +150,57 @@ extension CZDiskCacheManager {
     let (_, cacheKey) = getCacheFileInfo(forURL: httpURL)
     
     cachedItemsDictLockWrite { [weak self] (cachedItemsDict) -> Void in
-      guard let `self` = self else { return }
+      guard let `self` = self else {
+        return        
+      }
       self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: cacheKey, subkey: CacheConstant.kHttpUrlString, value: httpURL.absoluteString)
       self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: cacheKey, subkey: CacheConstant.kFileModifiedDate, value: NSDate())
       self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate())
       self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: cacheKey, subkey: CacheConstant.kFileSize, value: fileSize)
+      
     }
   }
    
-  func setCachedItemsDict(key: String, subkey: String, value: Any) {
+  func setCachedItemsDict(key: String,
+                          subkey: String,
+                          value: Any,
+                          skipIfKeyNotExists: Bool = false) {
     cachedItemsDictLockWrite { [weak self] (cachedItemsDict) -> Void in
       guard let `self` = self else { return }
-      self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: key, subkey: subkey, value: value)
+      self.setCachedItemsDictWithoutLock(
+        cachedItemsDict: &cachedItemsDict,
+        key: key,
+        subkey: subkey,
+        value: value,
+        skipIfKeyNotExists: skipIfKeyNotExists)
     }
   }
   
-  func setCachedItemsDictWithoutLock(cachedItemsDict: inout CachedItemsDict, key: String, subkey: String, value: Any) {
+  func setCachedItemsDictWithoutLock(cachedItemsDict: inout CachedItemsDict,
+                                     key: String,
+                                     subkey: String,
+                                     value: Any,
+                                     skipIfKeyNotExists: Bool = false) {
       if cachedItemsDict[key] == nil {
+        // Skip writing if the corresponding key doesn't exist.
+        guard !skipIfKeyNotExists else {
+          return
+        }
         cachedItemsDict[key] = [:]
       }
       cachedItemsDict[key]?[subkey] = value
       self.flushCachedItemsDictToDisk(cachedItemsDict)
+  }
+  
+  /**
+   - Note: For tests only!
+   
+   Should call `cachedItemsDictLock.readLock` to read cachedItemsDict for data consistency.
+   */
+  func getCachedItemsDict() -> CachedItemsDict {
+    return cachedItemsDictLock.readLock { (cachedItemsDict) -> CachedItemsDict? in
+      cachedItemsDict
+    } ?? [:]
   }
   
   func removeCachedItemsDict(forKey key: String) {
@@ -233,9 +261,11 @@ extension CZDiskCacheManager {
         .keys
         .sorted(by: { (key0, key1) -> Bool in
           // Sort URLs by modifiedDate.
-          let modifiedDate0 = cachedItemsDict[key0]?[CacheConstant.kFileModifiedDate] as? Date
-          let modifiedDate1 = cachedItemsDict[key1]?[CacheConstant.kFileModifiedDate] as? Date
-          return modifiedDate1!.timeIntervalSince(modifiedDate0!)  > 0
+          guard let modifiedDate0 = cachedItemsDict[key0]?[CacheConstant.kFileModifiedDate] as? Date,
+                let modifiedDate1 = cachedItemsDict[key1]?[CacheConstant.kFileModifiedDate] as? Date else {
+            return false
+          }
+          return modifiedDate1.timeIntervalSince(modifiedDate0)  > 0
         })
         .compactMap {
         return cachedItemsDict[$0]?[CacheConstant.kHttpUrlString] as? String
@@ -354,11 +384,7 @@ internal extension CZDiskCacheManager {
     self.ioQueue.async(flags: .barrier) { [weak self] in
       guard let `self` = self else { return }
       removeFileURLs?.forEach {
-        do {
-          try self.fileManager.removeItem(at: $0)
-        } catch {
-          assertionFailure("Failed to remove file. Error - \(error.localizedDescription)")
-        }
+        CZFileHelper.removeFile($0)
       }
       
       // 3. Call completion if applicable.

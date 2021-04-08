@@ -31,7 +31,7 @@ final class CZDownloadedObserverManagerIntegrationTests: XCTestCase {
     testDownloadedObserver = TestDownloadedObserver()
   }
   
-  func testDownloadFileAndPublishDownloadedURLs() {
+  func testDownloadFileAndPublishDownloadedURLs() {    
     let (waitForExpectatation, expectation) = CZTestUtils.waitWithInterval(Constant.timeOut, testCase: self)
     
     // Create mockDataMap.
