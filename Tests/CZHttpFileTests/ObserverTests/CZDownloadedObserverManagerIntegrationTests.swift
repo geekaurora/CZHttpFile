@@ -31,10 +31,7 @@ final class CZDownloadedObserverManagerIntegrationTests: XCTestCase {
     testDownloadedObserver = TestDownloadedObserver()
   }
   
-  func testDownloadFileAndPublishDownloadedURLs() {
-//    CZHttpFileManager.shared.cache.clearCache()
-//    Thread.sleep(forTimeInterval: 1)
-    
+  func testDownloadFileAndPublishDownloadedURLs() {    
     let (waitForExpectatation, expectation) = CZTestUtils.waitWithInterval(Constant.timeOut, testCase: self)
     
     // Create mockDataMap.

@@ -36,7 +36,7 @@ final class CZDiskCacheManagerTests: XCTestCase {
   override func setUp() {
     httpFileCache = CZHttpFileCache()
     // httpFileCache.removeCachedItemsDict(forUrl: MockData.testUrl)
-    Thread.sleep(forTimeInterval: 0.01)
+    // Thread.sleep(forTimeInterval: 0.01)
   }
   
   /*

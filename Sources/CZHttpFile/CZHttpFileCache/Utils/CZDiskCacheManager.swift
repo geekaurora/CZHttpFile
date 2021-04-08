@@ -193,7 +193,7 @@ extension CZDiskCacheManager {
   }
   
   /**
-   - Note: Tests Only!
+   - Note: For tests only!
    
    Should call `cachedItemsDictLock.readLock` to read cachedItemsDict for data consistency.
    */
