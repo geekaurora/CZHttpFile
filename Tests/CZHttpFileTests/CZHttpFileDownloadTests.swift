@@ -7,7 +7,7 @@ import CZNetworking
 final class CZHttpFileDownloadTests: XCTestCase {
   private enum MockData {
     static let urlForGet = URL(string: "http://www.test.com/some_file.jpg")!
-    static let dictionary: [String: AnyHashable] = [
+    static let dict: [String: AnyHashable] = [
       "a": "sdlfjas",
       "c": "sdlksdf",
       "b": "239823sd",
@@ -17,7 +17,7 @@ final class CZHttpFileDownloadTests: XCTestCase {
   private enum Constant {
     static let timeOut: TimeInterval = 30
   }
-  private var httpFileManager =  CZHttpFileManager.shared
+  private let httpFileManager =  CZHttpFileManager.shared
   
   override class func setUp() {
     // Should call clearCache() to clear cached files, otherwise it returns the cached file directly
@@ -36,7 +36,7 @@ final class CZHttpFileDownloadTests: XCTestCase {
 
     let (waitForExpectatation, expectation) = CZTestUtils.waitWithInterval(Constant.timeOut, testCase: self)
     // 0-2. Create mockDataMap.
-    let mockData = CZHTTPJsonSerializer.jsonData(with: MockData.dictionary)!
+    let mockData = CZHTTPJsonSerializer.jsonData(with: MockData.dict)!
     let mockDataDict = [MockData.urlForGet: mockData]
     CZHTTPManager.stubMockData(dict: mockDataDict)
 
@@ -46,7 +46,7 @@ final class CZHttpFileDownloadTests: XCTestCase {
 
       // 2. Verify downloaded data.
       let res: [String: AnyHashable]? = CZHTTPJsonSerializer.deserializedObject(with: data)
-      XCTAssert(res == MockData.dictionary, "Actual result = \(res), Expected result = \(MockData.dictionary)")
+      XCTAssert(res == MockData.dict, "Actual result = \(res), Expected result = \(MockData.dict)")
 
       expectation.fulfill()
     }
@@ -63,7 +63,7 @@ final class CZHttpFileDownloadTests: XCTestCase {
 
     /** 1. Download File */
     // Create mockDataMap.
-    let mockData = CZHTTPJsonSerializer.jsonData(with: MockData.dictionary)!
+    let mockData = CZHTTPJsonSerializer.jsonData(with: MockData.dict)!
     let mockDataDict = [MockData.urlForGet: mockData]
     CZHTTPManager.stubMockData(dict: mockDataDict)
 
@@ -71,13 +71,13 @@ final class CZHttpFileDownloadTests: XCTestCase {
       XCTAssert(fromCache, "Data should return from cache.")
 
       let res: [String: AnyHashable]? = CZHTTPJsonSerializer.deserializedObject(with: data)
-      XCTAssert(res == MockData.dictionary, "Actual result = \(res), Expected result = \(MockData.dictionary)")
+      XCTAssert(res == MockData.dict, "Actual result = \(res), Expected result = \(MockData.dict)")
 
       /** 2. Test Cache */
       Thread.sleep(forTimeInterval: 0.05)
       self.httpFileManager.cache.getCachedFile(withUrl: MockData.urlForGet) { (readData: NSData?) in
         let res: [String: AnyHashable]? = CZHTTPJsonSerializer.deserializedObject(with: readData as Data?)
-        XCTAssert(res == MockData.dictionary, "Actual result = \(res), Expected result = \(MockData.dictionary)")
+        XCTAssert(res == MockData.dict, "Actual result = \(res), Expected result = \(MockData.dict)")
 
         // Fulfill the expectatation.
         expectation.fulfill()
@@ -97,7 +97,7 @@ final class CZHttpFileDownloadTests: XCTestCase {
     let (waitForExpectatation, expectation) = CZTestUtils.waitWithInterval(Constant.timeOut, testCase: self)
     
     // Create mockDataMap.
-    let mockData = CZHTTPJsonSerializer.jsonData(with: MockData.dictionary)!
+    let mockData = CZHTTPJsonSerializer.jsonData(with: MockData.dict)!
     let mockDataDict = [MockData.urlForGet: mockData]
     CZHTTPManager.stubMockData(dict: mockDataDict)
     
@@ -106,7 +106,7 @@ final class CZHttpFileDownloadTests: XCTestCase {
       
       // Verify data.
       let res: [String: AnyHashable]? = CZHTTPJsonSerializer.deserializedObject(with: data)
-      XCTAssert(res == MockData.dictionary, "Actual result = \(res), Expected result = \(MockData.dictionary)")
+      XCTAssert(res == MockData.dict, "Actual result = \(res), Expected result = \(MockData.dict)")
       
       // Verify download state.
       Thread.sleep(forTimeInterval: 0.1)
@@ -127,7 +127,7 @@ final class CZHttpFileDownloadTests: XCTestCase {
     let (waitForExpectatation, expectation) = CZTestUtils.waitWithInterval(Constant.timeOut, testCase: self)
 
     // Create mockDataMap.
-    let mockData = CZHTTPJsonSerializer.jsonData(with: MockData.dictionary)!
+    let mockData = CZHTTPJsonSerializer.jsonData(with: MockData.dict)!
     let mockDataDict = [MockData.urlForGet: mockData]
     CZHTTPManager.stubMockData(dict: mockDataDict)
 
@@ -136,7 +136,7 @@ final class CZHttpFileDownloadTests: XCTestCase {
 
       // Verify data.
       let res: [String: AnyHashable]? = CZHTTPJsonSerializer.deserializedObject(with: data)
-      XCTAssert(res == MockData.dictionary, "Actual result = \(res), Expected result = \(MockData.dictionary)")
+      XCTAssert(res == MockData.dict, "Actual result = \(res), Expected result = \(MockData.dict)")
 
       // Verify download state.
       Thread.sleep(forTimeInterval: 0.1)
