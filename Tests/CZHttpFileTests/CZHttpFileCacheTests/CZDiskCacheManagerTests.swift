@@ -22,16 +22,7 @@ final class CZDiskCacheManagerTests: XCTestCase {
   var httpFileCache: CZHttpFileCache = CZHttpFileManager.shared.cache
   
   override class func setUp() {
-    // let httpFileCache = CZHttpFileCache()
-//    CZHttpFileManager.shared.cache.clearCache()
-//    Thread.sleep(forTimeInterval: 0.1)
     CZHttpFileTestUtils.clearCacheOfHttpFileManager()
-  }
-  
-  override func setUp() {
-    httpFileCache = CZHttpFileCache()
-    // httpFileCache.removeCachedItemsDict(forUrl: MockData.testUrl)
-    // Thread.sleep(forTimeInterval: 0.01)
   }
   
   // MARK: - setCacheFile
@@ -60,13 +51,8 @@ final class CZDiskCacheManagerTests: XCTestCase {
       let isFileExisting = CZFileHelper.fileExists(url:fileUrl)
       XCTAssertTrue(isFileExisting, "File should have been saved. fileUrl = \(fileUrl)")
       
-//      CZHttpFileTestUtils.clearCacheOfHttpFileManager()
-//      Thread.sleep(forTimeInterval: 1)
-      
-      self.httpFileCache.clearCache {
-        // 3. Fulfill.
-        expectation.fulfill()
-      }
+      // 3. Fulfill.
+      expectation.fulfill()
     }
     
     // Wait for expectatation.
