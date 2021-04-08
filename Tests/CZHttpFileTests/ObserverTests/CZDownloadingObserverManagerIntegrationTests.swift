@@ -4,7 +4,7 @@ import CZTestUtils
 import CZNetworking
 @testable import CZHttpFile
 
-final class CZDownloadedObserverManagerIntegrationTests: XCTestCase {
+final class CZDownloadingObserverManagerIntegrationTests: XCTestCase {
   private enum MockData {
     static let urlForGet = URL(string: "http://www.test.com/some_file.jpg")!
     static let dictionary: [String: AnyHashable] = [
@@ -18,7 +18,7 @@ final class CZDownloadedObserverManagerIntegrationTests: XCTestCase {
     static let timeOut: TimeInterval = 30
   }
   private var httpFileManager: CZHttpFileManager!
-  private var testDownloadedObserver: TestDownloadedObserver!
+  private var testDownloadingObserver: TestDownloadingObserver!
   
   override class func setUp() {
     let httpFileManager = CZHttpFileManager()
@@ -28,7 +28,7 @@ final class CZDownloadedObserverManagerIntegrationTests: XCTestCase {
   
   override func setUp() {
     httpFileManager = CZHttpFileManager()
-    testDownloadedObserver = TestDownloadedObserver()
+    testDownloadingObserver = TestDownloadingObserver()
   }
   
   func testDownloadFileAndPublishDwnloadedURLs() {
@@ -40,20 +40,20 @@ final class CZDownloadedObserverManagerIntegrationTests: XCTestCase {
     CZHTTPManager.stubMockData(dict: mockDataDict)
     
     // 1. Add observer.
-    httpFileManager.downloadedObserverManager.addObserver(testDownloadedObserver)
-    let isContained = httpFileManager.downloadedObserverManager.observers.contains(testDownloadedObserver)
-    XCTAssertTrue(isContained, "downloadedObserverManager should have added testDownloadedObserver.")
+    httpFileManager.downloadingObserverManager.addObserver(testDownloadingObserver)
+    let isContained = httpFileManager.downloadingObserverManager.observers.contains(testDownloadingObserver)
+    XCTAssertTrue(isContained, "downloadingObserverManager should have added testDownloadingObserver.")
     
     // 2. Download file.
     httpFileManager.downloadFile(url: MockData.urlForGet) { (data: Data?, error: Error?, fromCache: Bool) in
       
-      // 3. Verify downloadedURLs be published to the observer.
+      // 3. Verify downloadingURLs be published to the observer.
       Thread.sleep(forTimeInterval: 0.1)
-      let actualDownloadedURLs = self.testDownloadedObserver.downloadedURLs
-      let expectedDownloadedURLs = [MockData.urlForGet]
+      let actualDownloadingURLs = self.testDownloadingObserver.downloadingURLs
+      let expectedDownloadingURLs = [MockData.urlForGet]
       XCTAssertTrue(
-        actualDownloadedURLs == expectedDownloadedURLs,
-        "publishDownloadedURLs doesn't work correctly. expected = \(expectedDownloadedURLs), \n actual = \(actualDownloadedURLs)")
+        actualDownloadingURLs == expectedDownloadingURLs,
+        "publishDownloadingURLs doesn't work correctly. expected = \(expectedDownloadingURLs), \n actual = \(actualDownloadingURLs)")
       
       expectation.fulfill()
     }
@@ -64,10 +64,10 @@ final class CZDownloadedObserverManagerIntegrationTests: XCTestCase {
   
 }
 
-private class TestDownloadedObserver: CZDownloadedObserverProtocol {
-  fileprivate var downloadedURLs = [URL]()
+private class TestDownloadingObserver: CZDownloadingObserverProtocol {
+  fileprivate var downloadingURLs = [URL]()
   
-  func downloadedURLsDidUpdate(_ downloadedURLs: [URL]) {
-    self.downloadedURLs = downloadedURLs
+  func downloadingURLsDidUpdate(_ downloadingURLs: [URL]) {
+    self.downloadingURLs = downloadingURLs
   }
 }
