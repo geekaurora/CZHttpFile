@@ -22,11 +22,9 @@ final class CZDownloadedObserverManagerTests: XCTestCase {
   
   func testAddObserver() {
     let testDownloadedObserver = TestDownloadedObserver()
-    
     downloadedObserverManager.addObserver(testDownloadedObserver)
     let isContained = downloadedObserverManager.observers.contains(testDownloadedObserver)
     XCTAssertTrue(isContained, "downloadedObserverManager should have added testDownloadedObserver.")
-    
   }
   
   func testPublishDownloadedURLs() {

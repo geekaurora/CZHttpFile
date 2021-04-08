@@ -175,6 +175,17 @@ extension CZDiskCacheManager {
       self.flushCachedItemsDictToDisk(cachedItemsDict)
   }
   
+  /**
+   - Note: Tests Only!
+   
+   Should call `cachedItemsDictLock.readLock` to read cachedItemsDict for data consistency.
+   */
+  func getCachedItemsDict() -> CachedItemsDict {
+    return cachedItemsDictLock.readLock { (cachedItemsDict) -> CachedItemsDict? in
+      cachedItemsDict
+    } ?? [:]
+  }
+  
   func removeCachedItemsDict(forKey key: String) {
     cachedItemsDictLockWrite { [weak self] (cachedItemsDict) -> Void in
       guard let `self` = self else { return }
@@ -233,9 +244,11 @@ extension CZDiskCacheManager {
         .keys
         .sorted(by: { (key0, key1) -> Bool in
           // Sort URLs by modifiedDate.
-          let modifiedDate0 = cachedItemsDict[key0]?[CacheConstant.kFileModifiedDate] as? Date
-          let modifiedDate1 = cachedItemsDict[key1]?[CacheConstant.kFileModifiedDate] as? Date
-          return modifiedDate1!.timeIntervalSince(modifiedDate0!)  > 0
+          guard let modifiedDate0 = cachedItemsDict[key0]?[CacheConstant.kFileModifiedDate] as? Date,
+                let modifiedDate1 = cachedItemsDict[key1]?[CacheConstant.kFileModifiedDate] as? Date else {
+            return false
+          }
+          return modifiedDate1.timeIntervalSince(modifiedDate0)  > 0
         })
         .compactMap {
         return cachedItemsDict[$0]?[CacheConstant.kHttpUrlString] as? String
