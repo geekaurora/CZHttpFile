@@ -15,7 +15,7 @@ public protocol CZDownloadingObserverProtocol: class {
  - Note: It only holds weak reference to observers.
  */
 public class CZDownloadingObserverManager {
-  private lazy var observers = ThreadSafeWeakArray<CZDownloadingObserverProtocol>()
+  internal private(set) lazy var observers = ThreadSafeWeakArray<CZDownloadingObserverProtocol>()
   @ThreadSafe
   private var downloadingURLs: [URL] = []
   
