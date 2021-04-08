@@ -16,7 +16,7 @@ let package = Package(
       targets: ["CZHttpFile"]),
   ],
   dependencies: [
-    .package(url: "https://github.com/geekaurora/CZUtils.git", from: "3.4.8"),
+    .package(url: "https://github.com/geekaurora/CZUtils.git", from: "3.7.0"),
     .package(url: "https://github.com/geekaurora/CZTestUtils.git", from: "1.1.2"),
     .package(url: "https://github.com/geekaurora/CZNetworking.git", from: "3.3.1"),
   ],
