@@ -15,8 +15,8 @@ final class CZHttpFileCacheTests: XCTestCase {
       "d": 189298723,
     ]
   }
-  var httpFileCache: CZHttpFileCache = CZHttpFileManager.shared.cache
-  
+  let httpFileCache = CZHttpFileManager.shared.cache
+
   override func setUp() {
 //    httpFileCache = CZHttpFileCache()
   }

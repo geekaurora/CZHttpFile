@@ -17,7 +17,7 @@ final class CZHttpFileDownloadTests: XCTestCase {
   private enum Constant {
     static let timeOut: TimeInterval = 30
   }
-  private var httpFileManager =  CZHttpFileManager.shared
+  private let httpFileManager =  CZHttpFileManager.shared
   
   override class func setUp() {
     // Should call clearCache() to clear cached files, otherwise it returns the cached file directly

@@ -19,7 +19,7 @@ final class CZDiskCacheManagerTests: XCTestCase {
   private enum Constant {
     static let timeOut: TimeInterval = 30
   }
-  var httpFileCache: CZHttpFileCache = CZHttpFileManager.shared.cache
+  let httpFileCache = CZHttpFileManager.shared.cache
   
   override class func setUp() {
     CZHttpFileTestUtils.clearCacheOfHttpFileManager()
