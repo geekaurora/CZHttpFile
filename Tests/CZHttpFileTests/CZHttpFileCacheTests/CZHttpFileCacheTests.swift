@@ -17,9 +17,17 @@ final class CZHttpFileCacheTests: XCTestCase {
   }
   let httpFileCache = CZHttpFileManager.shared.cache
 
+  override class func setUp() {
+    CZHttpFileTestUtils.clearCacheOfHttpFileManager()
+  }
+  
   override func setUp() {}
   
+  // MARK: - File Cache / Mem Cache
+  
   func testReadWriteData1() {
+    CZHttpFileTestUtils.clearCacheOfHttpFileManager()
+    
     // 1. Intialize the async expectation.
     let (waitForExpectatation, expectation) = CZTestUtils.waitWithInterval(1, testCase: self)
     
@@ -28,7 +36,12 @@ final class CZHttpFileCacheTests: XCTestCase {
     
     Thread.sleep(forTimeInterval: 0.05)
     
-    // Verify file exists with `cachedFileURL(:)`.
+    // 3-1. Verify MemCache.
+    let (_, cacheKey) = httpFileCache.getCacheFileInfo(forURL: MockData.testUrl)
+    let isExistingInMemCache = (self.httpFileCache.getMemCache(forKey: cacheKey) != nil)
+    XCTAssertTrue(isExistingInMemCache, "File should have been in memCache. fileUrl = \(MockData.testUrl)")
+    
+    // 3-2. Verify DiskCache - file exists in with `cachedFileURL(:)`.
     let (fileURL, isExisting) = httpFileCache.cachedFileURL(forURL: MockData.testUrl)
     XCTAssert(fileURL != nil, "File should have been saved on disk and cacheItemsDict. url = \(MockData.testUrl), fileURL = \(fileURL)")
     XCTAssert(isExisting, "File should have been saved on disk and cacheItemsDict. url = \(MockData.testUrl)")
@@ -37,7 +50,7 @@ final class CZHttpFileCacheTests: XCTestCase {
       let readData = readData as Data?
       XCTAssert(data == readData, "Actual result = \(readData), Expected result = \(data)")
 
-      // 3. Fulfill the expectatation.
+      // 4. Fulfill the expectatation.
       expectation.fulfill()
     }
     
@@ -61,19 +74,20 @@ final class CZHttpFileCacheTests: XCTestCase {
     let (_, cacheKey) = self.httpFileCache.getCacheFileInfo(forURL: MockData.testUrl)
     
     Thread.sleep(forTimeInterval: 0.1)
+        
+    // 2-1. Verify DiskCache - file exists in with `cachedFileURL(:)`.
     httpFileCache.getCachedFile(withUrl: MockData.testUrl) { (readData: NSData?) in
       let readData = readData as Data?
       XCTAssert(data == readData, "Actual result = \(readData), Expected result = \(data)")
 
-      // Verify MemCache.
+      // 2-2. Verify MemCache.
       let dataFromMemCache = self.httpFileCache.getMemCache(forKey: cacheKey) as Data?
       XCTAssert(dataFromMemCache == readData, "MemCache failed! Actual result = \(readData), Expected result = \(data)")
 
       // 3. Fulfill the expectatation.
       expectation.fulfill()
     }
-    
-    // 2. Wait for the expectatation.
+
     waitForExpectatation()
   }
   
