@@ -62,7 +62,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
     return "CZBaseHttpFileCache"
   }
   
-  private let memCache: NSCache<NSString, DataType>
+  internal let memCache: NSCache<NSString, DataType>
   private let operationQueue: OperationQueue
   
   private(set) var diskCacheManager: CZDiskCacheManager<DataType>!
@@ -158,7 +158,12 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   // MARK: - Clear Cache
   
   public func clearCache(completion: CleanDiskCacheCompletion? = nil) {
+    clearMemCache()
     diskCacheManager.clearCache(completion: completion)
+  }
+  
+  private func clearMemCache(completion: CleanDiskCacheCompletion? = nil) {
+    memCache.removeAllObjects()
   }
   
   // MARK: - Overriden methods

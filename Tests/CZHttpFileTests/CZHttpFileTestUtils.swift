@@ -8,6 +8,6 @@ import CZHttpFile
 class CZHttpFileTestUtils {
   static func clearCacheOfHttpFileManager() {
     CZHttpFileManager.shared.cache.clearCache()
-    Thread.sleep(forTimeInterval: 1)
+    Thread.sleep(forTimeInterval: 0.1)
   }  
 }
