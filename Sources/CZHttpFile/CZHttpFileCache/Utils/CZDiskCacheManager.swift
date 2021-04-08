@@ -32,7 +32,6 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
   let ioQueue: DispatchQueue
   private(set) weak var downloadedObserverManager: CZDownloadedObserverManager?
 
-  private let fileManager: FileManager
   private let transformMetadataToCachedData: TransformMetadataToCachedData
   
   public init(maxCacheAge: TimeInterval,
@@ -45,7 +44,6 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
     self.cacheFolderName = cacheFolderName
     self.downloadedObserverManager = downloadedObserverManager
     self.transformMetadataToCachedData = transformMetadataToCachedData
-    self.fileManager = FileManager()
 
     self.ioQueue = DispatchQueue(
       label: CacheConstant.ioQueueLabel,
@@ -152,11 +150,14 @@ extension CZDiskCacheManager {
     let (_, cacheKey) = getCacheFileInfo(forURL: httpURL)
     
     cachedItemsDictLockWrite { [weak self] (cachedItemsDict) -> Void in
-      guard let `self` = self else { return }
+      guard let `self` = self else {
+        return        
+      }
       self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: cacheKey, subkey: CacheConstant.kHttpUrlString, value: httpURL.absoluteString)
       self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: cacheKey, subkey: CacheConstant.kFileModifiedDate, value: NSDate())
       self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate())
       self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: cacheKey, subkey: CacheConstant.kFileSize, value: fileSize)
+      
     }
   }
    
@@ -383,13 +384,7 @@ internal extension CZDiskCacheManager {
     self.ioQueue.async(flags: .barrier) { [weak self] in
       guard let `self` = self else { return }
       removeFileURLs?.forEach {
-        if self.fileManager.fileExists(atPath: $0.absoluteString) {
-          do {
-            try self.fileManager.removeItem(at: $0)
-          } catch {
-            assertionFailure("Failed to remove file \($0). Error - \(error.localizedDescription)")
-          }
-        }
+        CZFileHelper.removeFile($0)
       }
       
       // 3. Call completion if applicable.

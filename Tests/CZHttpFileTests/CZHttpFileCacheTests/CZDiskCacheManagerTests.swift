@@ -16,6 +16,9 @@ final class CZDiskCacheManagerTests: XCTestCase {
       "d": 189298723,
     ]
   }
+  private enum Constant {
+    static let timeOut: TimeInterval = 30
+  }
   var httpFileCache: CZHttpFileCache!
   
   override class func setUp() {
@@ -45,6 +48,34 @@ final class CZDiskCacheManagerTests: XCTestCase {
     public static let ioQueueLabel = "com.tony.cache.ioQueue"
   }
  */
+  
+  func testClearCache() {
+    // 1. Write file to cache and cachedItemsDict.
+    let data = CZHTTPJsonSerializer.jsonData(with: MockData.dict)!
+    httpFileCache.setCacheFile(withUrl: MockData.testUrl, data: data, completeSetCachedItemsDict: nil)
+    Thread.sleep(forTimeInterval: 0.05)
+    
+    let (waitForExpectatation, expectation) = CZTestUtils.waitWithInterval(Constant.timeOut, testCase: self)
+
+    // 2. Call clearCache().
+    let (fileUrl, _) = httpFileCache.cachedFileURL(forURL: MockData.testUrl)
+    httpFileCache.clearCache {
+      // 3-1. Verify: Info in cachedItemDict is removed.
+      let cachedItemsDict = self.httpFileCache.diskCacheManager.getCachedItemsDict()
+      let (_, cacheKey) = self.httpFileCache.diskCacheManager.getCacheFileInfo(forURL: MockData.testUrl)
+      let isCachedItemsDictKeyExisting = (cachedItemsDict[cacheKey] != nil)
+      XCTAssertTrue(!isCachedItemsDictKeyExisting, "CachedItemsDict key should have been removed. url = \(MockData.testUrl)")
+
+      // 3-2. Verify: file is removed.
+      let isFileExisting = CZFileHelper.fileExists(url:fileUrl)
+      XCTAssertTrue(!isFileExisting, "File should have been removed. fileUrl = \(fileUrl)")
+
+      expectation.fulfill()
+    }  
+    
+    // Wait for expectatation.
+    waitForExpectatation()
+  }
   
   func testSetCachedItemsDict1() {
     // setCachedItemsDict.
