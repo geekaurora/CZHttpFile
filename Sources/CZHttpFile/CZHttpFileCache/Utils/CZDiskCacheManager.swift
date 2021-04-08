@@ -367,10 +367,12 @@ internal extension CZDiskCacheManager {
     self.ioQueue.async(flags: .barrier) { [weak self] in
       guard let `self` = self else { return }
       removeFileURLs?.forEach {
-        do {
-          try self.fileManager.removeItem(at: $0)
-        } catch {
-          assertionFailure("Failed to remove file. Error - \(error.localizedDescription)")
+        if self.fileManager.fileExists(atPath: $0.absoluteString) {
+          do {
+            try self.fileManager.removeItem(at: $0)
+          } catch {
+            assertionFailure("Failed to remove file \($0). Error - \(error.localizedDescription)")
+          }
         }
       }
       

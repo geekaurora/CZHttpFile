@@ -7,6 +7,7 @@ import CZNetworking
 final class CZDiskCacheManagerTests: XCTestCase {
   private enum MockData {
     static let key = "929832737212"
+    static let testSize = 16232
     static let testUrl = URL(string: "http://www.test.com/some_file.jpg")!
     static let dict: [String: AnyHashable] = [
       "a": "sdlfjas",
@@ -17,6 +18,18 @@ final class CZDiskCacheManagerTests: XCTestCase {
   }
   var httpFileCache: CZHttpFileCache!
   
+  override class func setUp() {
+    let httpFileCache = CZHttpFileCache()
+    httpFileCache.clearCache()
+    Thread.sleep(forTimeInterval: 0.1)
+  }
+  
+  override class func tearDown() {
+    let httpFileCache = CZHttpFileCache()
+    httpFileCache.clearCache()
+    Thread.sleep(forTimeInterval: 0.1)
+  }
+  
   override func setUp() {
     httpFileCache = CZHttpFileCache()
     // httpFileCache.removeCachedItemsDict(forUrl: MockData.testUrl)
@@ -25,9 +38,6 @@ final class CZDiskCacheManagerTests: XCTestCase {
   
   /*
   public enum CacheConstant {
-    public static let kMaxFileAge: TimeInterval = 60 * 24 * 60 * 60
-    public static let kMaxCacheSize: Int = 500 * 1024 * 1024
-    public static let kCachedItemsDictFile = "cachedItemsDict.plist"
     public static let kFileModifiedDate = "modifiedDate"
     public static let kFileVisitedDate = "visitedDate"
     public static let kHttpUrlString = "url"
@@ -36,22 +46,32 @@ final class CZDiskCacheManagerTests: XCTestCase {
   }
  */
   
-  func testSetCachedItemsDict() {
+  func testSetCachedItemsDict1() {
     // setCachedItemsDict.
     httpFileCache.diskCacheManager.setCachedItemsDict(
       key: MockData.key,
-      subkey: CacheConstant.kHttpUrlString,
-      value: MockData.testUrl.absoluteString)
+      subkey: CacheConstant.kFileSize,
+      value: MockData.testSize)
     
     // Verify: getCachedItemsDict.
     let cachedItemsDict = httpFileCache.diskCacheManager.getCachedItemsDict()
-    let actualUrl = cachedItemsDict[MockData.key]?[CacheConstant.kHttpUrlString] as? String
+    let actualValue = cachedItemsDict[MockData.key]?[CacheConstant.kFileSize] as? Int
     XCTAssertEqual(
-      actualUrl,
-      MockData.testUrl.absoluteString,
-      "Incorrect url value! expected = \(MockData.testUrl.absoluteString), \nactual = \(actualUrl)"
+      actualValue,
+      MockData.testSize,
+      "Incorrect value! expected = \(MockData.testSize), \nactual = \(actualValue)"
     )
   }
   
+  func testSetCachedItemsDict2_ReadFromCache() {
+    // Verify from cache: getCachedItemsDict.
+    let cachedItemsDict = httpFileCache.diskCacheManager.getCachedItemsDict()
+    let actualValue = cachedItemsDict[MockData.key]?[CacheConstant.kFileSize] as? Int
+    XCTAssertEqual(
+      actualValue,
+      MockData.testSize,
+      "Incorrect value! expected = \(MockData.testSize), \nactual = \(actualValue)"
+    )
+  }
   
 }

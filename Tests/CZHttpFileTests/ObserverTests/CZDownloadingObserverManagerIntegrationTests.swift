@@ -24,7 +24,7 @@ final class CZDownloadingObserverManagerIntegrationTests: XCTestCase {
     let httpFileManager = CZHttpFileManager()
     httpFileManager.cache.clearCache()
     Thread.sleep(forTimeInterval: 0.1)
-  }
+  }  
   
   override func setUp() {
     httpFileManager = CZHttpFileManager()
