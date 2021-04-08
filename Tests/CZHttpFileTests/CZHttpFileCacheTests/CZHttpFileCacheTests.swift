@@ -17,9 +17,7 @@ final class CZHttpFileCacheTests: XCTestCase {
   }
   let httpFileCache = CZHttpFileManager.shared.cache
 
-  override func setUp() {
-//    httpFileCache = CZHttpFileCache()
-  }
+  override func setUp() {}
   
   func testReadWriteData1() {
     // 1. Intialize the async expectation.
