@@ -15,12 +15,10 @@ final class CZHttpFileCacheTests: XCTestCase {
       "d": 189298723,
     ]
   }
-  var httpFileCache: CZHttpFileCache!
+  var httpFileCache: CZHttpFileCache = CZHttpFileManager.shared.cache
   
   override func setUp() {
-    httpFileCache = CZHttpFileCache()
-    // httpFileCache.removeCachedItemsDict(forUrl: MockData.testUrl)
-    Thread.sleep(forTimeInterval: 0.01)
+//    httpFileCache = CZHttpFileCache()
   }
   
   func testReadWriteData1() {
@@ -58,13 +56,13 @@ final class CZHttpFileCacheTests: XCTestCase {
   /// to simulate relaunching App.
   func testReadWriteData2AfterRelaunchingApp() {
     // 1. Intialize the async expectation.
-    let (waitForExpectatation, expectation) = CZTestUtils.waitWithInterval(1, testCase: self)
+    let (waitForExpectatation, expectation) = CZTestUtils.waitWithInterval(30, testCase: self)
     
     let data = CZHTTPJsonSerializer.jsonData(with: MockData.dict)!
     //httpFileCache.setCacheFile(withUrl: MockData.testUrl, data: data)
     let (_, cacheKey) = self.httpFileCache.getCacheFileInfo(forURL: MockData.testUrl)
     
-    Thread.sleep(forTimeInterval: 0.01)
+    Thread.sleep(forTimeInterval: 0.1)
     httpFileCache.getCachedFile(withUrl: MockData.testUrl) { (readData: NSData?) in
       let readData = readData as Data?
       XCTAssert(data == readData, "Actual result = \(readData), Expected result = \(data)")
