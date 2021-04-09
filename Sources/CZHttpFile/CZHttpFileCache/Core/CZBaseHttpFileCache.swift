@@ -41,7 +41,7 @@ import CZUtils
  ```
  */
 public enum CacheConstant {
-  public static let kMaxFileAge: TimeInterval = 60 * 24 * 60 * 60
+  public static let kMaxFileAge: TimeInterval = 180 * 24 * 60 * 60
   public static let kMaxCacheSize: Int = 500 * 1024 * 1024
   public static let kCachedItemsDictFile = "cachedItemsDict.plist"
   public static let kFileModifiedDate = "modifiedDate"
