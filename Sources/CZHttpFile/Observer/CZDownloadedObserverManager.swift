@@ -22,9 +22,9 @@ public class CZDownloadedObserverManager {
   public func publishDownloadedURLs(_ downloadedURLs: [URL]) {
     dbgPrintWithFunc(self, "observers = \(observers.allObjects.count), downloadedURLs = \(downloadedURLs)")
 
-    self._downloadedURLs.threadLock({ (_downloadedURLs) -> Void in
+    _downloadedURLs.threadLock { _downloadedURLs in
       _downloadedURLs = downloadedURLs
-    })
+    }
     
     MainQueueScheduler.safeAsync {
       self.observers.allObjects.forEach {

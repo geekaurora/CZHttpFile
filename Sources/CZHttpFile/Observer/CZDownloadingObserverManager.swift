@@ -20,9 +20,9 @@ public class CZDownloadingObserverManager {
   private var downloadingURLs: [URL] = []
   
   public func publishDownloadingURLs(_ downloadingURLs: [URL]) {
-    self._downloadingURLs.threadLock({ (_downloadingURLs) -> Void in
+    _downloadingURLs.threadLock { _downloadingURLs in
       _downloadingURLs = downloadingURLs
-    })
+    }
     
     MainQueueScheduler.safeAsync {
       self.observers.allObjects.forEach {

@@ -11,7 +11,7 @@ public enum Constant {
 private var kvoContext: UInt8 = 0
 
 /**
- Asynchronous httpFile downloading class on top of OperationQueue
+ Asynchronous http file downloading class on top of OperationQueue.
  */
 public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
   public typealias Completion = (_ httpFile: DataType?, _ error: Error?, _ fromCache: Bool) -> Void
