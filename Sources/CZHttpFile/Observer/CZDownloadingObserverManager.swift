@@ -80,6 +80,7 @@ private extension CZDownloadingObserverManager {
   }
   
   func publishDownloadingProgressToObservers() {
+    let downloadingProgressDict = self.downloadingProgressDict
     let downloadingProgressList = downloadingURLs.map { url in
       DownloadingProgress(url: url, progress: downloadingProgressDict[url]?.progress ?? 0)
     }
