@@ -35,7 +35,7 @@ class HttpFileDownloadOperation: ConcurrentBlockOperation {
     }
   }
   
-  override func execute() {
+  override func _execute() {
     downloadHttpFile(url: url)
   }
   
