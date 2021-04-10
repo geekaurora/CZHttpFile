@@ -31,10 +31,10 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
   
   public init(cache: CZBaseHttpFileCache<DataType>,
               downloadingObserverManager: CZDownloadingObserverManager? = nil,
-              downloadQueueMaxConcurrent: Int = CZHttpFileDownloaderConstant.downloadQueueMaxConcurrent,
-              decodeQueueMaxConcurrent: Int = CZHttpFileDownloaderConstant.decodeQueueMaxConcurrent,
-              errorDomain: String = CZHttpFileDownloaderConstant.errorDomain,
-              shouldObserveOperations: Bool = CZHttpFileDownloaderConstant.shouldObserveOperations,
+              downloadQueueMaxConcurrent: Int = CZHttpFileDownloaderConfig.downloadQueueMaxConcurrent,
+              decodeQueueMaxConcurrent: Int = CZHttpFileDownloaderConfig.decodeQueueMaxConcurrent,
+              errorDomain: String = CZHttpFileDownloaderConfig.errorDomain,
+              shouldObserveOperations: Bool = CZHttpFileDownloaderConfig.shouldObserveOperations,
               httpFileDownloadQueueName: String = Constant.httpFileDownloadQueueName,
               httpFileDecodeQueueName: String = Constant.httpFileDecodeQueueName) {
     self.cache = cache

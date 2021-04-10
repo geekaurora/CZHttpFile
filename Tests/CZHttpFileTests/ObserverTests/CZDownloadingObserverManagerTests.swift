@@ -48,4 +48,8 @@ private class TestDownloadingObserver: CZDownloadingObserverProtocol {
   func downloadingURLsDidUpdate(_ downloadingURLs: [URL]) {
     self.downloadingURLs = downloadingURLs
   }
+  
+  func downloadingProgressDidUpdate(_ downloadingProgressList: [DownloadingProgress]) {
+    
+  }
 }

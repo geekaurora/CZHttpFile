@@ -381,8 +381,7 @@ internal extension CZDiskCacheManager {
     }
     
     // 2. Remove corresponding files from disk.
-    self.ioQueue.async(flags: .barrier) { [weak self] in
-      guard let `self` = self else { return }
+    self.ioQueue.async(flags: .barrier) {
       removeFileURLs?.forEach {
         CZFileHelper.removeFile($0)
       }

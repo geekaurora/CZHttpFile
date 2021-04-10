@@ -10,7 +10,7 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
  - Note: the default Data type is `Data`.
  */
 @objc open class CZHttpFileManager: NSObject {
-  
+
   public static let shared: CZHttpFileManager = {
     CZHTTPManager.Config.maxConcurrencies = Config.maxConcurrencies
     let shared = CZHttpFileManager()
@@ -54,7 +54,10 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
       self.downloader.downloadHttpFile(
         url: url,
         priority: priority,
-        progress: progress,
+        progress: { [weak self] (currSize, totalSize, downloadURL) in
+          progress?(currSize, totalSize, downloadURL)
+          self?.publishDownloadProgressIfNeeded(currSize, totalSize, downloadURL)
+        },
         completion: { (data: NSData?, error: Error?, fromCache: Bool) in
           completion(data as Data?, error, fromCache)
         })
@@ -89,5 +92,17 @@ public extension CZHttpFileManager {
       return .downloading
     }
     return .none
+  }
+}
+
+// MARK: - Private methods
+
+private extension CZHttpFileManager {
+  func publishDownloadProgressIfNeeded(_ currSize: Int64, _ totalSize: Int64, _ downloadURL: URL) {
+    guard CZHttpFileDownloaderConfig.shouldObserveDownloadingProgress else {
+      return
+    }
+    let progress = Double(currSize) / Double(totalSize)
+    downloadingObserverManager.publishDownloadingProgress(url: downloadURL, progress: progress)
   }
 }

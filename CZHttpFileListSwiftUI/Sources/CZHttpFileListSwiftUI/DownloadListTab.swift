@@ -9,7 +9,7 @@ public struct DownloadListTab: View {
   
   public var body: some View {
     VStack {
-      Picker(selection: $selectedIndex, label: Text("What is your favorite color?")) {
+      Picker(selection: $selectedIndex, label: Text("")) {
         Text("Downloaded").tag(0)
         Text("Downloading").tag(1)
       }
@@ -20,6 +20,8 @@ public struct DownloadListTab: View {
       } else {
         CZDownloadingList()
       }
+    }.onAppear() {
+      CZHttpFileDownloaderConfig.shouldObserveDownloadingProgress = true
     }
   }
 }

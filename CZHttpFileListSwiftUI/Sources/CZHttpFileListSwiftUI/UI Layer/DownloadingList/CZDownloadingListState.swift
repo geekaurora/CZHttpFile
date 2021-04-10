@@ -15,13 +15,15 @@ class CZDownloadingListState: NSObject, ObservableObject {
 // MARK: - CZDownloadingObserverProtocol
 
 extension CZDownloadingListState: CZDownloadingObserverProtocol {
+  func downloadingProgressDidUpdate(_ downloadingProgressList: [DownloadingProgress]) {
+    dbgPrintWithFunc(self, "downloadingProgressList = \(downloadingProgressList)")
+    
+    self.downloads = downloadingProgressList.map { CZDownload(url: $0.url, progress: $0.progress)  }
+    
+  }
+  
   func downloadingURLsDidUpdate(_ downloadingURLs: [URL]) {
     dbgPrint("\(type(of: self)).downloadingURLsDidUpdate() - downloadingURLs = \n\(downloadingURLs)")
-    
-    var downloads: [CZDownload] = []
-    for (id, url) in downloadingURLs.enumerated() {
-      downloads.append(CZDownload(url: url))
-    }
-    self.downloads = downloads
+    self.downloads = downloadingURLs.map { CZDownload(url: $0)  }
   }
 }
