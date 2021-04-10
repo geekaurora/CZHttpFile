@@ -27,6 +27,8 @@ final class CZHttpFileDownloadTests: XCTestCase {
   
   override func setUp() {}
   
+  // MARK: - Download file
+  
   /**
    Test downloaded file.
    */
@@ -88,6 +90,8 @@ final class CZHttpFileDownloadTests: XCTestCase {
     waitForExpectatation()
   }
   
+  // MARK: - Download State
+    
   /**
    Test downloaded state.
    */
@@ -148,6 +152,12 @@ final class CZHttpFileDownloadTests: XCTestCase {
 
     // Wait for expectatation.
     waitForExpectatation()
+  }
+  
+  func testCZHttpFileDownloaderConfig() {
+    XCTAssertTrue(
+      CZHttpFileDownloaderConfig.shouldObserveDownloadingProgress == false,
+      "CZHttpFileDownloaderConfig.shouldObserveDownloadingProgress should default to false.")
   }
   
 }
