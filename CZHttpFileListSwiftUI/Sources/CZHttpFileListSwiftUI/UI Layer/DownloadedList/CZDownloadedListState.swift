@@ -27,11 +27,6 @@ extension CZDownloadedListState: CZDownloadedObserverProtocol {
 extension CZDownloadedListState {
   func updateWithDownloadedURLs(_ downloadedURLs: [URL]) {
     // dbgPrint("\(type(of: self)).\(#function) - downloadedURLs = \n\(downloadedURLs)")
-
-    var downloads: [CZDownload] = []
-    for (id, url) in downloadedURLs.enumerated() {
-      downloads.append(CZDownload(url: url))
-    }
-    self.downloads = downloads
+    self.downloads = downloadedURLs.map { CZDownload(url: $0)  }
   }
 }
