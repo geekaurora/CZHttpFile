@@ -28,12 +28,7 @@ public class CZDownloadingObserverManager {
   @ThreadSafe
   private var downloadingProgressDict = DownloadingProgressDict()
   
-  public func publishDownloadingProgress(url: URL, progress: Double) {
-    _downloadingProgressDict.threadLock { _downloadingProgressDict in
-      _downloadingProgressDict[url] = DownloadingProgress(url: url, progress: progress)
-    }
-    publishDownloadingProgressToObservers()
-  }
+  // MARK: - Publish
   
   public func publishDownloadingURLs(_ downloadingURLs: [URL]) {
     _downloadingURLs.threadLock { _downloadingURLs in
@@ -45,12 +40,21 @@ public class CZDownloadingObserverManager {
         $0.downloadingURLsDidUpdate(downloadingURLs)
       }
     }
-    // Update downloadingProgressDict with updated `downloadingURLs`.
+    // Update downloadingProgressDict with updated `downloadingURLs` to filter removed URLs out.
     updateDownloadingProgressDict()
   }
   
+  public func publishDownloadingProgress(url: URL, progress: Double) {
+    _downloadingProgressDict.threadLock { _downloadingProgressDict in
+      _downloadingProgressDict[url] = DownloadingProgress(url: url, progress: progress)
+    }
+    publishDownloadingProgressToObservers()
+  }
+  
+  // MARK: - Observer
+  
   public func addObserver(_ observer: CZDownloadingObserverProtocol) {
-    // Publish the latest state to observer.
+    // Publish the latest State to observer.
     observer.downloadingURLsDidUpdate(downloadingURLs)
     // Append the observer.
     observers.append(observer)

@@ -16,11 +16,12 @@ class CZDownloadingListState: NSObject, ObservableObject {
 
 extension CZDownloadingListState: CZDownloadingObserverProtocol {
   func downloadingProgressDidUpdate(_ downloadingProgressDict: CZDownloadingObserverManager.DownloadingProgressDict) {
+    dbgPrintWithFunc(self, "downloadingProgressDict = \(downloadingProgressDict)")
     
   }
   
   func downloadingURLsDidUpdate(_ downloadingURLs: [URL]) {
-    dbgPrint("\(type(of: self)).downloadingURLsDidUpdate() - downloadingURLs = \n\(downloadingURLs)")    
+    dbgPrint("\(type(of: self)).downloadingURLsDidUpdate() - downloadingURLs = \n\(downloadingURLs)")
     self.downloads = downloadingURLs.map { CZDownload(url: $0)  }
   }
 }
