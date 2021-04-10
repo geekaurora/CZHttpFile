@@ -15,10 +15,10 @@ class CZDownloadingListState: NSObject, ObservableObject {
 // MARK: - CZDownloadingObserverProtocol
 
 extension CZDownloadingListState: CZDownloadingObserverProtocol {
-  func downloadingProgressDidUpdate(_ downloadingProgressDict: CZDownloadingObserverManager.DownloadingProgressDict) {
-    dbgPrintWithFunc(self, "downloadingProgressDict = \(downloadingProgressDict)")
+  func downloadingProgressDidUpdate(_ downloadingProgressList: [DownloadingProgress]) {
+    dbgPrintWithFunc(self, "downloadingProgressList = \(downloadingProgressList)")
     
-    self.downloads = downloadingProgressDict.map { CZDownload(url: $0.key, progress: $0.value.progress)  }
+    self.downloads = downloadingProgressList.map { CZDownload(url: $0.url, progress: $0.progress)  }
     
   }
   

@@ -8,7 +8,7 @@ import CZNetworking
 public protocol CZDownloadingObserverProtocol: class {
   func downloadingURLsDidUpdate(_ downloadingURLs: [URL])
   
-  func downloadingProgressDidUpdate(_ downloadingProgressDict: CZDownloadingObserverManager.DownloadingProgressDict)
+  func downloadingProgressDidUpdate(_ downloadingProgressList: [DownloadingProgress])
 }
 
 /**
@@ -80,9 +80,12 @@ private extension CZDownloadingObserverManager {
   }
   
   func publishDownloadingProgressToObservers() {
+    let downloadingProgressList = downloadingURLs.map { url in
+      DownloadingProgress(url: url, progress: downloadingProgressDict[url]?.progress ?? 0)
+    }
     MainQueueScheduler.safeAsync {
       self.observers.allObjects.forEach {
-        $0.downloadingProgressDidUpdate(self.downloadingProgressDict)
+        $0.downloadingProgressDidUpdate(downloadingProgressList)
       }
     }
   }
