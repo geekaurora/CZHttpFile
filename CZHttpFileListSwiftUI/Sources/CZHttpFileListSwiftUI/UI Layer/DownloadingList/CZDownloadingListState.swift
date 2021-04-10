@@ -18,6 +18,8 @@ extension CZDownloadingListState: CZDownloadingObserverProtocol {
   func downloadingProgressDidUpdate(_ downloadingProgressDict: CZDownloadingObserverManager.DownloadingProgressDict) {
     dbgPrintWithFunc(self, "downloadingProgressDict = \(downloadingProgressDict)")
     
+    self.downloads = downloadingProgressDict.map { CZDownload(url: $0.key, progress: $0.value.progress)  }
+    
   }
   
   func downloadingURLsDidUpdate(_ downloadingURLs: [URL]) {
