@@ -11,15 +11,6 @@ public protocol CZDownloadingObserverProtocol: class {
   func downloadingProgressDidUpdate(_ downloadingProgressDict: CZDownloadingObserverManager.DownloadingProgressDict)
 }
 
-public struct DownloadingProgress {
-  public let url: URL
-  public var progress: Double
-  public init(url: URL, progress: Double) {
-    self.url = url
-    self.progress = progress
-  }
-}
-
 /**
  Manager maintains observers of downloading states.
  
@@ -41,12 +32,7 @@ public class CZDownloadingObserverManager {
     _downloadingProgressDict.threadLock { _downloadingProgressDict in
       _downloadingProgressDict[url] = DownloadingProgress(url: url, progress: progress)
     }
-    
-    MainQueueScheduler.safeAsync {
-      self.observers.allObjects.forEach {
-        $0.downloadingProgressDidUpdate(self.downloadingProgressDict)
-      }
-    }
+    publishDownloadingProgressToObservers()
   }
   
   public func publishDownloadingURLs(_ downloadingURLs: [URL]) {
@@ -80,8 +66,20 @@ public class CZDownloadingObserverManager {
 private extension CZDownloadingObserverManager {
   func updateDownloadingProgressDict() {
     let downloadingURLsSet = Set(downloadingURLs)
+    guard downloadingURLsSet != Set(downloadingProgressDict.keys) else {
+      return
+    }
     _downloadingProgressDict.threadLock { _downloadingProgressDict in
       _downloadingProgressDict = _downloadingProgressDict.filter { downloadingURLsSet.contains($0.key) }
+    }
+    publishDownloadingProgressToObservers()
+  }
+  
+  func publishDownloadingProgressToObservers() {
+    MainQueueScheduler.safeAsync {
+      self.observers.allObjects.forEach {
+        $0.downloadingProgressDidUpdate(self.downloadingProgressDict)
+      }
     }
   }
 }
