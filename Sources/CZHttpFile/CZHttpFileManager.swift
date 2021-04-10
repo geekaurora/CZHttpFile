@@ -99,7 +99,7 @@ public extension CZHttpFileManager {
 
 private extension CZHttpFileManager {
   func publishDownloadProgressIfNeeded(_ currSize: Int64, _ totalSize: Int64, _ downloadURL: URL) {
-    guard CZHttpFileDownloaderConstant.shouldObserveDownloadingProgress else {
+    guard CZHttpFileDownloaderConfig.shouldObserveDownloadingProgress else {
       return
     }
     let progress = Double(currSize) / Double(totalSize)

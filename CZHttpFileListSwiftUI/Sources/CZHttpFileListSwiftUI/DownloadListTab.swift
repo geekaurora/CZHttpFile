@@ -21,7 +21,7 @@ public struct DownloadListTab: View {
         CZDownloadingList()
       }
     }.onAppear() {
-      CZHttpFileDownloaderConstant.shouldObserveDownloadingProgress = true
+      CZHttpFileDownloaderConfig.shouldObserveDownloadingProgress = true
     }
   }
 }
