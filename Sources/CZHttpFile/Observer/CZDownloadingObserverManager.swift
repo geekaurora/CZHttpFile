@@ -9,6 +9,15 @@ public protocol CZDownloadingObserverProtocol: class {
   func downloadingURLsDidUpdate(_ downloadingURLs: [URL])
 }
 
+class DownloadingProgress {
+  let url: URL
+  var progress: Double
+  init(url: URL, progress: Double) {
+    self.url = url
+    self.progress = progress
+  }
+}
+
 /**
  Manager maintains observers of downloading states.
  
