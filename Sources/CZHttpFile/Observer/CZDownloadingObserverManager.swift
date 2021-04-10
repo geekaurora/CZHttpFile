@@ -25,8 +25,14 @@ class DownloadingProgress {
  */
 public class CZDownloadingObserverManager {
   internal private(set) lazy var observers = ThreadSafeWeakArray<CZDownloadingObserverProtocol>()
+  
+  /// Thread safe download URLs.
   @ThreadSafe
   private var downloadingURLs: [URL] = []
+  
+  /// Thread safe downloading progress dictionary - [downloadingURL: DownloadingProgress].
+  @ThreadSafe
+  private var downloadingProgressDict = [URL: DownloadingProgress]()
   
   public func publishDownloadingURLs(_ downloadingURLs: [URL]) {
     _downloadingURLs.threadLock { _downloadingURLs in
@@ -38,6 +44,8 @@ public class CZDownloadingObserverManager {
         $0.downloadingURLsDidUpdate(downloadingURLs)
       }
     }
+    // Update downloadingProgressDict with updated `downloadingURLs`.
+    updateDownloadingProgressDict()
   }
   
   public func addObserver(_ observer: CZDownloadingObserverProtocol) {
@@ -51,3 +59,15 @@ public class CZDownloadingObserverManager {
     observers.remove(observer)
   }
 }
+
+// MARK: - Private methods
+
+private extension CZDownloadingObserverManager {
+  func updateDownloadingProgressDict() {
+    let downloadingURLsSet = Set(downloadingURLs)
+    _downloadingProgressDict.threadLock { _downloadingProgressDict in
+      _downloadingProgressDict = _downloadingProgressDict.filter { downloadingURLsSet.contains($0.key) }
+    }
+  }
+}
+
