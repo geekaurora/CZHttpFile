@@ -11,7 +11,8 @@ struct CZDownloadedList: View {
     
     VStack {
       Text(cacheInfo)
-
+      Spacer(minLength: 10)
+      
       Button("Clear All Cache") {
         CZHttpFileManager.shared.cache.clearCache() {
           CZAlertManager.showAlert(message: "Cleared all cache!")
