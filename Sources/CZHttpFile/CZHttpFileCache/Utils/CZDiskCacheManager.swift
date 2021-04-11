@@ -26,13 +26,22 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
     let cachedItemsDict: CachedItemsDict = loadCachedItemsDict() ?? [:]
     return CZMutexLock(cachedItemsDict)
   }()
-      
+  
+  var currentCacheSize: Int {
+    return cachedItemsDictLock.readLock { [weak self] (cachedItemsDict: CachedItemsDict) -> Int in
+      guard let `self` = self else {return 0}
+      return self.getSizeWithoutLock(cachedItemsDict: cachedItemsDict)
+    } ?? 0
+  }
+  
   let maxCacheAge: TimeInterval
   let maxCacheSize: Int
   let ioQueue: DispatchQueue
   private(set) weak var downloadedObserverManager: CZDownloadedObserverManager?
 
   private let transformMetadataToCachedData: TransformMetadataToCachedData
+  
+  // MARK: - Initializer
   
   public init(maxCacheAge: TimeInterval,
               maxCacheSize: Int,
@@ -53,13 +62,6 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
     super.init()
   }
   
-  var totalCachedFileSize: Int {
-    return cachedItemsDictLock.readLock { [weak self] (cachedItemsDict: CachedItemsDict) -> Int in
-      guard let `self` = self else {return 0}
-      return self.getSizeWithoutLock(cachedItemsDict: cachedItemsDict)
-    } ?? 0
-  }
-
   /**
    Get total cache size with `cachedItemsDict`.
    */
@@ -137,8 +139,6 @@ extension CZDiskCacheManager {
     }
   }
 }
-
-// MARK: - Clear Cache
 
 // MARK: - cachedItemsDict
   
@@ -285,7 +285,7 @@ extension CZDiskCacheManager {
   }
 }
 
-// MARK: - Clean DiskCache
+// MARK: - Clean Cache
 
 internal extension CZDiskCacheManager {
   
@@ -310,9 +310,9 @@ internal extension CZDiskCacheManager {
     }
     
     // 2. Clean disk by maxSize setting: based on visited date - simple LRU
-    if self.totalCachedFileSize > self.maxCacheSize {
+    if self.currentCacheSize > self.maxCacheSize {
       let expectedCacheSize = self.maxCacheSize / 2
-      let expectedReduceSize = self.totalCachedFileSize - expectedCacheSize
+      let expectedReduceSize = self.currentCacheSize - expectedCacheSize
       
       var removedFilesSize: Int = 0
       

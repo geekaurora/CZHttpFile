@@ -62,12 +62,15 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
     return "CZBaseHttpFileCache"
   }
   
+  public var currentCacheSize: Int {
+    diskCacheManager.currentCacheSize
+  }
+  public let maxCacheAge: TimeInterval
+  public let maxCacheSize: Int
+
   internal let memCache: NSCache<NSString, DataType>
   private let operationQueue: OperationQueue
-  
   private(set) var diskCacheManager: CZDiskCacheManager<DataType>!
-  let maxCacheAge: TimeInterval
-  let maxCacheSize: Int
   
   public init(maxCacheAge: TimeInterval = CacheConstant.kMaxFileAge,
               maxCacheSize: Int = CacheConstant.kMaxCacheSize,
@@ -96,7 +99,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   }
   
   var size: Int {
-    return diskCacheManager.totalCachedFileSize
+    return diskCacheManager.currentCacheSize
   }
   
   // MARK: - Set / Get Cache
