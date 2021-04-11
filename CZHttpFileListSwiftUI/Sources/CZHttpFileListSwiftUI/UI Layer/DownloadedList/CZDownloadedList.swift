@@ -7,7 +7,7 @@ struct CZDownloadedList: View {
   var listState = CZDownloadedListState()
   
   var body: some View {
-    let cacheInfo = "currentCacheSize = \(CZHttpFileManager.shared.cache.currentCacheSize) \nmaxCacheSize = \(CZHttpFileManager.shared.cache.maxCacheSize)"
+    let cacheInfo = "currentCacheSize = \(CZHttpFileManager.shared.cache.currentCacheSize.sizeString) \nmaxCacheSize = \(CZHttpFileManager.shared.cache.maxCacheSize.sizeString)"
     
     VStack {
       Text(cacheInfo)
