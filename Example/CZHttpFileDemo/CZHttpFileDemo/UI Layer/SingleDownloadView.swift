@@ -15,16 +15,7 @@ struct SingleDownloadView: View {
   
   var body: some View {
     VStack {
-      //    let audioInfo = CZAudioInfo(url: cacheFileUrl, title: "TestAudio")
-      //    AVPlayerView(audioInfo: audioInfo)
-      
       ProgressView(value: downloadAmount, total: 1)
-      
-      Button("Clean Cache") {
-        CZHttpFileManager.shared.cache.clearCache() {
-          CZAlertManager.showAlert(message: "Cleaned Cache!")
-        }
-      }
       
       Button("Download") {
         CZHttpFileManager.shared.downloadFile(

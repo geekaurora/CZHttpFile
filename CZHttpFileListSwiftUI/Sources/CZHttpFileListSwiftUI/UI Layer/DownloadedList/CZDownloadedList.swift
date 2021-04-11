@@ -7,8 +7,16 @@ struct CZDownloadedList: View {
   var listState = CZDownloadedListState()
   
   var body: some View {
-    List(listState.downloads, id: \.diffId) {
-      CZDownloadingCell(download: $0)
+    VStack {
+      Button("Clear All Cache") {
+        CZHttpFileManager.shared.cache.clearCache() {
+          CZAlertManager.showAlert(message: "Cleared all cache!")
+        }
+      }
+      
+      List(listState.downloads, id: \.diffId) {
+        CZDownloadingCell(download: $0)
+      }
     }
   }
 }
