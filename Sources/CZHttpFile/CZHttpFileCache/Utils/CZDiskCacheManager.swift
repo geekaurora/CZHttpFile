@@ -126,7 +126,8 @@ extension CZDiskCacheManager {
                             completion: @escaping (DataType?) -> Void)  {
     let (fileURL, cacheKey) = getCacheFileInfo(forURL: url)
     
-    // Read data from disk cache
+    // Read data from disk cache.
+    // Note: should async() to avoid block main thread.
     self.ioQueue.sync {
       if let data = try? Data(contentsOf: fileURL),
          let image = transformMetadataToCachedData(data).assertIfNil {
@@ -149,7 +150,7 @@ extension CZDiskCacheManager {
   func setCachedItemsDictForNewURL(_ httpURL: URL, fileSize: Int) {
     let (_, cacheKey) = getCacheFileInfo(forURL: httpURL)
     
-    cachedItemsDictLockWrite { [weak self] (cachedItemsDict) -> Void in
+    cachedItemsDictLockWrite(isAsync: true) { [weak self] (cachedItemsDict) -> Void in
       guard let `self` = self else {
         return        
       }
@@ -165,7 +166,7 @@ extension CZDiskCacheManager {
                           subkey: String,
                           value: Any,
                           skipIfKeyNotExists: Bool = false) {
-    cachedItemsDictLockWrite { [weak self] (cachedItemsDict) -> Void in
+    cachedItemsDictLockWrite(isAsync: true) { [weak self] (cachedItemsDict) -> Void in
       guard let `self` = self else { return }
       self.setCachedItemsDictWithoutLock(
         cachedItemsDict: &cachedItemsDict,
@@ -189,7 +190,7 @@ extension CZDiskCacheManager {
         cachedItemsDict[key] = [:]
       }
       cachedItemsDict[key]?[subkey] = value
-      self.flushCachedItemsDictToDisk(cachedItemsDict)
+      // self.flushCachedItemsDictToDisk(cachedItemsDict)
   }
   
   /**
@@ -203,26 +204,27 @@ extension CZDiskCacheManager {
     } ?? [:]
   }
   
-  func removeCachedItemsDict(forKey key: String) {
-    cachedItemsDictLockWrite { [weak self] (cachedItemsDict) -> Void in
-      guard let `self` = self else { return }
-      cachedItemsDict.removeValue(forKey: key)
-      self.flushCachedItemsDictToDisk(cachedItemsDict)
-    }
-  }
-  
-  func removeCachedItemsDict(forUrl url: URL) {
-    let cacheFileInfo = getCacheFileInfo(forURL: url)
-    removeCachedItemsDict(forKey: cacheFileInfo.cacheKey)
-  }
+//  func removeCachedItemsDict(forKey key: String) {
+//    cachedItemsDictLockWrite { [weak self] (cachedItemsDict) -> Void in
+//      guard let `self` = self else { return }
+//      cachedItemsDict.removeValue(forKey: key)
+//      self.flushCachedItemsDictToDisk(cachedItemsDict)
+//    }
+//  }
+//
+//  func removeCachedItemsDict(forUrl url: URL) {
+//    let cacheFileInfo = getCacheFileInfo(forURL: url)
+//    removeCachedItemsDict(forKey: cacheFileInfo.cacheKey)
+//  }
   
   func flushCachedItemsDictToDisk(_ cachedItemsDict: CachedItemsDict) {
-    (cachedItemsDict as NSDictionary).write(to: cachedItemsDictFileURL, atomically: true)
+    // (cachedItemsDict as NSDictionary).write(to: cachedItemsDictFileURL, atomically: true)
   }
   
-  func cachedItemsDictLockWrite<Result>(closure: @escaping (inout CachedItemsDict) -> Result?) -> Result? {
+  func cachedItemsDictLockWrite<Result>(isAsync: Bool = false,
+                                        closure: @escaping (inout CachedItemsDict) -> Result?) -> Result? {
     // Get result throught write lock.
-    let result = cachedItemsDictLock.writeLock(closure)
+    let result = cachedItemsDictLock.writeLock(isAsync: isAsync, closure)
     
     // Publish DownloadedURLs.
     publishDownloadedURLs()
