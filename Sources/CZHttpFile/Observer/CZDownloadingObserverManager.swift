@@ -45,6 +45,8 @@ public class CZDownloadingObserverManager {
   }
   
   public func publishDownloadingProgress(url: URL, progress: Double) {
+    assert(progress >= 0, "progress shouldn't be negative value.")
+    
     _downloadingProgressDict.threadLock { _downloadingProgressDict in
       _downloadingProgressDict[url] = DownloadingProgress(url: url, progress: progress)
     }
