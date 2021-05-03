@@ -56,7 +56,8 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
 
     self.ioQueue = DispatchQueue(
       label: CacheConstant.ioQueueLabel,
-      qos: .userInitiated,
+      //qos: .userInitiated,
+      qos: .default,
       attributes: .concurrent)
     
     super.init()
@@ -124,13 +125,15 @@ extension CZDiskCacheManager {
   
   public func getCachedFile(withUrl url: URL,
                             completion: @escaping (DataType?) -> Void)  {
-    let (fileURL, cacheKey) = getCacheFileInfo(forURL: url)
-    
     // Read data from disk cache.
-    // Note: should async() to avoid block main thread.
-    self.ioQueue.sync {
+    // Note: should async() to avoid blocking main thread.
+    // self.ioQueue.sync
+    self.ioQueue.async { [weak self] in
+      guard let `self` = self else { return }
+      let (fileURL, cacheKey) = self.getCacheFileInfo(forURL: url)
+      
       if let data = try? Data(contentsOf: fileURL),
-         let image = transformMetadataToCachedData(data).assertIfNil {
+         let image = self.transformMetadataToCachedData(data).assertIfNil {
         // Update last visited date
         self.setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate(), skipIfKeyNotExists: true)
         completion(image)
