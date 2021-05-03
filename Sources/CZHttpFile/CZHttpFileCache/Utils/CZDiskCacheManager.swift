@@ -60,7 +60,7 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
       qos: .default,
       attributes: .concurrent)
     
-    super.init()
+    super.init()    
   }
   
   /**
