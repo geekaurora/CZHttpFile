@@ -179,7 +179,8 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
       }
       
       if shouldObserveOperations {
-        dbgPrint("[CZHttpFileDownloader] Queued tasks: \(object.operationCount), currentThread = \(Thread.current), downloadingURLs = \(downloadingURLs)")
+        //dbgPrint("[CZHttpFileDownloader] Queued tasks: \(object.operationCount), currentThread = \(Thread.current), downloadingURLs = \(downloadingURLs)")
+        dbgPrint("[CZHttpFileDownloader] Queued tasks: \(object.operationCount), Executing tasks: \(object.operations.count), currentThread = \(Thread.current)")
       }
     }
   }
