@@ -110,7 +110,9 @@ extension CZDiskCacheManager {
     let (fileURL, cacheKey) = getCacheFileInfo(forURL: url)
     
     // Disk cache
-    ioQueue.async(flags: .barrier) { [weak self] in
+    // ioQueue.async(flags: .barrier)
+    ioQueue.async
+    { [weak self] in
       guard let `self` = self else { return }
       do {
         self.setCachedItemsDictForNewURL(url, fileSize: data.count)
@@ -385,6 +387,10 @@ internal extension CZDiskCacheManager {
       return removeFileURLs
     }
     
+    guard !(removeFileURLs?.isEmpty ?? true) else {
+      return
+    }
+      
     // 2. Remove corresponding files from disk.
     self.ioQueue.async(flags: .barrier) {
       removeFileURLs?.forEach {
