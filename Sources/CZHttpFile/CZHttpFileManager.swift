@@ -40,6 +40,14 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
                            priority: Operation.QueuePriority = .normal,
                            progress: HTTPRequestWorker.Progress? = nil,
                            completion: @escaping CZHttpFileDownloderCompletion) {
+    
+    SimpleImageDownloader.shared.download(url) { (data: Data?) in
+      MainQueueScheduler.sync {
+        completion(data as Data?, nil, false)
+      }
+    }
+    
+    /*
     cache.getCachedFile(withUrl: url) { [weak self] (data: NSData?) in
       guard let `self` = self else { return }
       if CZHttpFileDownloaderConfig.enableLocalCache,
@@ -63,6 +71,7 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
           completion(data as Data?, error, fromCache)
         })
     }
+ */
   }
   
   @objc(cancelDownloadWithURL:)
