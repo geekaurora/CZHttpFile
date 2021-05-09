@@ -77,6 +77,7 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
                                completion: @escaping Completion) {
     guard let url = url else { return }
     
+    /*
     SimpleImageDownloader.shared.download(url) { (data: Data?) in
       guard let data = data.assertIfNil else { return }
       
@@ -96,10 +97,9 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
          completion(outputHttpFile, nil, false)
       }
     }
+    */
     
-    /*
-    cancelDownload(with: url)
-    
+    // cancelDownload(with: url)
     let operation = HttpFileDownloadOperation(
       url: url,
       progress: progress,
@@ -145,7 +145,7 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
       })
     operation.queuePriority = priority
     httpFileDownloadQueue.addOperation(operation)
- */
+ 
   }
   
   @objc(cancelDownloadWithURL:)
