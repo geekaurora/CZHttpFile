@@ -141,6 +141,7 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
 //            })
         }
       }, failure: { (task, error) in
+        assertionFailure("Failedd to download file. url = \(url), Error - \(error)")
         completion(nil, error, false)
       })
     operation.queuePriority = priority
