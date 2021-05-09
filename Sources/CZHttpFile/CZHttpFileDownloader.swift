@@ -76,7 +76,7 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
                                progress: HTTPRequestWorker.Progress? = nil,
                                completion: @escaping Completion) {
     guard let url = url else { return }
-    
+        
     /*
     SimpleImageDownloader.shared.download(url) { (data: Data?) in
       guard let data = data.assertIfNil else { return }
@@ -94,12 +94,15 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
       }
       
       MainQueueScheduler.async {
-         completion(outputHttpFile, nil, false)
+        dbgPrintWithFunc(self, "Downloaded - url = \(url)")
+        CZSystemInfo.getURLSessionInfo()
+        completion(outputHttpFile, nil, false)
       }
     }
     */
     
     // cancelDownload(with: url)
+    
     let operation = HttpFileDownloadOperation(
       url: url,
       progress: progress,
@@ -146,7 +149,9 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
         completion(nil, error, false)
       })
     operation.queuePriority = priority
+    
     httpFileDownloadQueue.addOperation(operation)
+    
  
   }
   

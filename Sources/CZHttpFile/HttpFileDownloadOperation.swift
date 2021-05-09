@@ -22,16 +22,16 @@ class HttpFileDownloadOperation: ConcurrentBlockOperation {
     super.init()
     
     self.props["url"] = url
-    self.success = { [weak self] (data, reponse) in
+    self.success = { [weak self] (task, data) in
       // Update Operation's `isFinished` prop
       self?.finish()
-      success?(data, reponse)
+      success?(task, data)
     }
     
-    self.failure = { [weak self] (reponse, error) in
+    self.failure = { [weak self] (task, error) in
       // Update Operation's `isFinished` prop
       self?.finish()
-      failure?(reponse, error)
+      failure?(task, error)
     }
   }
   
@@ -48,15 +48,25 @@ class HttpFileDownloadOperation: ConcurrentBlockOperation {
 
 private extension HttpFileDownloadOperation {
   func downloadHttpFile(url: URL) {
-    requester = HTTPRequestWorker(
-      .GET,
-      url: url,
-      params: nil,
-      shouldSerializeJson: false,
-      success: success,
-      failure: failure,
-      progress: progress)
-    requester?.start()
+    URLSession.shared.dataTask(with: url) { [weak self] (data, response, error) in
+      guard let `self` = self else { return }
+      if let error = error {
+        self.failure?(nil, error)
+        return
+      }
+       self.success?(nil, data)
+    }.resume()
+
+    
+//    requester = HTTPRequestWorker(
+//      .GET,
+//      url: url,
+//      params: nil,
+//      shouldSerializeJson: false,
+//      success: success,
+//      failure: failure,
+//      progress: progress)
+//    requester?.start()
   }
 }
 
