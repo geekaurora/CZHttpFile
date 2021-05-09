@@ -93,7 +93,7 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
       }
       
       MainQueueScheduler.async {
-        completion(outputHttpFile, nil, false)
+         completion(outputHttpFile, nil, false)
       }
     }
     
