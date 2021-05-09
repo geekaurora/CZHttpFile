@@ -117,7 +117,7 @@ extension CZDiskCacheManager {
       do {
         self.setCachedItemsDictForNewURL(url, fileSize: data.count)
         completeSetCachedItemsDict?()
-        try data.write(to: fileURL)
+        // try data.write(to: fileURL)
         completeSaveCachedFile?()
       } catch {
         assertionFailure("Failed to write file. Error - \(error.localizedDescription)")
