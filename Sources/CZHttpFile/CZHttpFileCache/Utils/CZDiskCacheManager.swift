@@ -22,9 +22,9 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
     return URL(fileURLWithPath: cacheFolderHelper.cacheFolder + CacheConstant.kCachedItemsDictFile)
   }()
   
-  lazy var cachedItemsDictLock: CZMutexLock<CachedItemsDict> = {
+  lazy var cachedItemsDictLock: CZMutexLockWithNSLock<CachedItemsDict> = {
     let cachedItemsDict: CachedItemsDict = loadCachedItemsDict() ?? [:]
-    return CZMutexLock(cachedItemsDict)
+    return CZMutexLockWithNSLock(cachedItemsDict)
   }()
   
   var currentCacheSize: Int {
