@@ -48,7 +48,7 @@ class HttpFileDownloadOperation: ConcurrentBlockOperation {
 
 private extension HttpFileDownloadOperation {
   func downloadHttpFile(url: URL) {
-    if (true) {
+    if (false) {
       
       // * TEST - Fixed crash!
       URLSession.shared.dataTask(with: url) { [weak self] (data, response, error) in
@@ -59,7 +59,6 @@ private extension HttpFileDownloadOperation {
         }
          self.success?(nil, data)
       }.resume()
-
       
 //      URLSession.shared.dataTask(with: url) { [weak self] (data, response, error) in
 //        guard let `self` = self else { return }
@@ -91,9 +90,8 @@ private extension HttpFileDownloadOperation {
         success: success,
         failure: failure,
         progress: progress)
-      //requester?.start()
-      
-      requester?.testStartFetch()
+      requester?.start()
+      // requester?.testStartFetch()
     }
   }
 }
