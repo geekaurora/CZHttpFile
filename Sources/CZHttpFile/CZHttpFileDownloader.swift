@@ -150,9 +150,7 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
       })
     operation.queuePriority = priority
     
-    httpFileDownloadQueue.addOperation(operation)
-    
- 
+    httpFileDownloadQueue.addOperation(operation)     
   }
   
   @objc(cancelDownloadWithURL:)

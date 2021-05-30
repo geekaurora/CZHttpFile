@@ -33,11 +33,7 @@ class HttpFileDownloadOperation: ConcurrentBlockOperation {
       self?.finish()
       failure?(task, error)
     }
-  }
-  
-  deinit {
-    
-  }
+  }  
   
   override func _execute() {
     downloadHttpFile(url: url)
