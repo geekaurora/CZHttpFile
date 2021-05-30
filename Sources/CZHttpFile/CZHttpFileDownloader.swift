@@ -45,11 +45,11 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
     httpFileDownloadQueue.name = httpFileDownloadQueueName
     // .default QoS: between .userInteractive and .utility.
     httpFileDownloadQueue.qualityOfService = .default
-    // httpFileDownloadQueue.maxConcurrentOperationCount = downloadQueueMaxConcurrent
+    httpFileDownloadQueue.maxConcurrentOperationCount = downloadQueueMaxConcurrent
     
     httpFileDecodeQueue = OperationQueue()
     httpFileDownloadQueue.name = httpFileDecodeQueueName
-    // httpFileDecodeQueue.maxConcurrentOperationCount = decodeQueueMaxConcurrent
+    httpFileDecodeQueue.maxConcurrentOperationCount = decodeQueueMaxConcurrent
     super.init()
     
     // if shouldObserveOperations {
@@ -187,7 +187,7 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
       
       if shouldObserveOperations {
         //dbgPrint("[CZHttpFileDownloader] Queued tasks: \(object.operationCount), currentThread = \(Thread.current), downloadingURLs = \(downloadingURLs)")
-        CZSystemInfo.getURLSessionInfo()
+        // CZSystemInfo.getURLSessionInfo()
         dbgPrint("[CZHttpFileDownloader] Queued tasks: \(object.operationCount), Executing tasks: \(object.operations.count), currentThread = \(Thread.current)")
       }
     }

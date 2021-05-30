@@ -35,6 +35,10 @@ class HttpFileDownloadOperation: ConcurrentBlockOperation {
     }
   }
   
+  deinit {
+    
+  }
+  
   override func _execute() {
     downloadHttpFile(url: url)
   }
@@ -48,25 +52,53 @@ class HttpFileDownloadOperation: ConcurrentBlockOperation {
 
 private extension HttpFileDownloadOperation {
   func downloadHttpFile(url: URL) {
-    URLSession.shared.dataTask(with: url) { [weak self] (data, response, error) in
-      guard let `self` = self else { return }
-      if let error = error {
-        self.failure?(nil, error)
-        return
-      }
-       self.success?(nil, data)
-    }.resume()
+    if (true) {
+      
+      // * TEST - Fixed crash!
+      URLSession.shared.dataTask(with: url) { [weak self] (data, response, error) in
+        guard let `self` = self else { return }
+        if let error = error {
+          self.failure?(nil, error)
+          return
+        }
+         self.success?(nil, data)
+      }.resume()
 
+      
+//      URLSession.shared.dataTask(with: url) { [weak self] (data, response, error) in
+//        guard let `self` = self else { return }
+//        // * Add MainQueueScheduler.
+//        MainQueueScheduler.async {
+//          if let error = error {
+//            self.failure?(nil, error)
+//            return
+//          }
+//          self.success?(nil, data)
+//        }
+//      }.resume()
     
-//    requester = HTTPRequestWorker(
-//      .GET,
-//      url: url,
-//      params: nil,
-//      shouldSerializeJson: false,
-//      success: success,
-//      failure: failure,
-//      progress: progress)
-//    requester?.start()
+    } else {
+      
+      // * Crash.
+//      CZHTTPManager.shared.GET(
+//        url.absoluteString,
+//        shouldSerializeJson: false,
+//        success: success,
+//        failure: failure,
+//        progress: progress)
+      
+      requester = HTTPRequestWorker(
+        .GET,
+        url: url,
+        params: nil,
+        shouldSerializeJson: false,
+        success: success,
+        failure: failure,
+        progress: progress)
+      //requester?.start()
+      
+      requester?.testStartFetch()
+    }
   }
 }
 
