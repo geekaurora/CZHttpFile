@@ -111,13 +111,13 @@ extension CZDiskCacheManager {
     
     // Disk cache
     // ioQueue.async(flags: .barrier)
-    ioQueue.async
-    { [weak self] in
+    ioQueue.async { [weak self] in
       guard let `self` = self else { return }
       do {
         self.setCachedItemsDictForNewURL(url, fileSize: data.count)
         completeSetCachedItemsDict?()
-        // try data.write(to: fileURL)
+        // * Write file to disk.
+        try data.write(to: fileURL)
         completeSaveCachedFile?()
       } catch {
         assertionFailure("Failed to write file. Error - \(error.localizedDescription)")

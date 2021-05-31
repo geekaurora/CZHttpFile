@@ -113,15 +113,15 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
           }
           
           // Save downloaded file to cache.
-//          self.cache.setCacheFile(
-//            withUrl: url,
-//            data: ouputData,
-//            completeSetCachedItemsDict: {
-//              // Call completion on mainQueue - after setting CachedItems info to ensure downloaded state.
-//              MainQueueScheduler.async {
-//                completion(outputHttpFile, nil, false)
-//              }
-//            })
+          self.cache.setCacheFile(
+            withUrl: url,
+            data: ouputData,
+            completeSetCachedItemsDict: {
+              // Call completion on mainQueue - after setting CachedItems info to ensure downloaded state.
+              MainQueueScheduler.async {
+                completion(outputHttpFile, nil, false)
+              }
+            })
         }
       }, failure: { (task, error) in
         CZSystemInfo.getURLSessionInfo()
