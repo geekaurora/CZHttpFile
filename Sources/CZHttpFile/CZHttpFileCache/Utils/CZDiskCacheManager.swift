@@ -137,7 +137,7 @@ extension CZDiskCacheManager {
       if let data = try? Data(contentsOf: fileURL),
          let image = self.transformMetadataToCachedData(data).assertIfNil {
         // Update last visited date
-        self.setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate(), skipIfKeyNotExists: true)
+        // self.setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate(), skipIfKeyNotExists: true)
         completion(image)
       } else {
         completion(nil)
@@ -161,7 +161,7 @@ extension CZDiskCacheManager {
       }
       self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: cacheKey, subkey: CacheConstant.kHttpUrlString, value: httpURL.absoluteString)
       self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: cacheKey, subkey: CacheConstant.kFileModifiedDate, value: NSDate())
-      self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate())
+//      self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate())
       self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: cacheKey, subkey: CacheConstant.kFileSize, value: fileSize)
       
     }
@@ -327,8 +327,8 @@ internal extension CZDiskCacheManager {
         sortCachedItemsDictClosure: { (keyValue1: (key: String, value: [String : Any]),
                                        keyValue2: (key: String, value: [String : Any])) -> Bool in
           // Sort files with last visted date
-          if let modifiedDate1 = keyValue1.value[CacheConstant.kFileVisitedDate] as? Date,
-             let modifiedDate2 = keyValue2.value[CacheConstant.kFileVisitedDate] as? Date {
+          if let modifiedDate1 = keyValue1.value[CacheConstant.kFileModifiedDate] as? Date,
+             let modifiedDate2 = keyValue2.value[CacheConstant.kFileModifiedDate] as? Date {
             return modifiedDate1.timeIntervalSince(modifiedDate2) < 0
           } else {
             fatalError()
