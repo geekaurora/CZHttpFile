@@ -19,16 +19,16 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
   public let downloader: CZHttpFileDownloader<NSData>
   public let cache: CZHttpFileCache
   
-  public let downloadingObserverManager: CZDownloadingObserverManager
-  public let downloadedObserverManager: CZDownloadedObserverManager
+  public var downloadingObserverManager: CZDownloadingObserverManager?
+  public var downloadedObserverManager: CZDownloadedObserverManager?
   
   public enum Config {
     public static var maxConcurrencies = 5
   }
   
   public override init() {
-    downloadingObserverManager = CZDownloadingObserverManager()
-    downloadedObserverManager = CZDownloadedObserverManager()
+//    downloadingObserverManager = CZDownloadingObserverManager()
+//    downloadedObserverManager = CZDownloadedObserverManager()
     cache = CZHttpFileCache(downloadedObserverManager: downloadedObserverManager)
     downloader = CZHttpFileDownloader(cache: cache, downloadingObserverManager: downloadingObserverManager)
     super.init()    
@@ -40,6 +40,7 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
                            priority: Operation.QueuePriority = .normal,
                            progress: HTTPRequestWorker.Progress? = nil,
                            completion: @escaping CZHttpFileDownloderCompletion) {
+        
     cache.getCachedFile(withUrl: url) { [weak self] (data: NSData?) in
       guard let `self` = self else { return }
       if CZHttpFileDownloaderConfig.enableLocalCache,
@@ -63,6 +64,7 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
           completion(data as Data?, error, fromCache)
         })
     }
+ 
   }
   
   @objc(cancelDownloadWithURL:)
@@ -104,6 +106,6 @@ private extension CZHttpFileManager {
       return
     }
     let progress = Double(currSize) / Double(totalSize)
-    downloadingObserverManager.publishDownloadingProgress(url: downloadURL, progress: progress)
+    downloadingObserverManager?.publishDownloadingProgress(url: downloadURL, progress: progress)
   }
 }

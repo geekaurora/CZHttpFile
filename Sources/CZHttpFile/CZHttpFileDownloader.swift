@@ -21,6 +21,7 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
   ///         `decodedMetadata` is NSData format of `decodedData`.
   public typealias DecodeData = (_ inputData: Data) -> (decodedData: DataType?, decodedMetadata: Data?)?
   
+  private let httpManager: CZHTTPManager
   private let httpFileDownloadQueue: OperationQueue
   private let httpFileDecodeQueue: OperationQueue
   private let shouldObserveOperations: Bool
@@ -40,6 +41,8 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
     self.cache = cache
     self.downloadingObserverManager = downloadingObserverManager
     self.shouldObserveOperations = shouldObserveOperations
+    
+    httpManager = CZHTTPManager(maxConcurrencies: downloadQueueMaxConcurrent)
     
     httpFileDownloadQueue = OperationQueue()
     httpFileDownloadQueue.name = httpFileDownloadQueueName
@@ -76,10 +79,12 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
                                progress: HTTPRequestWorker.Progress? = nil,
                                completion: @escaping Completion) {
     guard let url = url else { return }
-    cancelDownload(with: url)
+    
+    // cancelDownload(with: url)
     
     let operation = HttpFileDownloadOperation(
       url: url,
+      httpManager: httpManager,
       progress: progress,
       success: { [weak self] (task, data) in
         guard let `self` = self, let data = data else {
@@ -103,35 +108,34 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
             (outputHttpFile, ouputData) = (decodedHttpFile, decodedData)
           }
           
+          MainQueueScheduler.async {
+            completion(outputHttpFile, nil, false)
+          }
+          
           // Save downloaded file to cache.
-          self.cache.setCacheFile(
-            withUrl: url,
-            data: ouputData,
-            completeSetCachedItemsDict: {
-              // Call completion on mainQueue - after setting CachedItems info to ensure downloaded state.
-              MainQueueScheduler.async {
-                completion(outputHttpFile, nil, false)
-              }
-            })
+//          self.cache.setCacheFile(
+//            withUrl: url,
+//            data: ouputData,
+//            completeSetCachedItemsDict: {
+//              // Call completion on mainQueue - after setting CachedItems info to ensure downloaded state.
+//              MainQueueScheduler.async {
+//                completion(outputHttpFile, nil, false)
+//              }
+//            })
         }
       }, failure: { (task, error) in
+        CZSystemInfo.getURLSessionInfo()
+        assertionFailure("Failed to download file. url = \(url), Error - \(error)")
         completion(nil, error, false)
       })
     operation.queuePriority = priority
-    httpFileDownloadQueue.addOperation(operation)
+    
+    httpFileDownloadQueue.addOperation(operation)    
   }
   
   @objc(cancelDownloadWithURL:)
   public func cancelDownload(with url: URL?) {
-    guard let url = url else { return }
-    
-    let cancelIfNeeded = { (operation: Operation) in
-      if let operation = operation as? HttpFileDownloadOperation,
-         operation.url == url {
-        operation.cancel()
-      }
-    }
-    httpFileDownloadQueue.operations.forEach(cancelIfNeeded)
+    httpManager.cancelTask(with: url)
   }
   
   // MARK: - KVO Delegation
@@ -152,7 +156,9 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
       }
       
       if shouldObserveOperations {
-        dbgPrint("[CZHttpFileDownloader] Queued tasks: \(object.operationCount), currentThread = \(Thread.current), downloadingURLs = \(downloadingURLs)")
+        //dbgPrint("[CZHttpFileDownloader] Queued tasks: \(object.operationCount), currentThread = \(Thread.current), downloadingURLs = \(downloadingURLs)")
+        // CZSystemInfo.getURLSessionInfo()
+        dbgPrint("[CZHttpFileDownloader] Queued tasks: \(object.operationCount), Executing tasks: \(object.operations.count), currentThread = \(Thread.current)")
       }
     }
   }

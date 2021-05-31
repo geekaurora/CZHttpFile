@@ -69,15 +69,11 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   public let maxCacheSize: Int
 
   internal let memCache: NSCache<NSString, DataType>
-  private let operationQueue: OperationQueue
   private(set) var diskCacheManager: CZDiskCacheManager<DataType>!
   
   public init(maxCacheAge: TimeInterval = CacheConstant.kMaxFileAge,
               maxCacheSize: Int = CacheConstant.kMaxCacheSize,
               downloadedObserverManager: CZDownloadedObserverManager? = nil) {
-    operationQueue = OperationQueue()
-    operationQueue.maxConcurrentOperationCount = 60
-    
     // Memory cache
     memCache = NSCache()
     memCache.countLimit = 1000
