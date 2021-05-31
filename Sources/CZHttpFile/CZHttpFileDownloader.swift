@@ -87,10 +87,10 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
       shouldSerializeJson: false,
       queuePriority: priority,
       success: { [weak self] (task, data) in
-      guard let `self` = self, let data = data else {
-        completion(nil, WebHttpFileError.invalidData, false)
-        return
-      }
+        guard let `self` = self, let data = data.assertIfNil else {
+          completion(nil, WebHttpFileError.invalidData, false)
+          return
+        }
       
       // Decode Data to httpFile in OperationQueue.
       // If `decodeData` closure is nil, returns `data` directly without decoding.
