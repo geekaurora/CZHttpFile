@@ -21,6 +21,7 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
   ///         `decodedMetadata` is NSData format of `decodedData`.
   public typealias DecodeData = (_ inputData: Data) -> (decodedData: DataType?, decodedMetadata: Data?)?
   
+  private let httpManager: CZHTTPManager
   private let httpFileDownloadQueue: OperationQueue
   private let httpFileDecodeQueue: OperationQueue
   private let shouldObserveOperations: Bool
@@ -40,6 +41,8 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
     self.cache = cache
     self.downloadingObserverManager = downloadingObserverManager
     self.shouldObserveOperations = shouldObserveOperations
+    
+    httpManager = CZHTTPManager(maxConcurrencies: downloadQueueMaxConcurrent)
     
     httpFileDownloadQueue = OperationQueue()
     httpFileDownloadQueue.name = httpFileDownloadQueueName
@@ -76,35 +79,12 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
                                progress: HTTPRequestWorker.Progress? = nil,
                                completion: @escaping Completion) {
     guard let url = url else { return }
-        
-    /*
-    SimpleImageDownloader.shared.download(url) { (data: Data?) in
-      guard let data = data.assertIfNil else { return }
-      
-      var outputHttpFile: DataType? = data as? DataType
-      var ouputData: Data? = data
-      
-      // Decode from `data` to `(outputHttpFile, ouputData)` if applicable.
-      if let decodeData = decodeData {
-        guard let (decodedHttpFile, decodedData) = decodeData(data).assertIfNil else {
-          completion(nil, WebHttpFileError.invalidData, false)
-          return
-        }
-        (outputHttpFile, ouputData) = (decodedHttpFile, decodedData)
-      }
-      
-      MainQueueScheduler.async {
-        dbgPrintWithFunc(self, "Downloaded - url = \(url)")
-        CZSystemInfo.getURLSessionInfo()
-        completion(outputHttpFile, nil, false)
-      }
-    }
-    */
     
     // cancelDownload(with: url)
     
     let operation = HttpFileDownloadOperation(
       url: url,
+      httpManager: httpManager,
       progress: progress,
       success: { [weak self] (task, data) in
         guard let `self` = self, let data = data else {
@@ -150,7 +130,7 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
       })
     operation.queuePriority = priority
     
-    httpFileDownloadQueue.addOperation(operation)     
+    httpFileDownloadQueue.addOperation(operation)
   }
   
   @objc(cancelDownloadWithURL:)

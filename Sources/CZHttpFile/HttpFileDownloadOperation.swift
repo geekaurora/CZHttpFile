@@ -12,12 +12,15 @@ class HttpFileDownloadOperation: ConcurrentBlockOperation {
   private var success: HTTPRequestWorker.Success?
   private var failure: HTTPRequestWorker.Failure?
   let url: URL
-  
+  private weak var httpManager: CZHTTPManager?
+    
   required init(url: URL,
+                httpManager: CZHTTPManager,
                 progress: HTTPRequestWorker.Progress? = nil,
                 success: HTTPRequestWorker.Success?,
                 failure: HTTPRequestWorker.Failure?) {
     self.url = url
+    self.httpManager = httpManager
     self.progress = progress
     super.init()
     
@@ -48,35 +51,9 @@ class HttpFileDownloadOperation: ConcurrentBlockOperation {
 
 private extension HttpFileDownloadOperation {
   func downloadHttpFile(url: URL) {
-    if (false) {
-      
-      // * TEST - Fixed crash!
-      URLSession.shared.dataTask(with: url) { [weak self] (data, response, error) in
-        guard let `self` = self else { return }
-        if let error = error {
-          self.failure?(nil, error)
-          return
-        }
-         self.success?(nil, data)
-      }.resume()
-      
-//      URLSession.shared.dataTask(with: url) { [weak self] (data, response, error) in
-//        guard let `self` = self else { return }
-//        // * Add MainQueueScheduler.
-//        MainQueueScheduler.async {
-//          if let error = error {
-//            self.failure?(nil, error)
-//            return
-//          }
-//          self.success?(nil, data)
-//        }
-//      }.resume()
-    
-    } else {
-      
-      // * Crash.
-      CZHTTPManager.shared.GET(
-        url.absoluteString,
+      // CZHTTPManager.shared.GET(
+      httpManager?.GET(
+      url.absoluteString,
         shouldSerializeJson: false,
         success: success,
         failure: failure,
@@ -91,9 +68,7 @@ private extension HttpFileDownloadOperation {
 //        failure: failure,
 //        progress: progress)
 //      requester?.start()
-      
-      // requester?.testStartFetch()
-    }
+
   }
 }
 
