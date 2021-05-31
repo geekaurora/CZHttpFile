@@ -51,7 +51,6 @@ class HttpFileDownloadOperation: ConcurrentBlockOperation {
 
 private extension HttpFileDownloadOperation {
   func downloadHttpFile(url: URL) {
-      // CZHTTPManager.shared.GET(
       httpManager?.GET(
       url.absoluteString,
         shouldSerializeJson: false,
