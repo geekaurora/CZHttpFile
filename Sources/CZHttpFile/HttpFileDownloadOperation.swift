@@ -75,22 +75,23 @@ private extension HttpFileDownloadOperation {
     } else {
       
       // * Crash.
-//      CZHTTPManager.shared.GET(
-//        url.absoluteString,
-//        shouldSerializeJson: false,
-//        success: success,
-//        failure: failure,
-//        progress: progress)
-      
-      requester = HTTPRequestWorker(
-        .GET,
-        url: url,
-        params: nil,
+      CZHTTPManager.shared.GET(
+        url.absoluteString,
         shouldSerializeJson: false,
         success: success,
         failure: failure,
         progress: progress)
-      requester?.start()
+      
+//      requester = HTTPRequestWorker(
+//        .GET,
+//        url: url,
+//        params: nil,
+//        shouldSerializeJson: false,
+//        success: success,
+//        failure: failure,
+//        progress: progress)
+//      requester?.start()
+      
       // requester?.testStartFetch()
     }
   }
