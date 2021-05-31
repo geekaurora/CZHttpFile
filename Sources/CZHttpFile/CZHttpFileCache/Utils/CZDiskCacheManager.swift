@@ -195,7 +195,7 @@ extension CZDiskCacheManager {
         cachedItemsDict[key] = [:]
       }
       cachedItemsDict[key]?[subkey] = value
-      // self.flushCachedItemsDictToDisk(cachedItemsDict)
+      self.flushCachedItemsDictToDisk(cachedItemsDict)
   }
   
   /**
@@ -223,7 +223,7 @@ extension CZDiskCacheManager {
 //  }
   
   func flushCachedItemsDictToDisk(_ cachedItemsDict: CachedItemsDict) {
-    // (cachedItemsDict as NSDictionary).write(to: cachedItemsDictFileURL, atomically: true)
+    (cachedItemsDict as NSDictionary).write(to: cachedItemsDictFileURL, atomically: true)
   }
   
   func cachedItemsDictLockWrite<Result>(isAsync: Bool = false,
