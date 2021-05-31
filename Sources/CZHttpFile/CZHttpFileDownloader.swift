@@ -82,37 +82,37 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
     
     // cancelDownload(with: url)
     
-    httpManager.GET(
-      url.absoluteString,
-      shouldSerializeJson: false,
-      queuePriority: priority,
+    let operation = HttpFileDownloadOperation(
+      url: url,
+      httpManager: httpManager,
+      progress: progress,
       success: { [weak self] (task, data) in
-        guard let `self` = self, let data = data.assertIfNil else {
+        guard let `self` = self, let data = data else {
           completion(nil, WebHttpFileError.invalidData, false)
           return
         }
-      
-      // Decode Data to httpFile in OperationQueue.
-      // If `decodeData` closure is nil, returns `data` directly without decoding.
-      // - Note: you may customize decoding with additional work. e.g. Decode to UIImage and then crop.
-      self.httpFileDecodeQueue.addOperation {
-        var outputHttpFile: DataType? = data as? DataType
-        var ouputData: Data? = data
         
-        // Decode from `data` to `(outputHttpFile, ouputData)` if applicable.
-        if let decodeData = decodeData {
-          guard let (decodedHttpFile, decodedData) = decodeData(data).assertIfNil else {
-            completion(nil, WebHttpFileError.invalidData, false)
-            return
+        // Decode Data to httpFile in OperationQueue.
+        // If `decodeData` closure is nil, returns `data` directly without decoding.
+        // - Note: you may customize decoding with additional work. e.g. Decode to UIImage and then crop.
+        self.httpFileDecodeQueue.addOperation {
+          var outputHttpFile: DataType? = data as? DataType
+          var ouputData: Data? = data
+          
+          // Decode from `data` to `(outputHttpFile, ouputData)` if applicable.
+          if let decodeData = decodeData {
+            guard let (decodedHttpFile, decodedData) = decodeData(data).assertIfNil else {
+              completion(nil, WebHttpFileError.invalidData, false)
+              return
+            }
+            (outputHttpFile, ouputData) = (decodedHttpFile, decodedData)
           }
-          (outputHttpFile, ouputData) = (decodedHttpFile, decodedData)
-        }
-        
-        MainQueueScheduler.async {
-          completion(outputHttpFile, nil, false)
-        }
-        
-        // Save downloaded file to cache.
+          
+          MainQueueScheduler.async {
+            completion(outputHttpFile, nil, false)
+          }
+          
+          // Save downloaded file to cache.
 //          self.cache.setCacheFile(
 //            withUrl: url,
 //            data: ouputData,
@@ -122,13 +122,15 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
 //                completion(outputHttpFile, nil, false)
 //              }
 //            })
-      }
-    }, failure: { (task, error) in
-      CZSystemInfo.getURLSessionInfo()
-      assertionFailure("Failed to download file. url = \(url), Error - \(error)")
-      completion(nil, error, false)
-    }, progress: progress)
+        }
+      }, failure: { (task, error) in
+        CZSystemInfo.getURLSessionInfo()
+        assertionFailure("Failed to download file. url = \(url), Error - \(error)")
+        completion(nil, error, false)
+      })
+    operation.queuePriority = priority
     
+    httpFileDownloadQueue.addOperation(operation)    
   }
   
   @objc(cancelDownloadWithURL:)
