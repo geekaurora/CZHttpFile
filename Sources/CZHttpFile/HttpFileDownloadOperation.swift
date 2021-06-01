@@ -51,23 +51,23 @@ class HttpFileDownloadOperation: ConcurrentBlockOperation {
 
 private extension HttpFileDownloadOperation {
   func downloadHttpFile(url: URL) {
-      httpManager?.GET(
+    httpManager?.GET(
       url.absoluteString,
-        shouldSerializeJson: false,
-        success: success,
-        failure: failure,
-        progress: progress)
-      
-//      requester = HTTPRequestWorker(
-//        .GET,
-//        url: url,
-//        params: nil,
-//        shouldSerializeJson: false,
-//        success: success,
-//        failure: failure,
-//        progress: progress)
-//      requester?.start()
-
+      shouldSerializeJson: false,
+      success: success,
+      failure: failure,
+      progress: progress)
+    
+    //      requester = HTTPRequestWorker(
+    //        .GET,
+    //        url: url,
+    //        params: nil,
+    //        shouldSerializeJson: false,
+    //        success: success,
+    //        failure: failure,
+    //        progress: progress)
+    //      requester?.start()
+    
   }
 }
 

@@ -57,6 +57,7 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
   ///
   /// - Parameters:
   ///   - shouldEnableCachedItemsDict: Indicates whether to save cached file information. e.g. url, size. Defaults to false.
+  ///     false for CZWebImage. true for CZHttpFile - large files.
   public init(maxCacheAge: TimeInterval,
               maxCacheSize: Int,
               cacheFolderName: String,
