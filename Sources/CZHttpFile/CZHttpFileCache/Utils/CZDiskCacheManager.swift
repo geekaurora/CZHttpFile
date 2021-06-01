@@ -55,7 +55,7 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
   public init(maxCacheAge: TimeInterval,
               maxCacheSize: Int,
               cacheFolderName: String,
-              shouldEnableCachedItemsDict: Bool = false,
+              shouldEnableCachedItemsDict: Bool = true,
               transformMetadataToCachedData: @escaping TransformMetadataToCachedData,
               downloadedObserverManager: CZDownloadedObserverManager? = nil) {
     self.maxCacheAge = maxCacheAge
@@ -148,7 +148,7 @@ extension CZDiskCacheManager {
       if let data = try? Data(contentsOf: fileURL),
          let image = self.transformMetadataToCachedData(data).assertIfNil {
         // Update last visited date
-        // self.setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate(), skipIfKeyNotExists: true)
+        self.setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate(), skipIfKeyNotExists: true)
         completion(image)
       } else {
         completion(nil)
