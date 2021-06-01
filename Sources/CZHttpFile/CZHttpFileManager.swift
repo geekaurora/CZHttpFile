@@ -27,8 +27,8 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
   }
   
   public override init() {
-//    downloadingObserverManager = CZDownloadingObserverManager()
-//    downloadedObserverManager = CZDownloadedObserverManager()
+    downloadingObserverManager = CZDownloadingObserverManager()
+    downloadedObserverManager = CZDownloadedObserverManager()
     cache = CZHttpFileCache(downloadedObserverManager: downloadedObserverManager)
     downloader = CZHttpFileDownloader(cache: cache, downloadingObserverManager: downloadingObserverManager)
     super.init()    

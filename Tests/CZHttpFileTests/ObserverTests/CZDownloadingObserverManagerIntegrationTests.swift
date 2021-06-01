@@ -40,8 +40,8 @@ final class CZDownloadingObserverManagerIntegrationTests: XCTestCase {
     CZHTTPManager.stubMockData(dict: mockDataDict)
     
     // 1. Add observer.
-    httpFileManager.downloadingObserverManager.addObserver(testDownloadingObserver)
-    let isContained = httpFileManager.downloadingObserverManager.observers.contains(testDownloadingObserver)
+    httpFileManager.downloadingObserverManager?.addObserver(testDownloadingObserver)
+    let isContained = httpFileManager.downloadingObserverManager?.observers.contains(testDownloadingObserver) ?? false
     XCTAssertTrue(isContained, "downloadingObserverManager should have added testDownloadingObserver.")
     
     // 2. Download file.
