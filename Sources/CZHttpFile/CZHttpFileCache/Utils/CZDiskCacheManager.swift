@@ -6,10 +6,15 @@ public typealias CleanDiskCacheCompletion = () -> Void
 public typealias SetCacheFileCompletion = () -> Void
 internal typealias CachedItemsDict = [String: [String: Any]]
 
+private enum CZDiskCacheManagerConstant {
+  static let debounceTaskSchedulerGap: TimeInterval = 1
+}
+
 /**
  Manager that maintains the disk cache including file read/write and cachedItemsDict.
  */
 internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
+
   private(set) lazy var cacheFolderHelper: CZCacheFolderHelper = {
     return CZCacheFolderHelper(cacheFolderName: cacheFolderName)
   }()
@@ -44,10 +49,10 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
   private(set) weak var downloadedObserverManager: CZDownloadedObserverManager?
 
   private let transformMetadataToCachedData: TransformMetadataToCachedData
+  private var debounceTaskScheduler: DebounceTaskScheduler?
   
   // MARK: - Initializer
-  
-  
+    
   /// Initialization of CZDiskCacheManager.
   ///
   /// - Parameters:
@@ -64,7 +69,10 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
     self.shouldEnableCachedItemsDict = shouldEnableCachedItemsDict
     self.downloadedObserverManager = downloadedObserverManager
     self.transformMetadataToCachedData = transformMetadataToCachedData
-
+    if shouldEnableCachedItemsDict {
+      self.debounceTaskScheduler = DebounceTaskScheduler(gap: CZDiskCacheManagerConstant.debounceTaskSchedulerGap)
+    }
+    
     self.ioQueue = DispatchQueue(
       label: CacheConstant.ioQueueLabel,
       //qos: .userInitiated,
@@ -237,6 +245,14 @@ extension CZDiskCacheManager {
     guard shouldEnableCachedItemsDict else {
       return
     }
+    debounceTaskScheduler?.schedule { [weak self] in
+      self?.flushCachedItemsDictToDiskWithoutScheduler(cachedItemsDict)
+    }
+    // flushCachedItemsDictToDiskWithoutScheduler(cachedItemsDict)
+  }
+  
+  func flushCachedItemsDictToDiskWithoutScheduler(_ cachedItemsDict: CachedItemsDict) {
+    dbgPrintWithFunc(self, "flushCachedItemsDictToDiskWithoutScheduler()")
     (cachedItemsDict as NSDictionary).write(to: cachedItemsDictFileURL, atomically: true)
   }
   
