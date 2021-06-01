@@ -156,7 +156,7 @@ extension CZDiskCacheManager {
       if let data = try? Data(contentsOf: fileURL),
          let image = self.transformMetadataToCachedData(data).assertIfNil {
         // Update last visited date
-        self.setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate(), skipIfKeyNotExists: true)
+        // self.setCachedItemsDict(key: cacheKey, subkey: CacheConstant.kFileVisitedDate, value: NSDate(), skipIfKeyNotExists: true)
         completion(image)
       } else {
         completion(nil)
