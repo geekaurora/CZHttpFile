@@ -27,6 +27,7 @@ final class CZDownloadedObserverManagerIntegrationTests: XCTestCase {
   }
   
   override func setUp() {
+    CZHttpFileManager.Config.shouldEnableDownloadObservers = true      
     httpFileManager = CZHttpFileManager()
     testDownloadedObserver = TestDownloadedObserver()
   }
