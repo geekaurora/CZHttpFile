@@ -6,8 +6,8 @@ public typealias CleanDiskCacheCompletion = () -> Void
 public typealias SetCacheFileCompletion = () -> Void
 internal typealias CachedItemsDict = [String: [String: Any]]
 
-private enum CZDiskCacheManagerConstant {
-  static let debounceTaskSchedulerGap: TimeInterval = 1
+internal enum CZDiskCacheManagerConstant {
+  static var debounceTaskSchedulerGap: TimeInterval = 5
 }
 
 /**
