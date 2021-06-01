@@ -25,6 +25,7 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
   public enum Config {
     public static var maxConcurrencies = 5
     public static var shouldEnableDownloadObservers = false
+    public static var shouldEnableCachedItemsDict = true
   }
   
   public override init() {
@@ -32,9 +33,12 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
       downloadingObserverManager = CZDownloadingObserverManager()
       downloadedObserverManager = CZDownloadedObserverManager()
     }
-    cache = CZHttpFileCache(downloadedObserverManager: downloadedObserverManager)
+    
+    cache = CZHttpFileCache(
+      shouldEnableCachedItemsDict: Config.shouldEnableCachedItemsDict,
+      downloadedObserverManager: downloadedObserverManager)
     downloader = CZHttpFileDownloader(cache: cache, downloadingObserverManager: downloadingObserverManager)
-    super.init()    
+    super.init()
   }
   
   // MARK: - Download

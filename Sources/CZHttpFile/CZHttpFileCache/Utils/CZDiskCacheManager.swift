@@ -60,7 +60,7 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
   public init(maxCacheAge: TimeInterval,
               maxCacheSize: Int,
               cacheFolderName: String,
-              shouldEnableCachedItemsDict: Bool = true,
+              shouldEnableCachedItemsDict: Bool = false,
               transformMetadataToCachedData: @escaping TransformMetadataToCachedData,
               downloadedObserverManager: CZDownloadedObserverManager? = nil) {
     self.maxCacheAge = maxCacheAge

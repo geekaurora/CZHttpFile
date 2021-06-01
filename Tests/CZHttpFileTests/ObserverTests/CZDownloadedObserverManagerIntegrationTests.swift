@@ -27,7 +27,7 @@ final class CZDownloadedObserverManagerIntegrationTests: XCTestCase {
   }
   
   override func setUp() {
-    CZHttpFileManager.Config.shouldEnableDownloadObservers = true      
+    CZHttpFileManager.Config.shouldEnableDownloadObservers = true
     httpFileManager = CZHttpFileManager()
     testDownloadedObserver = TestDownloadedObserver()
   }
@@ -41,7 +41,7 @@ final class CZDownloadedObserverManagerIntegrationTests: XCTestCase {
     CZHTTPManager.stubMockData(dict: mockDataDict)
     
     // 1. Add observer.
-    httpFileManager.downloadedObserverManager?.addObserver(testDownloadedObserver)
+    httpFileManager.downloadedObserverManager!.addObserver(testDownloadedObserver)
     let isContained = httpFileManager.downloadedObserverManager?.observers.contains(testDownloadedObserver) ?? false
     XCTAssertTrue(isContained, "downloadedObserverManager should have added testDownloadedObserver.")
     

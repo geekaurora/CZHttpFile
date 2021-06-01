@@ -73,6 +73,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   
   public init(maxCacheAge: TimeInterval = CacheConstant.kMaxFileAge,
               maxCacheSize: Int = CacheConstant.kMaxCacheSize,
+              shouldEnableCachedItemsDict: Bool = false,
               downloadedObserverManager: CZDownloadedObserverManager? = nil) {
     // Memory cache
     memCache = NSCache()
@@ -87,6 +88,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
       maxCacheAge: maxCacheAge,
       maxCacheSize: maxCacheSize,
       cacheFolderName: cacheFolderName,
+      shouldEnableCachedItemsDict: shouldEnableCachedItemsDict,
       transformMetadataToCachedData: transformMetadataToCachedData,
       downloadedObserverManager: downloadedObserverManager)
     
