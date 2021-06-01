@@ -45,7 +45,7 @@ public enum CacheConstant {
   public static let kMaxCacheSize: Int = 500 * 1024 * 1024
   public static let kCachedItemsDictFile = "cachedItemsDict.plist"
   public static let kFileModifiedDate = "modifiedDate"
-  public static let kFileVisitedDate = "visitedDate"
+  // public static let kFileVisitedDate = "visitedDate"
   public static let kHttpUrlString = "url"
   public static let kFileSize = "size"
   public static let ioQueueLabel = "com.tony.cache.ioQueue"
@@ -73,6 +73,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   
   public init(maxCacheAge: TimeInterval = CacheConstant.kMaxFileAge,
               maxCacheSize: Int = CacheConstant.kMaxCacheSize,
+              shouldEnableCachedItemsDict: Bool = false,
               downloadedObserverManager: CZDownloadedObserverManager? = nil) {
     // Memory cache
     memCache = NSCache()
@@ -87,6 +88,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
       maxCacheAge: maxCacheAge,
       maxCacheSize: maxCacheSize,
       cacheFolderName: cacheFolderName,
+      shouldEnableCachedItemsDict: shouldEnableCachedItemsDict,
       transformMetadataToCachedData: transformMetadataToCachedData,
       downloadedObserverManager: downloadedObserverManager)
     
