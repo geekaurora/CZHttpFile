@@ -130,14 +130,15 @@ extension CZDiskCacheManager {
     let (fileURL, cacheKey) = getCacheFileInfo(forURL: url)
     
     // Disk cache
-    // ioQueue.async(flags: .barrier)
+    // ioQueue.async(flags: .barrier) { [weak self] in
     ioQueue.async { [weak self] in
       guard let `self` = self else { return }
       do {
         self.setCachedItemsDictForNewURL(url, fileSize: data.count)
         completeSetCachedItemsDict?()
         // * Write file to disk.
-        try data.write(to: fileURL)
+        // `.atomic`: If write succeeds, moves the temporary file to its final location.
+        try data.write(to: fileURL, options: [.atomic])
         completeSaveCachedFile?()
       } catch {
         assertionFailure("Failed to write file. Error - \(error.localizedDescription)")
@@ -341,6 +342,10 @@ internal extension CZDiskCacheManager {
   }
   
   func cleanDiskCacheIfNeeded(completion: CleanDiskCacheCompletion? = nil) {
+    guard shouldEnableCachedItemsDict else {
+      return
+    }
+    
     // 1. Clean disk by age.
     let currDate = Date()
     cleanDiskCache { (itemInfo: [String : Any]) -> Bool in
