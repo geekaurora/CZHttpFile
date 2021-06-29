@@ -342,6 +342,10 @@ internal extension CZDiskCacheManager {
   }
   
   func cleanDiskCacheIfNeeded(completion: CleanDiskCacheCompletion? = nil) {
+    guard shouldEnableCachedItemsDict else {
+      return
+    }
+    
     // 1. Clean disk by age.
     let currDate = Date()
     cleanDiskCache { (itemInfo: [String : Any]) -> Bool in
