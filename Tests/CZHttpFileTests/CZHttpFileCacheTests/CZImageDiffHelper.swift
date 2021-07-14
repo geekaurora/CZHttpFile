@@ -34,9 +34,9 @@ class CZImageDiffHelper {
     // Checking that our `UInt32` buffer has same number of bytes as image has.
     let bytesPerRow = min(expectedCGImage.bytesPerRow, actualCGImage.bytesPerRow)
         
-    _ = MemoryLayout<UInt32>.stride              // 4
-    _ = bytesPerRow / Int(imageSize.width)       // 2
-    // assert(val1 == val2)
+    let val1 = MemoryLayout<UInt16>.stride              // 4
+    let val2 = bytesPerRow / Int(imageSize.width)       // bytesPerPixel: 2
+    assert(val1 == val2)
     
     let expectedPixels = UnsafeMutablePointer<UInt32>.allocate(capacity: numberOfPixels)
     let actualPixels = UnsafeMutablePointer<UInt32>.allocate(capacity: numberOfPixels)
