@@ -7,13 +7,14 @@ import CZNetworking
 /**
  Helper that compares two images with `tolerance`.
  
+ https://stackoverflow.com/questions/11342897/how-to-compare-two-uiimage-objects
  https://github.com/facebookarchive/ios-snapshot-test-case/blob/master/FBSnapshotTestCase/Categories/UIImage%2BCompare.m
  */
 class CZImageDiffHelper {
   
   static func compare(expected: Data,
                       actual: Data,
-                      tolerance: Float = 0.1) throws -> Bool {
+                      tolerance: Float = 0) throws -> Bool {
     guard let expectedUIImage = UIImage(data: expected), let actualUIImage = UIImage(data: actual) else {
       throw CZError(domain: "unableToGetUIImageFromData")
     }
@@ -31,15 +32,15 @@ class CZImageDiffHelper {
     let imageSize = CGSize(width: expectedCGImage.width, height: expectedCGImage.height)
     let numberOfPixels = Int(imageSize.width * imageSize.height)
     
-    // Checking that our `UInt32` buffer has same number of bytes as image has.
+    // Checking that our `UInt16` buffer has same number of bytes as image has.
     let bytesPerRow = min(expectedCGImage.bytesPerRow, actualCGImage.bytesPerRow)
         
-    let val1 = MemoryLayout<UInt16>.stride              // 4
+    let val1 = MemoryLayout<UInt16>.stride              // Element size: 4
     let val2 = bytesPerRow / Int(imageSize.width)       // bytesPerPixel: 2
     assert(val1 == val2)
     
-    let expectedPixels = UnsafeMutablePointer<UInt32>.allocate(capacity: numberOfPixels)
-    let actualPixels = UnsafeMutablePointer<UInt32>.allocate(capacity: numberOfPixels)
+    let expectedPixels = UnsafeMutablePointer<UInt16>.allocate(capacity: numberOfPixels)
+    let actualPixels = UnsafeMutablePointer<UInt16>.allocate(capacity: numberOfPixels)
     
     let expectedPixelsRaw = UnsafeMutableRawPointer(expectedPixels)
     let actualPixelsRaw = UnsafeMutableRawPointer(actualPixels)
@@ -72,7 +73,7 @@ class CZImageDiffHelper {
       throw CZError(domain: "unableToGetUIImageFromData")
     }
     
-    // 2-1. Draw image with CGContext.
+    // 2-1. Draw cgImage to CGContext.
     expectedContext.draw(expectedCGImage, in: CGRect(origin: .zero, size: imageSize))
     actualContext.draw(actualCGImage, in: CGRect(origin: .zero, size: imageSize))
     
