@@ -24,8 +24,9 @@ final class CZImageCacheTests: XCTestCase {
     let transformedImageData = transformedImage!.pngData()!
     
     do {
-      let isEqual = try CZImageDiffHelper.compare(expected: imageData, observed: transformedImageData)
-       XCTAssert(isEqual)
+      //let isEqual = try CZImageDiffHelper.compare(expected: imageData, observed: transformedImageData)
+      let isEqual = try CZImageDiffHelper.compare(expected: imageData, observed: imageData)
+      XCTAssert(isEqual)
     } catch {
       assertionFailure("Failed to compare images. error \(error.localizedDescription)")
     }

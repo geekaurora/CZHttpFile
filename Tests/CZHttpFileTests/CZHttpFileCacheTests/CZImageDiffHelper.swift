@@ -45,19 +45,28 @@ class CZImageDiffHelper {
     let observedPixelsRaw = UnsafeMutableRawPointer(observedPixels)
     
     let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
+    
     // 2-0. Create CGContext for rendering.
     guard let expectedContext = CGContext(
-            data: expectedPixelsRaw, width: Int(imageSize.width), height: Int(imageSize.height),
-            bitsPerComponent: expectedCGImage.bitsPerComponent, bytesPerRow: bytesPerRow,
-            space: expectedColorSpace, bitmapInfo: bitmapInfo.rawValue) else {
+            data: expectedPixelsRaw,
+            width: Int(imageSize.width),
+            height: Int(imageSize.height),
+            bitsPerComponent: expectedCGImage.bitsPerComponent,
+            bytesPerRow: bytesPerRow,
+            space: expectedColorSpace,
+            bitmapInfo: bitmapInfo.rawValue) else {
       expectedPixels.deallocate()
       observedPixels.deallocate()
       throw CZError(domain: "unableToGetUIImageFromData")
     }
     guard let observedContext = CGContext(
-            data: observedPixelsRaw, width: Int(imageSize.width), height: Int(imageSize.height),
-            bitsPerComponent: observedCGImage.bitsPerComponent, bytesPerRow: bytesPerRow,
-            space: observedColorSpace, bitmapInfo: bitmapInfo.rawValue) else {
+            data: observedPixelsRaw,
+            width: Int(imageSize.width),
+            height: Int(imageSize.height),
+            bitsPerComponent: observedCGImage.bitsPerComponent,
+            bytesPerRow: bytesPerRow,
+            space: observedColorSpace,
+            bitmapInfo: bitmapInfo.rawValue) else {
       expectedPixels.deallocate()
       observedPixels.deallocate()
       throw CZError(domain: "unableToGetUIImageFromData")
