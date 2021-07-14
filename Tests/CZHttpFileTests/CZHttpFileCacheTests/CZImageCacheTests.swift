@@ -20,13 +20,13 @@ final class CZImageCacheTests: XCTestCase {
           let image = systemImage.pngImage.assertIfNil else {
       return
     }
-    // After converting to PNG, the transferred data are the same. (second time works, first time not)
+    // After converting to PNG, the transferred data are the same. (Second time works, first time not)
     let imageData = image.pngData()!
     
     // 1. Call `imageCache.transformMetadataToCachedData` to transform Data to Image.
     let transformedImage = imageCache.transformMetadataToCachedData(imageData)
     
-    // 2. Verify the transferred image is the same as the original one.
+    // 2. Verify the transferred image is correct.
     let transformedImageData = transformedImage!.pngData()!
     XCTAssert(imageData == transformedImageData)
   }
