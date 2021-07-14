@@ -34,8 +34,8 @@ class CZImageDiffHelper {
     // Checking that our `UInt32` buffer has same number of bytes as image has.
     let bytesPerRow = min(expectedCGImage.bytesPerRow, actualCGImage.bytesPerRow)
         
-    let val1 = MemoryLayout<UInt32>.stride              // 4
-    let val2 = bytesPerRow / Int(imageSize.width)       // 2
+    _ = MemoryLayout<UInt32>.stride              // 4
+    _ = bytesPerRow / Int(imageSize.width)       // 2
     // assert(val1 == val2)
     
     let expectedPixels = UnsafeMutablePointer<UInt32>.allocate(capacity: numberOfPixels)
@@ -88,12 +88,18 @@ class CZImageDiffHelper {
       // Go through each pixel in turn and see if it is different
       var numDiffPixels = 0
       
-      let expectedBufferByte = expectedBuffer[pixel]
-      let actualBufferByte =  actualBuffer[pixel] 
-      for pixel in 0 ..< numberOfPixels where expectedBuffer[pixel] != actualBuffer[pixel] {
+
+      // for pixel in 0 ..< numberOfPixels where expectedBuffer[pixel] != actualBuffer[pixel] {
+      for pixel in 0 ..< numberOfPixels {
+       let expectedBufferByte = expectedBuffer[pixel]
+        let actualBufferByte =  actualBuffer[pixel]
+        if expectedBufferByte == actualBufferByte {
+          continue
+        }
+        
         // If this pixel is different, increment the pixel diff count and see if we have hit our limit.
         numDiffPixels += 1
-        let percentage = 100 * Float(numDiffPixels) / Float(numberOfPixels)
+        let percentage = Float(numDiffPixels) / Float(numberOfPixels)
         if percentage > tolerance {
           isEqual = false
           break
