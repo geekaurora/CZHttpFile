@@ -87,6 +87,9 @@ class CZImageDiffHelper {
     } else {
       // Go through each pixel in turn and see if it is different
       var numDiffPixels = 0
+      
+      let expectedBufferByte = expectedBuffer[pixel]
+      let actualBufferByte =  actualBuffer[pixel] 
       for pixel in 0 ..< numberOfPixels where expectedBuffer[pixel] != actualBuffer[pixel] {
         // If this pixel is different, increment the pixel diff count and see if we have hit our limit.
         numDiffPixels += 1
