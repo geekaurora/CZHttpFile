@@ -16,21 +16,30 @@ final class CZImageCacheTests: XCTestCase {
       assertionFailure("Should run tests above iOS 13.0.")
       return
     }
-    guard let image = UIImage(systemName: "heart.fill").assertIfNil else {
+    guard let systemImage = UIImage(systemName: "heart.fill").assertIfNil,
+          let image = systemImage.pngImage.assertIfNil else {
       return
     }
+    // After converting to PNG, the transferred data are the same. (second time works, first time not)
     let imageData = image.pngData()!
-    let transformedImage = imageCache.transformMetadataToCachedData(imageData)
-    let transformedImageData = transformedImage!.pngData()!
     
-    do {
-      //let isEqual = try CZImageDiffHelper.compare(expected: imageData, observed: transformedImageData)
-      let isEqual = try CZImageDiffHelper.compare(expected: imageData, actual: imageData)
-      XCTAssert(isEqual)
-    } catch {
-      assertionFailure("Failed to compare images. error \(error.localizedDescription)")
-    }
+    // 1. Call `imageCache.transformMetadataToCachedData` to transform Data to Image.
+    let transformedImage = imageCache.transformMetadataToCachedData(imageData)
+    
+    // 2. Verify the transferred image is the same as the original one.
+    let transformedImageData = transformedImage!.pngData()!
+    XCTAssert(imageData == transformedImageData)
   }
-  
-  
 }
+
+/**
+`CZImageDiffHelper.compare` doesn't work - memory compare.
+ 
+ do {
+   //let isEqual = try CZImageDiffHelper.compare(expected: imageData, observed: transformedImageData)
+   let isEqual = try CZImageDiffHelper.compare(expected: imageData, actual: imageData)
+   XCTAssert(isEqual)
+ } catch {
+  assertionFailure("Failed to compare images. error \(error.localizedDescription)")
+ }
+ */
