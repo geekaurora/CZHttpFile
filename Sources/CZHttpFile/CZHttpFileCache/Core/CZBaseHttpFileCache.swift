@@ -158,6 +158,9 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   
   // MARK: - Clear Cache
   
+  /**
+   Forces to clear all caches - memCache / diskCache.
+   */
   public func clearCache(completion: CleanDiskCacheCompletion? = nil) {
     clearMemCache()
     diskCacheManager.clearCache(completion: completion)

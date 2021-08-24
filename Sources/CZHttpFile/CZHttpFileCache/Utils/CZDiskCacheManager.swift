@@ -331,14 +331,18 @@ extension CZDiskCacheManager {
 
 internal extension CZDiskCacheManager {
   
+  /// Force to clear all disk cache.
   func clearCache(completion: CleanDiskCacheCompletion? = nil) {
-    self.cleanDiskCache { (itemInfo: [String : Any]) -> Bool in
-      true
-    } completion: {
-      MainQueueScheduler.safeAsync {
-        completion?()
-      }
-    }
+    // Delete the cache directory.
+    CZFileHelper.removeDirectory(path: cacheFolderHelper.cacheFolder, createDirectoryAfterDeletion: true)
+    
+//    self.cleanDiskCache { (itemInfo: [String : Any]) -> Bool in
+//      true
+//    } completion: {
+//      MainQueueScheduler.safeAsync {
+//        completion?()
+//      }
+//    }
   }
   
   func cleanDiskCacheIfNeeded(completion: CleanDiskCacheCompletion? = nil) {
