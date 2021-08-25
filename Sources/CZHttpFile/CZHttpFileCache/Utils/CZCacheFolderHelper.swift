@@ -6,15 +6,7 @@ internal class CZCacheFolderHelper: NSObject {
   
   private(set) lazy var cacheFolder: String = {
     let cacheFolder = CZFileHelper.documentDirectory + cacheFolderName + "/"
-    
-    let fileManager = FileManager()
-    if !fileManager.fileExists(atPath: cacheFolder) {
-      do {
-        try fileManager.createDirectory(atPath: cacheFolder, withIntermediateDirectories: true, attributes: nil)
-      } catch {
-        assertionFailure("Failed to create CacheFolder! Error - \(error.localizedDescription); Folder - \(cacheFolder)")
-      }
-    }
+    CZFileHelper.createDirectoryIfNeeded(at: cacheFolder)
     dbgPrint("\(type(of: self)) - \(#function): cacheFolder = \(cacheFolder)")
     return cacheFolder
   }()
