@@ -9,7 +9,7 @@ class CZDownloadedListState: NSObject, ObservableObject {
   override init() {
     super.init()
     
-    CZHttpFileManager.shared.downloadedObserverManager.addObserver(self)
+    CZHttpFileManager.shared.downloadedObserverManager?.addObserver(self)
   }
 }
 
