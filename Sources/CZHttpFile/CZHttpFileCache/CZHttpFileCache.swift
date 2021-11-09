@@ -2,13 +2,12 @@ import Foundation
 import CZUtils
 
 /**
- Thread safe local cache backed by DispatchQueue mutex lock/LRU queue, supports maxFileAge/maxCacheSize purging strategy.
+ Thread safe local file cache backed by DispatchQueue mutex lock/LRU queue, supports maxFileAge/maxCacheSize purging strategy.
  
  - Note: CachedData Class type is `NSData`.
  */
 public class CZHttpFileCache: CZBaseHttpFileCache<NSData> {
-  // public static let shared = CZHttpFileCache()
-  
+
   // MARK: - Override methods
   
   public override var cacheFolderName: String {

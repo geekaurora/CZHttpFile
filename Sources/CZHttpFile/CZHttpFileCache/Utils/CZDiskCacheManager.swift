@@ -361,6 +361,8 @@ internal extension CZDiskCacheManager {
     
     // 2. Clean disk by maxSize setting: based on visited date - simple LRU.
     if self.currentCacheSize > self.maxCacheSize {
+      dbgPrintWithFunc(self, "[Cache][CleanUp] Cleaning cache .. currentCacheSize = \(currentCacheSize), maxCacheSize = \(maxCacheSize)")
+      
       let expectedCacheSize = self.maxCacheSize / 2
       let expectedReduceSize = self.currentCacheSize - expectedCacheSize
       
@@ -418,9 +420,10 @@ internal extension CZDiskCacheManager {
         return cachedItemsDict.sorted(by: sortCachedItemsDictClosure)
       }()
       
-      // Check the condition whether to remove the key.
+      // Loop through keys / values of cachedItemsDict: decide whether to remove the `key`.
       for (key, value) in sortedItemsInfo {
         if shouldRemoveItemClosure(value) {
+          dbgPrintWithFunc(self, "[Cache][CleanUp] Cleaning cache .. key = \(key)")
           removedKeys.append(key)
           cachedItemsDict.removeValue(forKey: key)
         }
