@@ -351,17 +351,19 @@ internal extension CZDiskCacheManager {
     }
     
     // 1. Clean disk by age.
-    let currDate = Date()
-    cleanDiskCache { (itemInfo: [String : Any]) -> Bool in
-      guard let modifiedDate = itemInfo[CacheConstant.kFileModifiedDate] as? Date else {
-        return false
+    if self.maxCacheAge != -1 {
+      let currDate = Date()
+      cleanDiskCache { (itemInfo: [String : Any]) -> Bool in
+        guard let modifiedDate = itemInfo[CacheConstant.kFileModifiedDate] as? Date else {
+          return false
+        }
+        return currDate.timeIntervalSince(modifiedDate) > self.maxCacheAge
       }
-      return currDate.timeIntervalSince(modifiedDate) > self.maxCacheAge
     }
     
     // 2. Clean disk by maxSize setting: based on visited date - simple LRU.
-    if self.currentCacheSize > self.maxCacheSize {
-      dbgPrintWithFunc(self, "[Cache][CleanUp] Cleaning cache .. currentCacheSize = \(currentCacheSize), maxCacheSize = \(maxCacheSize)")
+    if self.maxCacheSize != -1 && self.currentCacheSize > self.maxCacheSize {
+      dbgPrint("\n\n\n[Cache][CleanUp] Cleaning cache .. currentCacheSize = \(currentCacheSize), maxCacheSize = \(maxCacheSize)\n\n\n")
       
       let expectedCacheSize = self.maxCacheSize / 2
       let expectedReduceSize = self.currentCacheSize - expectedCacheSize
@@ -423,7 +425,7 @@ internal extension CZDiskCacheManager {
       // Loop through keys / values of cachedItemsDict: decide whether to remove the `key`.
       for (key, value) in sortedItemsInfo {
         if shouldRemoveItemClosure(value) {
-          dbgPrintWithFunc(self, "[Cache][CleanUp] Cleaning cache .. key = \(key)")
+          dbgPrint("[Cache][CleanUp] Cleaning cache .. key = \(key)")
           removedKeys.append(key)
           cachedItemsDict.removeValue(forKey: key)
         }

@@ -27,8 +27,10 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
     public static var shouldEnableDownloadObservers = false
     /// Indiates whether to enable cachedItemsDict. Note: Defaults to true to clean up cache.
     public static var shouldEnableCachedItemsDict = true
-    public static var kMaxCacheSize = CacheConstant.kMaxCacheSize
-    // public static var kMaxCacheSize: Int = CacheConstant.kMaxCacheSize * 50
+    
+    /// - Note: Disable cache cleaning for CZHttpFileManager.
+    public static var kMaxCacheAge: TimeInterval = -1
+    public static var kMaxCacheSize = -1
   }
   
   public override init() {
@@ -38,6 +40,7 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
     }
     
     cache = CZHttpFileCache(
+      maxCacheAge: Config.kMaxCacheAge,
       maxCacheSize: Config.kMaxCacheSize,
       shouldEnableCachedItemsDict: Config.shouldEnableCachedItemsDict,
       downloadedObserverManager: downloadedObserverManager)
