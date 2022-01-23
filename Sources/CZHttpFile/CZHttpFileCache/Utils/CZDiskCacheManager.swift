@@ -129,7 +129,9 @@ extension CZDiskCacheManager {
     guard let data = data.assertIfNil else { return }
     let (fileURL, cacheKey) = getCacheFileInfo(forURL: url)
     
-    // Disk cache
+    // Disk cache.
+    // The reason to abandon `.barrier` flag: it blocks other operations if any writing is on going. (Files writing is discrete: mostly won't conflict)
+    // TODO: Add thread-safe `writingFilePaths` set. If writing of `filePath` is already in process, skip the later duplicate writing.
     // ioQueue.async(flags: .barrier) { [weak self] in
     ioQueue.async { [weak self] in
       guard let `self` = self else { return }
@@ -247,6 +249,7 @@ extension CZDiskCacheManager {
     guard shouldEnableCachedItemsDict else {
       return
     }
+    // Write cachedItemsDict to disk asynchronously with `debounceTaskScheduler`: only write once every 5s.
     debounceTaskScheduler?.schedule { [weak self] in
       self?.flushCachedItemsDictToDiskWithoutScheduler(cachedItemsDict)
     }
