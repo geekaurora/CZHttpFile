@@ -71,7 +71,7 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
     self.downloadedObserverManager = downloadedObserverManager
     self.transformMetadataToCachedData = transformMetadataToCachedData
     if shouldEnableCachedItemsDict {
-      self.debounceTaskScheduler = DebounceTaskScheduler(gap: CZDiskCacheManagerConstant.debounceTaskSchedulerGap)
+      self.debounceTaskScheduler = DebounceTaskScheduler(interval: CZDiskCacheManagerConstant.debounceTaskSchedulerGap)
     }
     
     self.ioQueue = DispatchQueue(
