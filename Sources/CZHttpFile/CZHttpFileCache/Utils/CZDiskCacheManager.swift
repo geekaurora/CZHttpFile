@@ -27,6 +27,7 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
     return URL(fileURLWithPath: cacheFolderHelper.cacheFolder + CacheConstant.kCachedItemsDictFile)
   }()
   
+  /// `cachedItems` maintains cached file size, create date. It's mainly used for:  1. cache clearing 2. publishDownloadedURLs().
   lazy var cachedItemsDictLock: CZMutexLockWithNSLock<CachedItemsDict>? = {
     guard shouldEnableCachedItemsDict else {
       return nil
@@ -131,7 +132,7 @@ extension CZDiskCacheManager {
     
     // Disk cache.
     // The reason to abandon `.barrier` flag: it blocks other operations if any writing is on going. (Files writing is discrete: mostly won't conflict)
-    // TODO: Add thread-safe `writingFilePaths` set. If writing of `filePath` is already in process, skip the later duplicate writing.
+    // [Won't fix] It won't cause issues - https://github.com/geekaurora/CZHttpFile/issues/38
     // ioQueue.async(flags: .barrier) { [weak self] in
     ioQueue.async { [weak self] in
       guard let `self` = self else { return }
