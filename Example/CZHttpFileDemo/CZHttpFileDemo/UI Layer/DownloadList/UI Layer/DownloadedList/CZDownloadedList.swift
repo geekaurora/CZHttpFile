@@ -1,7 +1,6 @@
 import SwiftUI
 import CZUtils
 import CZHttpFile
-import CZAVPlayer
 
 struct CZDownloadedList: View {
   @ObservedObject

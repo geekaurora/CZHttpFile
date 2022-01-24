@@ -1,7 +1,6 @@
 import SwiftUI
 import CZUtils
 import CZHttpFile
-import CZAVPlayer
 
 class CZDownloadedListState: NSObject, ObservableObject {
   @Published

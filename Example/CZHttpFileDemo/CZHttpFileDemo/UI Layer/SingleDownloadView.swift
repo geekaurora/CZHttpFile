@@ -1,7 +1,6 @@
 import SwiftUI
 import CZUtils
 import CZHttpFile
-import CZAVPlayer
 
 struct SingleDownloadView: View {
   @State private var downloadAmount = 0.0
