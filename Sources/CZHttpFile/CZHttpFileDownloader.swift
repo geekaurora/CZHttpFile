@@ -108,9 +108,9 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
             (outputHttpFile, ouputData) = (decodedHttpFile, decodedData)
           }
           
-          MainQueueScheduler.async {
-            completion(outputHttpFile, nil, false)
-          }
+//          MainQueueScheduler.async {
+//            completion(outputHttpFile, nil, false)
+//          }
           
           // Save downloaded file to cache.
           self.cache.setCacheFile(
