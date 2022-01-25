@@ -86,7 +86,7 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
       url: url,
       httpManager: httpManager,
       progress: progress,
-      success: { [weak self] (task, data) in
+      success: { [weak self] (data) in
         guard let `self` = self, let data = data else {
           completion(nil, WebHttpFileError.invalidData, false)
           return
@@ -123,7 +123,7 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
               }
             })
         }
-      }, failure: { (task, error) in
+      }, failure: { (error) in
         CZSystemInfo.getURLSessionInfo()
         assertionFailure("Failed to download file. url = \(url), Error - \(error)")
         completion(nil, error, false)

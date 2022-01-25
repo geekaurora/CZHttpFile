@@ -25,16 +25,16 @@ class HttpFileDownloadOperation: ConcurrentBlockOperation {
     super.init()
     
     self.props["url"] = url
-    self.success = { [weak self] (task, data) in
+    self.success = { [weak self] (data) in
       // Update Operation's `isFinished` prop
       self?.finish()
-      success?(task, data)
+      success?(data)
     }
     
-    self.failure = { [weak self] (task, error) in
+    self.failure = { [weak self] (error) in
       // Update Operation's `isFinished` prop
       self?.finish()
-      failure?(task, error)
+      failure?(error)
     }
   }  
   
