@@ -144,7 +144,7 @@ extension CZDiskCacheManager {
         try data.write(to: fileURL, options: [.atomic])
         completeSaveCachedFile?()
       } catch {
-        assertionFailure("Failed to write file. Error - \(error.localizedDescription)")
+        assertionFailure("Failed to write file - \(fileURL). Error - \(error.localizedDescription)")
       }
     }
   }

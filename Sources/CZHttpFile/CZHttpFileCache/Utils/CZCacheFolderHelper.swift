@@ -6,8 +6,8 @@ internal class CZCacheFolderHelper: NSObject {
   
   private(set) lazy var cacheFolder: String = {
     let cacheFolder = CZFileHelper.documentDirectory + cacheFolderName + "/"
+    dbgPrintWithFunc(self, "cacheFolder = \(cacheFolder)")
     CZFileHelper.createDirectoryIfNeeded(at: cacheFolder)
-    dbgPrint("\(type(of: self)) - \(#function): cacheFolder = \(cacheFolder)")
     return cacheFolder
   }()
   private var cacheFolderName: String
