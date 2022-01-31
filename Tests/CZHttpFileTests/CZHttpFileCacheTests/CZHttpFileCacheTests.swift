@@ -58,7 +58,7 @@ final class CZHttpFileCacheTests: XCTestCase {
     waitForExpectatation()
   }
   
-  /// Test read from cache after relaunching App / ColdStart (written by the precious test).
+  /// [Written by the previous test] Test read from cache after relaunching App / ColdStart.
   /// It verifies both DiskCache and MemCache.
   ///
   /// - Note: Should run `testReadWriteData1` first!
