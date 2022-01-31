@@ -148,25 +148,26 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
         return
       }
       let (_, cacheKey) = self.diskCacheManager.getCacheFileInfo(forURL: url)
+      
       // Read data from mem cache.
-      var image = self.getMemCache(forKey: cacheKey)
+      if let image = self.getMemCache(forKey: cacheKey) {
+        MainQueueScheduler.async {
+          completion(image)
+        }
+        return
+      }
       
       // Read data from disk cache.
-      if image == nil {
-        self.diskCacheManager.getCachedFile(withUrl: url) { (decodedData) in
-          // Set decodedData from the disk cache.
-          image = decodedData
-          // Set mem cache after loading data from disk.
-          if let image = image {
-            self.setMemCache(image: image, forKey: cacheKey)
-          }
+      self.diskCacheManager.getCachedFile(withUrl: url) { (decodedData) in
+        // Set mem cache after loading data from disk.
+        if let image = decodedData {
+          self.setMemCache(image: image, forKey: cacheKey)
+        }
+        MainQueueScheduler.async {
+          completion(decodedData)
         }
       }
       
-      // Completion callback
-      MainQueueScheduler.sync {
-        completion(image)
-      }
     }
   }
   
