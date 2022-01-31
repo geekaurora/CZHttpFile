@@ -49,6 +49,7 @@ public enum CacheConstant {
   public static let kHttpUrlString = "url"
   public static let kFileSize = "size"
   public static let ioQueueLabel = "com.tony.cache.ioQueue"
+  public static let preprocessQueueLabel = "com.tony.cache.preprocessQueue"
 }
 
 /**
@@ -70,6 +71,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
 
   internal let memCache: NSCache<NSString, DataType>
   private(set) var diskCacheManager: CZDiskCacheManager<DataType>!
+  private let preprocessQueue: DispatchQueue
   
   public init(maxCacheAge: TimeInterval = CacheConstant.kMaxFileAge,
               maxCacheSize: Int = CacheConstant.kMaxCacheSize,
@@ -82,6 +84,12 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
     
     self.maxCacheAge = maxCacheAge
     self.maxCacheSize = maxCacheSize
+    
+    preprocessQueue = DispatchQueue(
+      label: CacheConstant.preprocessQueueLabel,
+      qos: .default,
+      attributes: [.concurrent])
+    
     super.init()
     
     diskCacheManager = CZDiskCacheManager(
@@ -134,25 +142,32 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   
   public func getCachedFile(withUrl url: URL,
                             completion: @escaping (DataType?) -> Void)  {
-    let (_, cacheKey) = diskCacheManager.getCacheFileInfo(forURL: url)
-    // Read data from mem cache.
-    var image = self.getMemCache(forKey: cacheKey)
-    
-    // Read data from disk cache.
-    if image == nil {      
-      diskCacheManager.getCachedFile(withUrl: url) { (decodedData) in
-        // Set decodedData from the disk cache.
-        image = decodedData
+    // Note: execute tasks on preprocessQueue to avoid performance issue.
+    preprocessQueue.async { [weak self] in
+      guard let `self` = self else {
+        return
+      }
+      let (_, cacheKey) = self.diskCacheManager.getCacheFileInfo(forURL: url)
+      
+      // Read data from mem cache.
+      if let image = self.getMemCache(forKey: cacheKey) {
+        MainQueueScheduler.async {
+          completion(image)
+        }
+        return
+      }
+      
+      // Read data from disk cache.
+      self.diskCacheManager.getCachedFile(withUrl: url) { (decodedData) in
         // Set mem cache after loading data from disk.
-        if let image = image {
+        if let image = decodedData {
           self.setMemCache(image: image, forKey: cacheKey)
         }
+        MainQueueScheduler.async {
+          completion(decodedData)
+        }
       }
-    }
-    
-    // Completion callback
-    MainQueueScheduler.sync {
-      completion(image)
+      
     }
   }
   
