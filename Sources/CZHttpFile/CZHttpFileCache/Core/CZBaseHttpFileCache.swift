@@ -143,7 +143,9 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   public func getCachedFile(withUrl url: URL,
                             completion: @escaping (DataType?) -> Void)  {
     guard !CZHttpFileDownloaderConfig.enableLocalCache else {
-      completion(nil)
+      MainQueueScheduler.async {
+         completion(nil)
+      }
       return
     }
     
