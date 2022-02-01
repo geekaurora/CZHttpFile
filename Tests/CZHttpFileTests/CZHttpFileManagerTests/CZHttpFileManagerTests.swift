@@ -5,7 +5,66 @@ import CZNetworking
 @testable import CZHttpFile
 
 final class CZHttpFileManagerTests: XCTestCase {
-
+  public typealias GetRequestSuccess = (Data?) -> Void
+  
+  private enum Constant {
+    static let timeOut: TimeInterval = 10
+  }
+  private enum MockData {
+    static let urlForGet = URL(string: "https://www.apple.com/newsroom/rss-feed-GET.rss")!
+    static let urlForGetCodable = URL(string: "https://www.apple.com/newsroom/rss-feed-GETCodable.rss")!
+    static let urlForGetDictionaryable = URL(string: "https://www.apple.com/newsroom/rss-feed-GetDictionaryable.rss")!
+    static let urlForGetDictionaryableOneModel = URL(string: "https://www.apple.com/newsroom/rss-feed-GetDictionaryableOneModel.rss")!
+    
+    static let dictionary: [String: AnyHashable] = [
+      "a": "sdlfjas",
+      "c": "sdlksdf",
+      "b": "239823sd",
+      "d": 189298723,
+    ]
+    static let array: [AnyHashable] = [
+      "sdlfjas",
+      "sdlksdf",
+      "239823sd",
+      189298723,
+    ]
+  }
+  
+  static let queueLable = "com.tests.queue"
+  @ThreadSafe
+  private var executionSuccessCount = 0
+  private var czHttpFileManager: CZHttpFileManager!
+  
+  override func setUp() {
+    czHttpFileManager = CZHttpFileManager()
+    executionSuccessCount = 0
+  }
+  
+  // MARK: - Download
+  
+  /**
+   Test downloadFile() method.
+   */
+  func testDownloadFile() {
+    let (waitForExpectatation, expectation) = CZTestUtils.waitWithInterval(Constant.timeOut, testCase: self)
+    
+    // Create mockDataMap.
+    let mockData = CZHTTPJsonSerializer.jsonData(with: MockData.dictionary)!
+    let mockDataMap = [MockData.urlForGet: mockData]
+    
+    // Stub MockData.
+    CZHTTPManager.stubMockData(dict: mockDataMap)
+    
+    czHttpFileManager.downloadFile(url: MockData.urlForGet) { data, error, fromCache in
+      let res: [String: AnyHashable]? = CZHTTPJsonSerializer.deserializedObject(with: data)
+      XCTAssert(res == MockData.dictionary, "Actual result = \(res), Expected result = \(MockData.dictionary)")
+      expectation.fulfill()
+    }
+    
+    // Wait for expectatation.
+    waitForExpectatation()
+  }
+  
   // MARK: - Config
   
   func testConfigMaxSize() {
