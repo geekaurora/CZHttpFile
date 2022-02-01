@@ -54,12 +54,13 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
                            priority: Operation.QueuePriority = .normal,
                            progress: HTTPRequestWorker.Progress? = nil,
                            completion: @escaping CZHttpFileDownloderCompletion) {
-        
+  
     cache.getCachedFile(withUrl: url) { [weak self] (data: NSData?) in
       guard let `self` = self else { return }
+      
+      // Load from local disk.
       if CZHttpFileDownloaderConfig.enableLocalCache,
          let data = data as Data? {
-        // Load from local disk.
         MainQueueScheduler.sync {
           completion(data, nil, true)
         }
