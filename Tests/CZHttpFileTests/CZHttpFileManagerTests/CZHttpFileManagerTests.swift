@@ -36,8 +36,10 @@ final class CZHttpFileManagerTests: XCTestCase {
   private var czHttpFileManager: CZHttpFileManager!
   
   override func setUp() {
-    czHttpFileManager = CZHttpFileManager()
     executionSuccessCount = 0
+
+    czHttpFileManager = CZHttpFileManager()
+    czHttpFileManager.cache.clearCache()
   }
   
   // MARK: - Download
@@ -56,6 +58,8 @@ final class CZHttpFileManagerTests: XCTestCase {
     CZHTTPManager.stubMockData(dict: mockDataMap)
     
     czHttpFileManager.downloadFile(url: MockData.urlForGet) { data, error, fromCache in
+      XCTAssert(!fromCache, "Result should return from network - not from cache. fromCache = \(fromCache)")
+
       let res: [String: AnyHashable]? = CZHTTPJsonSerializer.deserializedObject(with: data)
       XCTAssert(res == MockData.dictionary, "Actual result = \(res), Expected result = \(MockData.dictionary)")
       expectation.fulfill()
