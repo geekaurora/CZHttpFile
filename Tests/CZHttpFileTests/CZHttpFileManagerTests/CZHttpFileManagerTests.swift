@@ -110,8 +110,7 @@ final class CZHttpFileManagerTests: XCTestCase {
     // Wait for expectatation.
     waitForExpectatation()
   }
-  
-  
+    
   /// [Written by the previous test] Test read from cache after relaunching App / ColdStart.
   /// It verifies both DiskCache and MemCache.
   ///
@@ -139,7 +138,7 @@ final class CZHttpFileManagerTests: XCTestCase {
     }
     
     waitForExpectatation()
-  }
+  }  
   
   // MARK: - Config
   

@@ -164,7 +164,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
           self.setMemCache(image: image, forKey: cacheKey)
         }
         MainQueueScheduler.async {
-          completion(decodedData)
+           completion(decodedData)
         }
       }
       
