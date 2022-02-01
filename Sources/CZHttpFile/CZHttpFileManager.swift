@@ -59,8 +59,7 @@ public typealias CZHttpFileDownloderCompletion = (_ data: Data?, _ error: Error?
       guard let `self` = self else { return }
       
       // Load from local disk.
-      if CZHttpFileDownloaderConfig.enableLocalCache,
-         let data = data as Data? {
+      if let data = data as Data? {
         MainQueueScheduler.sync {
           completion(data, nil, true)
         }

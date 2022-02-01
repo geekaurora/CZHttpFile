@@ -142,6 +142,11 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   
   public func getCachedFile(withUrl url: URL,
                             completion: @escaping (DataType?) -> Void)  {
+    guard !CZHttpFileDownloaderConfig.enableLocalCache else {
+      completion(nil)
+      return
+    }
+    
     // Note: execute tasks on preprocessQueue to avoid performance issue.
     preprocessQueue.async { [weak self] in
       guard let `self` = self else {
@@ -179,6 +184,8 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
   public func clearCache(completion: CleanDiskCacheCompletion? = nil) {
     clearMemCache()
     diskCacheManager.clearCache(completion: completion)
+    
+    dbgPrintWithFunc(self, withDividers: true, "Cleared all files of the cache!")
   }
   
   private func clearMemCache(completion: CleanDiskCacheCompletion? = nil) {
