@@ -139,7 +139,7 @@ extension CZDiskCacheManager {
       do {
         self.setCachedItemsDictForNewURL(url, fileSize: data.count)
         completeSetCachedItemsDict?()
-        // * Write file to disk.
+        // * Write downloaded file to disk.
         // `.atomic`: If write succeeds, moves the temporary file to its final location.
         try data.write(to: fileURL, options: [.atomic])
         completeSaveCachedFile?()
