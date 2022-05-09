@@ -338,7 +338,10 @@ internal extension CZDiskCacheManager {
   /// Force to clear all disk cache.
   func clearCache(completion: CleanDiskCacheCompletion? = nil) {
     // Delete the cache directory.
-    CZFileHelper.removeDirectory(path: cacheFolderHelper.cacheFolder, createDirectoryAfterDeletion: true)
+    ioQueue.async(flags: .barrier) { [weak self] in
+      guard let `self` = self else { return }
+      CZFileHelper.removeDirectory(path: self.cacheFolderHelper.cacheFolder, createDirectoryAfterDeletion: true)
+    }
     
 //    self.cleanDiskCache { (itemInfo: [String : Any]) -> Bool in
 //      true

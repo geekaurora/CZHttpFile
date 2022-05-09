@@ -70,9 +70,17 @@ final class CZHttpFileManagerTests: XCTestCase {
     // Wait for expectatation.
     waitForExpectatation()
   }
-  
-  
+    
   /**
+   [FlakyTest] Assertion at CZDiskCacheManager.setCacheFile(withUrl:).
+   https://github.com/geekaurora/CZHttpFile/issues/48
+   
+   ### Error
+   Failed to write file - file doesn’t exist."
+   
+   ### Reason
+   The file already exists?
+   
    Test downloadFile() method - verify result from mem cache.
    */
   func testDownloadFileFromCache1() {
