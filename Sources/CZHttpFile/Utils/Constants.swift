@@ -10,7 +10,7 @@ public enum CZHttpFileDownloaderConfig {
   public static var shouldObserveDownloadingProgress = false
   
   /// Indicates whether to enable caching itemsDict. Defaults to false.
-  public static var shouldEnableCachedItemsDict = false
+  public static var shouldEnableCachedItemsDict = true
   /// Indicates whether to enable local disk cache. Defaults to true.
   public static var enableLocalCache = true
   
