@@ -7,6 +7,7 @@ public typealias SetCacheFileCompletion = () -> Void
 internal typealias CachedItemsDict = [String: [String: Any]]
 
 internal enum CZDiskCacheManagerConstant {
+  /// Debounce interval - write cachedItemsDict to disk at most once every 5 secs.
   static var debounceTaskSchedulerGap: TimeInterval = 5
 }
 
