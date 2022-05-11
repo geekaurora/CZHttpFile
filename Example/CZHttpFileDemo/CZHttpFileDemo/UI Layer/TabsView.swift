@@ -25,8 +25,7 @@ struct TabsView: View {
           Text("Downloading")
         }
       
-    }.onAppear() {
-      CZHttpFileDownloaderConfig.enableLocalCache = false
+    }.onAppear() {      
     }
   }
 }
