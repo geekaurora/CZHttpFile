@@ -133,7 +133,8 @@ extension CZDiskCacheManager {
     
     // Disk cache.
     // The reason to abandon `.barrier` flag: it blocks other operations if any writing is on going. (Files writing is discrete: mostly won't conflict)
-    // [Won't fix] It won't cause issues - https://github.com/geekaurora/CZHttpFile/issues/38
+    // [Won't fix] It won't cause issues - as data.write(to:) is called with `.atomic` option.
+    // https://github.com/geekaurora/CZHttpFile/issues/38
     // ioQueue.async(flags: .barrier) { [weak self] in
     ioQueue.async { [weak self] in
       guard let `self` = self else { return }
