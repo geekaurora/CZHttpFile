@@ -45,7 +45,6 @@ public enum CacheConstant {
   public static let kMaxCacheSize = 500 * 1024 * 1024
   public static let kCachedItemsDictFile = "cachedItemsDict.plist"
   public static let kFileModifiedDate = "modifiedDate"
-  // public static let kFileVisitedDate = "visitedDate"
   public static let kHttpUrlString = "url"
   public static let kFileSize = "size"
   public static let ioQueueLabel = "com.tony.cache.ioQueue"
