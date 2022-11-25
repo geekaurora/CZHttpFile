@@ -80,7 +80,10 @@ public class CZHttpFileDownloader<DataType: NSObjectProtocol>: NSObject {
                                completion: @escaping Completion) {
     guard let url = url else { return }
     
-    // cancelDownload(with: url)
+    if !CZNetworkingConstants.shouldJoinOnFlightOperation {
+      // Cancel the on-flight download with the same `url`.
+      cancelDownload(with: url)
+    }
     
     let operation = HttpFileDownloadOperation(
       url: url,
