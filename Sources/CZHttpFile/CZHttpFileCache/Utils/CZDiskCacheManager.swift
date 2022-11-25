@@ -133,7 +133,10 @@ extension CZDiskCacheManager {
     
     // Disk cache.
     // The reason to abandon `.barrier` flag: it blocks other operations if any writing is on going. (Files writing is discrete: mostly won't conflict)
-    // [Won't fix] It won't cause issues - as data.write(to:) is called with `.atomic` option.
+    // [Won't fix] It won't cause issues:
+    // 1). As data.write(to:) is called with .atomic option, which won't write the target file
+    // with temp file if writing fails.
+    // 2). If writing fails, the downloader will download the file again as it doesn't find file in mem / disk cache.
     // https://github.com/geekaurora/CZHttpFile/issues/38
     // ioQueue.async(flags: .barrier) { [weak self] in
     ioQueue.async { [weak self] in
@@ -185,8 +188,7 @@ extension CZDiskCacheManager {
       }
       self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: cacheKey, subkey: CacheConstant.kHttpUrlString, value: httpURL.absoluteString)
       self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: cacheKey, subkey: CacheConstant.kFileModifiedDate, value: NSDate())
-      self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: cacheKey, subkey: CacheConstant.kFileSize, value: fileSize)
-      
+      self.setCachedItemsDictWithoutLock(cachedItemsDict: &cachedItemsDict, key: cacheKey, subkey: CacheConstant.kFileSize, value: fileSize)      
     }
   }
    
