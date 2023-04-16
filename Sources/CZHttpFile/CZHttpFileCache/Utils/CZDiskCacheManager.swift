@@ -29,12 +29,12 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
   }()
   
   /// `cachedItems` maintains cached file size, create date. It's mainly used for:  1. cache clearing 2. publishDownloadedURLs().
-  lazy var cachedItemsDictLock: CZMutexLockWithNSLock<CachedItemsDict>? = {
+  lazy var cachedItemsDictLock: CZSimpleMutexLock<CachedItemsDict>? = {
     guard shouldEnableCachedItemsDict else {
       return nil
     }
     let cachedItemsDict: CachedItemsDict = loadCachedItemsDict() ?? [:]
-    return CZMutexLockWithNSLock(cachedItemsDict)
+    return CZSimpleMutexLock(cachedItemsDict)
   }()
   
   var currentCacheSize: Int {
