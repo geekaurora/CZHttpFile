@@ -51,6 +51,8 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
   private(set) weak var downloadedObserverManager: CZDownloadedObserverManager?
 
   private let transformMetadataToCachedData: TransformMetadataToCachedData
+  
+  /// The debouncing task scheduler that write cachedItems to disk every `debounceTaskSchedulerGap` seconds to improve the performance.
   private var debounceTaskScheduler: DebounceTaskScheduler?
   
   // MARK: - Initializer
