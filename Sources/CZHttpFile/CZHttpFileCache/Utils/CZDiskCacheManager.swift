@@ -346,13 +346,13 @@ internal extension CZDiskCacheManager {
       CZFileHelper.removeDirectory(path: self.cacheFolderHelper.cacheFolder, createDirectoryAfterDeletion: true)
     }
     
-//    self.cleanDiskCache { (itemInfo: [String : Any]) -> Bool in
-//      true
-//    } completion: {
-//      MainQueueScheduler.safeAsync {
-//        completion?()
-//      }
-//    }
+    self.cleanDiskCache { (itemInfo: [String : Any]) -> Bool in
+      return true
+    } completion: {
+      MainQueueScheduler.safeAsync {
+        completion?()
+      }
+    }
   }
   
   func cleanDiskCacheIfNeeded(completion: CleanDiskCacheCompletion? = nil) {

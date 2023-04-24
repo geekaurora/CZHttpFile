@@ -7,7 +7,7 @@ struct CZDownloadedList: View {
   var listState = CZDownloadedListState()
   
   var body: some View {
-    let cacheInfo = "currentCacheSize = \(CZHttpFileManager.shared.cache.currentCacheSize.sizeString) \nmaxCacheSize = \(CZHttpFileManager.shared.cache.maxCacheSize.sizeString)"
+    let cacheInfo = "currentCacheSize = \(listState.currentCacheSize.sizeString) \nmaxCacheSize = \(CZHttpFileManager.shared.cache.maxCacheSize.sizeString)"
     
     VStack {
       Text(cacheInfo)
@@ -15,6 +15,7 @@ struct CZDownloadedList: View {
       
       Button("Clear All Cache") {
         CZHttpFileManager.shared.cache.clearCache() {
+          listState.refreshCurrentCacheSize()
           CZAlertManager.showAlert(message: "Cleared all cache!")
         }
       }
@@ -22,6 +23,9 @@ struct CZDownloadedList: View {
       List(listState.downloads, id: \.diffId) {
         CZDownloadingCell(download: $0)
       }
+    }
+    .onAppear {
+      listState.refreshCurrentCacheSize()
     }
   }
 }
