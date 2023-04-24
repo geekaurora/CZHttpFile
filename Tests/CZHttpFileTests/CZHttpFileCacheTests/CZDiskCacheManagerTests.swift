@@ -22,7 +22,7 @@ final class CZDiskCacheManagerTests: XCTestCase {
   let httpFileCache = CZHttpFileManager.shared.cache
   
   override class func setUp() {
-    CZHttpFileTestUtils.clearCacheOfHttpFileManager()
+    // CZHttpFileTestUtils.clearCacheOfHttpFileManager()
   }
   
   // MARK: - setCacheFile
@@ -61,6 +61,7 @@ final class CZDiskCacheManagerTests: XCTestCase {
   
   // MARK: - CachedItemsDict
 
+  /// Test setCachedItemsDict: cold start without clearning cache.
   func testSetCachedItemsDict1() {
     // setCachedItemsDict.
     httpFileCache.diskCacheManager.setCachedItemsDict(
@@ -92,38 +93,42 @@ final class CZDiskCacheManagerTests: XCTestCase {
   
   // MARK: - Clear Cache
 
-  // TODO: fix test.
-//  func testClearCache() {
-//    // 1. Write file to cache and cachedItemsDict.
-//    let data = CZHTTPJsonSerializer.jsonData(with: MockData.dict)!
-//    httpFileCache.setCacheFile(withUrl: MockData.testUrl, data: data, completeSetCachedItemsDict: nil)
-//    Thread.sleep(forTimeInterval: 0.05)
-//    
-//    let (waitForExpectatation, expectation) = CZTestUtils.waitWithInterval(Constant.timeOut, testCase: self)
-//
-//    // 2. Call clearCache().
-//    let (fileUrl, _) = httpFileCache.cachedFileURL(forURL: MockData.testUrl)
-//    httpFileCache.clearCache {
-//      // 3-1. Verify: Info in cachedItemDict is removed.
-//      let cachedItemsDict = self.httpFileCache.diskCacheManager.getCachedItemsDict()
-//      let (_, cacheKey) = self.httpFileCache.diskCacheManager.getCacheFileInfo(forURL: MockData.testUrl)
-//      let isCachedItemsDictKeyExisting = (cachedItemsDict[cacheKey] != nil)
-//      XCTAssertTrue(!isCachedItemsDictKeyExisting, "CachedItemsDict key should have been removed. url = \(MockData.testUrl)")
-//
-//      // 3-2. Verify: memCache is removed.
-//      let isExistingInMemCache = (self.httpFileCache.getMemCache(forKey: cacheKey) != nil)
-//      XCTAssertTrue(!isExistingInMemCache, "File should have been removed. fileUrl = \(fileUrl)")
-//      
-//      // 3-3. Verify: cached file is removed.
-//      let isExistingInDiskCache = CZFileHelper.fileExists(url:fileUrl)
-//      XCTAssertTrue(!isExistingInDiskCache, "File should have been removed. fileUrl = \(fileUrl)")
-//
-//      expectation.fulfill()
-//    }
-//    
-//    // Wait for expectatation.
-//    waitForExpectatation()
-//  }
+  func testClearCache() {
+    // 1. Write file to cache and cachedItemsDict.
+    let data = CZHTTPJsonSerializer.jsonData(with: MockData.dict)!
+    httpFileCache.setCacheFile(withUrl: MockData.testUrl, data: data, completeSetCachedItemsDict: nil)
+    Thread.sleep(forTimeInterval: 0.1)
+    
+    let (waitForExpectatation, expectation) = CZTestUtils.waitWithInterval(Constant.timeOut, testCase: self)
+    let (_, cacheKey) = self.httpFileCache.diskCacheManager.getCacheFileInfo(forURL: MockData.testUrl)
+    
+    // 1-2. Verify: Info in cachedItemDict is saved.
+    let cachedItemsDict = self.httpFileCache.diskCacheManager.getCachedItemsDict()
+    let isCachedItemsDictKeyExisting = (cachedItemsDict[cacheKey] != nil)
+    XCTAssertTrue(isCachedItemsDictKeyExisting, "CachedItemsDict key should have been removed. url = \(MockData.testUrl)")
+  
+    // 2. Call clearCache().
+    let (fileUrl, _) = httpFileCache.cachedFileURL(forURL: MockData.testUrl)
+    httpFileCache.clearCache {
+      // 3-1. Verify: Info in cachedItemDict is removed.
+      let cachedItemsDict = self.httpFileCache.diskCacheManager.getCachedItemsDict()
+      let isCachedItemsDictKeyExisting = (cachedItemsDict[cacheKey] != nil)
+      XCTAssertTrue(!isCachedItemsDictKeyExisting, "CachedItemsDict key should have been removed. url = \(MockData.testUrl)")
+
+      // 3-2. Verify: memCache is removed.
+      let isExistingInMemCache = (self.httpFileCache.getMemCache(forKey: cacheKey) != nil)
+      XCTAssertTrue(!isExistingInMemCache, "File should have been removed. fileUrl = \(fileUrl)")
+      
+      // 3-3. Verify: cached file is removed.
+      let isExistingInDiskCache = CZFileHelper.fileExists(url:fileUrl)
+      XCTAssertTrue(!isExistingInDiskCache, "File should have been removed. fileUrl = \(fileUrl)")
+
+      expectation.fulfill()
+    }
+    
+    // Wait for expectatation.
+    waitForExpectatation()
+  }
     
 }
 
