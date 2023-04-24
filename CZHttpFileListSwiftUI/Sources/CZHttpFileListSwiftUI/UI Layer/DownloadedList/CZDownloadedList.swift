@@ -5,9 +5,15 @@ import CZHttpFile
 struct CZDownloadedList: View {
   @ObservedObject
   var listState = CZDownloadedListState()
+  @State
+  var currentCacheSize = 0
+  
+  func refresh() {
+    self.currentCacheSize = CZHttpFileManager.shared.cache.currentCacheSize
+  }
   
   var body: some View {
-    let cacheInfo = "currentCacheSize = \(CZHttpFileManager.shared.cache.currentCacheSize.sizeString) \nmaxCacheSize = \(CZHttpFileManager.shared.cache.maxCacheSize.sizeString)"
+    let cacheInfo = "currentCacheSize = \(currentCacheSize.sizeString) \nmaxCacheSize = \(CZHttpFileManager.shared.cache.maxCacheSize.sizeString)"
     
     VStack {
       Text(cacheInfo)
@@ -15,6 +21,7 @@ struct CZDownloadedList: View {
       
       Button("Clear All Cache") {
         CZHttpFileManager.shared.cache.clearCache() {
+          self.refresh()
           CZAlertManager.showAlert(message: "Cleared all cache!")
         }
       }
@@ -22,6 +29,8 @@ struct CZDownloadedList: View {
       List(listState.downloads, id: \.diffId) {
         CZDownloadingCell(download: $0)
       }
+    }.onAppear {
+      refresh()
     }
   }
 }
