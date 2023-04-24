@@ -7,19 +7,20 @@ class CZDownloadedListState: NSObject, ObservableObject {
   var downloads: [CZDownload] = []
   
   @Published
-  var currentCacheSize = CZHttpFileManager.shared.cache.currentCacheSize
+  var currentCacheSize: Int
   
   private let cache: CZBaseHttpFileCacheProtocol
   
   init(cache: CZBaseHttpFileCacheProtocol) {
     self.cache = cache
+    self.currentCacheSize = cache.currentCacheSize
     super.init()
     
     CZHttpFileManager.shared.downloadedObserverManager?.addObserver(self)
   }
   
   func refreshCurrentCacheSize() {
-    self.currentCacheSize = CZHttpFileManager.shared.cache.currentCacheSize
+    self.currentCacheSize = cache.currentCacheSize
   }
 }
 

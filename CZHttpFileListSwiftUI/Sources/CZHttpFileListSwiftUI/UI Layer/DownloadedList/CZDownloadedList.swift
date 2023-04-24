@@ -21,7 +21,7 @@ struct CZDownloadedList: View {
       Spacer(minLength: 10)
       
       Button("Clear All Cache") {
-        CZHttpFileManager.shared.cache.clearCache() {
+        self.cache.clearCache() {
           listState.refreshCurrentCacheSize()
           CZAlertManager.showAlert(message: "Cleared all cache!")
         }
