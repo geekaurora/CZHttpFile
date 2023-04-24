@@ -24,8 +24,8 @@ struct CZDownloadedList: View {
         CZDownloadingCell(download: $0)
       }
     }
-//    .onAppear {
-//      listState.refreshCurrentCacheSize()
-//    }
+    .onAppear {
+      listState.refreshCurrentCacheSize()
+    }
   }
 }
