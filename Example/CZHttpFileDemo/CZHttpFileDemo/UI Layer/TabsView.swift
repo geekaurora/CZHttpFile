@@ -19,7 +19,7 @@ struct TabsView: View {
           Text("Download")
         }
       
-      DownloadListTab()
+      DownloadListTab(cache: CZHttpFileManager.shared.cache)
         .tabItem {
           Image(systemName: "square.and.arrow.down")
           Text("Downloading")
