@@ -4,7 +4,14 @@ import CZHttpFile
 
 struct CZDownloadedList: View {
   @ObservedObject
-  var listState = CZDownloadedListState()
+  var listState: CZDownloadedListState
+  
+  private let cache: CZBaseHttpFileCacheProtocol
+  
+  public init(cache: CZBaseHttpFileCacheProtocol) {
+    self.cache = cache
+    self.listState = CZDownloadedListState(cache: cache)
+  }
   
   var body: some View {
     let cacheInfo = "currentCacheSize = \(listState.currentCacheSize.sizeString) \nmaxCacheSize = \(CZHttpFileManager.shared.cache.maxCacheSize.sizeString)"

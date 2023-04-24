@@ -20,11 +20,15 @@ import CZHttpFile
 public struct DownloadListTab: View {
   @State private var selectedIndex = 0
   
-  public init() {}
+  private let cache: CZBaseHttpFileCacheProtocol
+  
+  public init(cache: CZBaseHttpFileCacheProtocol) {
+    self.cache = cache
+  }
   
   public var body: some View {
     VStack {
-      CZDownloadedList()
+      CZDownloadedList(cache: cache)
       
 //      Picker(selection: $selectedIndex, label: Text("")) {
 //        Text("Downloaded").tag(0)

@@ -51,12 +51,19 @@ public enum CacheConstant {
   public static let preprocessQueueLabel = "com.tony.cache.preprocessQueue"
 }
 
+public protocol CZBaseHttpFileCacheProtocol {
+  var maxCacheSize: Int { get }
+  var currentCacheSize: Int  { get }
+  
+  func clearCache(completion: CleanDiskCacheCompletion?)
+}
+
 /**
  Base class of http file cache.
  
  Constraining `DataType` with `NSObjectProtocol` because NSCache requires its Value type to be Class.
  */
-open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject {
+open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject, CZBaseHttpFileCacheProtocol {
   
   public var cacheFolderName: String {
     return "CZBaseHttpFileCache"
