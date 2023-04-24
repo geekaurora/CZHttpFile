@@ -13,7 +13,7 @@ import CZHttpFile
  DownloadListTab()
    .tabItem {
      Image(systemName: "square.and.arrow.down")
-     Text("Downloading")
+     Text("Download")
    }
  ```
  */
