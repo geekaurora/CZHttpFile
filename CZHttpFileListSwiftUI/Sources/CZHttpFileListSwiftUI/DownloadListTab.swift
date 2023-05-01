@@ -22,7 +22,7 @@ public struct DownloadListTab: View {
   
   private let cache: CZBaseHttpFileCacheProtocol
   
-  public init(cache: CZBaseHttpFileCacheProtocol) {
+  public init(cache: CZBaseHttpFileCacheProtocol = CZHttpFileManager.shared.cache) {
     self.cache = cache
   }
   
