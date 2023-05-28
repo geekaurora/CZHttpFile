@@ -22,7 +22,7 @@ struct CZDownloadedList: View {
       
       Button("Clear All Cache") {
         self.cache.clearCache() {
-          listState.refreshCurrentCacheSize()
+          listState.refresh()
           CZAlertManager.showAlert(message: "Cleared all cache!")
         }
       }
@@ -32,7 +32,7 @@ struct CZDownloadedList: View {
       }
     }
     .onAppear {
-      listState.refreshCurrentCacheSize()
+      listState.refresh()
     }
   }
 }

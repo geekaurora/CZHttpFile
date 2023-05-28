@@ -14,15 +14,15 @@ class CZDownloadedListState: NSObject, ObservableObject {
   init(cache: CZBaseHttpFileCacheProtocol) {
     self.cache = cache
     self.currentCacheSize = cache.currentCacheSize
-    self.downloads = cache.downloadedURLs.map { CZDownload(url: $0)  }
+    self.downloads = cache.downloadedURLs.map { CZDownload(url: $0) }
     super.init()
-    
     
     CZHttpFileManager.shared.downloadedObserverManager?.addObserver(self)
   }
   
-  func refreshCurrentCacheSize() {
+  func refresh() {
     self.currentCacheSize = cache.currentCacheSize
+    updateWithDownloadedURLs()
   }
 }
 
@@ -38,6 +38,10 @@ extension CZDownloadedListState: CZDownloadedObserverProtocol {
 // MARK: - Private methods
 
 extension CZDownloadedListState {
+  func updateWithDownloadedURLs() {
+    updateWithDownloadedURLs(cache.downloadedURLs)
+  }
+
   func updateWithDownloadedURLs(_ downloadedURLs: [URL]) {
     // dbgPrint("\(type(of: self)).\(#function) - downloadedURLs = \n\(downloadedURLs)")
     self.downloads = downloadedURLs.map { CZDownload(url: $0)  }
