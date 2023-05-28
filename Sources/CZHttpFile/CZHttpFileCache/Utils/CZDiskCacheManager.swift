@@ -14,7 +14,7 @@ internal enum CZDiskCacheManagerConstant {
 /**
  Manager that maintains the disk cache including file read/write and cachedItemsDict.
  */
-internal class CZDiskCacheManager<DataType>: NSObject {
+internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
 
   private(set) lazy var cacheFolderHelper: CZCacheFolderHelper = {
     return CZCacheFolderHelper(cacheFolderName: cacheFolderName)
