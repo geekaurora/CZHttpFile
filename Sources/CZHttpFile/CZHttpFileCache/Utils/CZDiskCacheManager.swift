@@ -274,63 +274,16 @@ extension CZDiskCacheManager {
     let result = cachedItemsDictLock?.writeLock(isAsync: isAsync, closure)
     
     // Publish DownloadedURLs.
-    publishDownloadedURLs()
+    // publishDownloadedURLs()
     
     return result
   }
   
+  // MARK: - Publish state
+  
   func publishDownloadedURLs() {
     let cachedFileHttpURLs = self.cachedFileHttpURLs().map { URL(string: $0)! }
     downloadedObserverManager?.publishDownloadedURLs(cachedFileHttpURLs)
-  }
-}
-
-// MARK: - Helper methods
-
-extension CZDiskCacheManager {
-  /**
-   Returns cached file URL if has been downloaded, otherwise nil.
-   */
-  func cachedFileURL(forURL httpURL: URL?) -> (fileURL: URL?, isExisting: Bool) {
-    guard let httpURL = httpURL else {
-      return (nil, false)
-    }    
-    let cacheFileInfo = getCacheFileInfo(forURL: httpURL)
-    let fileURL = cacheFileInfo.fileURL
-    let isExisting = urlExistsInCache(httpURL)
-    return (fileURL, isExisting)
-  }
-  
-  /**
-   Returns HTTP URL strings of downloaded files.
-   */
-  func cachedFileHttpURLs() -> [String] {
-    return cachedItemsDictLock?.readLock { (cachedItemsDict) -> [String] in
-      cachedItemsDict
-        .keys
-        .sorted(by: { (key0, key1) -> Bool in
-          // Sort URLs by modifiedDate.
-          guard let modifiedDate0 = cachedItemsDict[key0]?[CacheConstant.kFileModifiedDate] as? Date,
-                let modifiedDate1 = cachedItemsDict[key1]?[CacheConstant.kFileModifiedDate] as? Date else {
-            return false
-          }
-          return modifiedDate1.timeIntervalSince(modifiedDate0)  > 0
-        })
-        .compactMap {
-        return cachedItemsDict[$0]?[CacheConstant.kHttpUrlString] as? String
-      }
-    } ?? []
-  }
-  
-  func cacheFileURL(forKey key: String) -> URL {
-    return URL(fileURLWithPath: cacheFolderHelper.cacheFolder + key)
-  }
-    
-  func getCacheFileInfo(forURL url: URL) -> CacheFileInfo {
-    let urlString = url.absoluteString
-    let cacheKey = urlString.MD5 + urlString.fileType(includingDot: true)
-    let fileURL = URL(fileURLWithPath: cacheFolderHelper.cacheFolder + cacheKey)
-    return (fileURL: fileURL, cacheKey: cacheKey)
   }
 }
 
@@ -458,6 +411,56 @@ internal extension CZDiskCacheManager {
       // 3. Call completion if applicable.
       completion?()
     }
+  }
+}
+
+
+// MARK: - Helper methods
+
+extension CZDiskCacheManager {
+  /**
+   Returns cached file URL if has been downloaded, otherwise nil.
+   */
+  func cachedFileURL(forURL httpURL: URL?) -> (fileURL: URL?, isExisting: Bool) {
+    guard let httpURL = httpURL else {
+      return (nil, false)
+    }
+    let cacheFileInfo = getCacheFileInfo(forURL: httpURL)
+    let fileURL = cacheFileInfo.fileURL
+    let isExisting = urlExistsInCache(httpURL)
+    return (fileURL, isExisting)
+  }
+  
+  /**
+   Returns HTTP URL strings of downloaded files.
+   */
+  func cachedFileHttpURLs() -> [String] {
+    return cachedItemsDictLock?.readLock { (cachedItemsDict) -> [String] in
+      cachedItemsDict
+        .keys
+        .sorted(by: { (key0, key1) -> Bool in
+          // Sort URLs by modifiedDate.
+          guard let modifiedDate0 = cachedItemsDict[key0]?[CacheConstant.kFileModifiedDate] as? Date,
+                let modifiedDate1 = cachedItemsDict[key1]?[CacheConstant.kFileModifiedDate] as? Date else {
+            return false
+          }
+          return modifiedDate1.timeIntervalSince(modifiedDate0)  > 0
+        })
+        .compactMap {
+        return cachedItemsDict[$0]?[CacheConstant.kHttpUrlString] as? String
+      }
+    } ?? []
+  }
+  
+  func cacheFileURL(forKey key: String) -> URL {
+    return URL(fileURLWithPath: cacheFolderHelper.cacheFolder + key)
+  }
+    
+  func getCacheFileInfo(forURL url: URL) -> CacheFileInfo {
+    let urlString = url.absoluteString
+    let cacheKey = urlString.MD5 + urlString.fileType(includingDot: true)
+    let fileURL = URL(fileURLWithPath: cacheFolderHelper.cacheFolder + cacheKey)
+    return (fileURL: fileURL, cacheKey: cacheKey)
   }
 }
 
