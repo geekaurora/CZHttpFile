@@ -14,7 +14,7 @@ internal enum CZDiskCacheManagerConstant {
 /**
  Manager that maintains the disk cache including file read/write and cachedItemsDict.
  */
-internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
+internal class CZDiskCacheManager<DataType>: NSObject {
 
   private(set) lazy var cacheFolderHelper: CZCacheFolderHelper = {
     return CZCacheFolderHelper(cacheFolderName: cacheFolderName)
@@ -281,9 +281,12 @@ extension CZDiskCacheManager {
   
   // MARK: - Publish state
   
+  func downloadedURLs() -> [URL] {
+    return self.cachedFileHttpURLs().map { URL(string: $0)! }
+  }
+  
   func publishDownloadedURLs() {
-    let cachedFileHttpURLs = self.cachedFileHttpURLs().map { URL(string: $0)! }
-    downloadedObserverManager?.publishDownloadedURLs(cachedFileHttpURLs)
+    downloadedObserverManager?.publishDownloadedURLs(downloadedURLs())
   }
 }
 

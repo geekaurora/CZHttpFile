@@ -51,9 +51,12 @@ public enum CacheConstant {
   public static let preprocessQueueLabel = "com.tony.cache.preprocessQueue"
 }
 
-public protocol CZBaseHttpFileCacheProtocol {
+protocol CZBaseHttpFileCacheProtocol {
+  associatedtype DataType
+  
   var maxCacheSize: Int { get }
   var currentCacheSize: Int  { get }
+  var diskCacheManager: CZDiskCacheManager<DataType>! { get }
   
   func clearCache(completion: CleanDiskCacheCompletion?)
 }
