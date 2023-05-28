@@ -281,12 +281,12 @@ extension CZDiskCacheManager {
   
   // MARK: - Publish state
   
-  func downloadedURLs() -> [URL] {
+  var downloadedURLs: [URL] {
     return self.cachedFileHttpURLs().map { URL(string: $0)! }
   }
   
   func publishDownloadedURLs() {
-    downloadedObserverManager?.publishDownloadedURLs(downloadedURLs())
+    downloadedObserverManager?.publishDownloadedURLs(self.downloadedURLs)
   }
 }
 
