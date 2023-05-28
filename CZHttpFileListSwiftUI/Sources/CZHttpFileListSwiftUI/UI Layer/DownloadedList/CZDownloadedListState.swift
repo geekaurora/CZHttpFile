@@ -14,7 +14,9 @@ class CZDownloadedListState: NSObject, ObservableObject {
   init(cache: CZBaseHttpFileCacheProtocol) {
     self.cache = cache
     self.currentCacheSize = cache.currentCacheSize
+    self.downloads = cache.downloadedURLs.map { CZDownload(url: $0)  }
     super.init()
+    
     
     CZHttpFileManager.shared.downloadedObserverManager?.addObserver(self)
   }

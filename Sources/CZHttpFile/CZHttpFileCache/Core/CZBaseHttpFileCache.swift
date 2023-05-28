@@ -54,6 +54,7 @@ public enum CacheConstant {
 public protocol CZBaseHttpFileCacheProtocol {
   var maxCacheSize: Int { get }
   var currentCacheSize: Int  { get }
+  var downloadedURLs: [URL] { get }
   
   func clearCache(completion: CleanDiskCacheCompletion?)
 }
@@ -74,6 +75,9 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject, CZBaseHttp
   }
   public let maxCacheAge: TimeInterval
   public let maxCacheSize: Int
+  public var downloadedURLs: [URL] {
+    return diskCacheManager.downloadedURLs
+  }
 
   internal let memCache: NSCache<NSString, DataType>
   private(set) var diskCacheManager: CZDiskCacheManager<DataType>!

@@ -27,9 +27,9 @@ struct CZDownloadedList: View {
         }
       }
       
-//      List(listState.downloads, id: \.diffId) {
-//        CZDownloadingCell(download: $0)
-//      }
+      List(listState.downloads, id: \.diffId) {
+        CZDownloadingCell(download: $0)
+      }
     }
     .onAppear {
       listState.refreshCurrentCacheSize()
