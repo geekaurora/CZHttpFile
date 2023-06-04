@@ -15,7 +15,7 @@ let package = Package(
       targets: ["CZHttpFileListSwiftUI"]),
   ],
   dependencies: [
-    .package(url: "https://github.com/geekaurora/CZUtils.git", from: "3.4.9"),
+    .package(url: "https://github.com/geekaurora/CZUtils.git", from: "4.4.0"),
     .package(url: "https://github.com/geekaurora/CZHttpFile.git", from: "1.8.0"),
     .package(url: "https://github.com/geekaurora/SwiftUIKit.git", from: "1.2.0"),
   ],

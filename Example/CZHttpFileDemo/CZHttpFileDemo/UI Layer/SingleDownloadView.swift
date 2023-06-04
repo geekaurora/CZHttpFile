@@ -6,7 +6,7 @@ struct SingleDownloadView: View {
   @State private var downloadAmount = 0.0
   
   let url = URL(string: "https://github.com/geekaurora/terrace/raw/master/media/starter01.m4a")!
-  
+
   var cacheFileUrl: URL? {
     let cacheFileInfo = CZHttpFileManager.shared.cache.getCacheFileInfo(forURL: url)
     return cacheFileInfo.fileURL
