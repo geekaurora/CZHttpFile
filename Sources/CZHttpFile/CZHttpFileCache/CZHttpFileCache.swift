@@ -17,11 +17,11 @@ public class CZHttpFileCache: CZBaseHttpFileCache<NSData> {
   /**
    Data transformer that transforms from `data` to  NSData.
    */
-  override func transformMetadataToCachedData(_ data: Data) -> NSData? {
+  public override func transformDataToModel(_ data: Data) -> NSData? {
     return data as NSData
   }
   
-  override func cacheCost(forImage image: NSData) -> Int {
+  public override func cacheCost(forModel image: NSData) -> Int {
     return image.count
   }
 }

@@ -18,12 +18,12 @@ public class CZImageCache: CZBaseHttpFileCache<UIImage> {
   /**
    Data transformer that transforms from `data` to  UIImage.
    */
-  override func transformMetadataToCachedData(_ data: Data) -> UIImage? {
+  public override func transformDataToModel(_ data: Data) -> UIImage? {
     let image = UIImage(data: data)
     return image
   }
   
-  override func cacheCost(forImage image: UIImage) -> Int {
+  public override func cacheCost(forModel image: UIImage) -> Int {
     return Int(image.size.height * image.size.width * image.scale * image.scale)
   }
 }

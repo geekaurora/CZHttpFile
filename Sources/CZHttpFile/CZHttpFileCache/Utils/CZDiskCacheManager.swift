@@ -20,7 +20,7 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
     return CZCacheFolderHelper(cacheFolderName: cacheFolderName)
   }()
   
-  internal typealias TransformMetadataToCachedData = (_ data: Data) -> DataType?
+  internal typealias TransformDataToModel = (_ data: Data) -> DataType?
   
   private var cacheFolderName: String
   
@@ -50,7 +50,7 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
   let shouldEnableCachedItemsDict: Bool
   private(set) weak var downloadedObserverManager: CZDownloadedObserverManager?
 
-  private let transformMetadataToCachedData: TransformMetadataToCachedData
+  private let transformDataToModel: TransformDataToModel
   
   /// The debouncing task scheduler that write cachedItems to disk every `debounceTaskSchedulerGap` seconds to improve the performance.
   private var debounceTaskScheduler: DebounceTaskScheduler?
@@ -66,14 +66,14 @@ internal class CZDiskCacheManager<DataType: NSObjectProtocol>: NSObject {
               maxCacheSize: Int,
               cacheFolderName: String,
               shouldEnableCachedItemsDict: Bool = false,
-              transformMetadataToCachedData: @escaping TransformMetadataToCachedData,
+              transformDataToModel: @escaping TransformDataToModel,
               downloadedObserverManager: CZDownloadedObserverManager? = nil) {
     self.maxCacheAge = maxCacheAge
     self.maxCacheSize = maxCacheSize
     self.cacheFolderName = cacheFolderName
     self.shouldEnableCachedItemsDict = shouldEnableCachedItemsDict
     self.downloadedObserverManager = downloadedObserverManager
-    self.transformMetadataToCachedData = transformMetadataToCachedData
+    self.transformDataToModel = transformDataToModel
     if shouldEnableCachedItemsDict {
       self.debounceTaskScheduler = DebounceTaskScheduler(interval: CZDiskCacheManagerConstant.debounceTaskSchedulerGap)
     }
@@ -166,7 +166,7 @@ extension CZDiskCacheManager {
       let (fileURL, cacheKey) = self.getCacheFileInfo(forURL: url)
       
       if let data = try? Data(contentsOf: fileURL),
-         let image = self.transformMetadataToCachedData(data).assertIfNil {
+         let image = self.transformDataToModel(data).assertIfNil {
         completion(image)
       } else {
         completion(nil)

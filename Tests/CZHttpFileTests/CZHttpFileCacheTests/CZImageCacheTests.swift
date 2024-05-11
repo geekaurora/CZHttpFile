@@ -23,8 +23,8 @@ final class CZImageCacheTests: XCTestCase {
     // After converting to PNG, the transferred data are the same. (Second time works, first time not)
     let imageData = image.pngData()!
     
-    // 1. Call `imageCache.transformMetadataToCachedData` to transform Data to Image.
-    let transformedImage = imageCache.transformMetadataToCachedData(imageData)
+    // 1. Call `imageCache.transformDataToModel` to transform Data to Image.
+    let transformedImage = imageCache.transformDataToModel(imageData)
     
     // 2. Verify the transferred image is correct.
     let transformedImageData = transformedImage!.pngData()!

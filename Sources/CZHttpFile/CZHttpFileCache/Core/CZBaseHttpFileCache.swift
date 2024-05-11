@@ -6,19 +6,19 @@ import CZUtils
  
  ### Note
  
- - `DataType` is Class type of decoded CachedData from original `Data`. e.g. UIImage, Data.
+ - `ModelType` is Class type of decoded CachedData from original `Data`. e.g. UIImage, Data.
  
  ### Usage
  
  1. Initializer
  ```
  super.init(
-       transformMetadataToCachedData: Self.transformMetadataToCachedData)
+       transformDataToModel: Self.transformDataToModel)
  ```
  
  2. override `cacheCost` to calculate data cost for memCache.
  ```
- override func cacheCost(forImage image: AnyObject) -> Int {
+ override func cacheCost(forModel image: AnyObject) -> Int {
    guard let image = (image as? UIImage).assertIfNil else {
      return 0
    }
@@ -26,9 +26,9 @@ import CZUtils
   }
  ```
  
- 3. Define `transformMetadataToCachedData` closure to transforms from `Data` to  desired class type e.g. UIImage.
+ 3. Define `transformDataToModel` closure to transforms from `Data` to  desired class type e.g. UIImage.
  ```
- static func transformMetadataToCachedData(_ data: Data?) -> UIImage?
+ static func transformDataToModel(_ data: Data?) -> UIImage?
  ```
  
  4. Override `cacheFolderName`
@@ -62,11 +62,11 @@ public protocol CZBaseHttpFileCacheProtocol {
 /**
  Base class of http file cache.
  
- Constraining `DataType` with `NSObjectProtocol` because NSCache requires its Value type to be Class.
+ Constraining `ModelType` with `NSObjectProtocol` because NSCache requires its Value type to be Class.
  */
-open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject, CZBaseHttpFileCacheProtocol {
-  
-  public var cacheFolderName: String {
+open class CZBaseHttpFileCache<ModelType: NSObjectProtocol>: NSObject, CZBaseHttpFileCacheProtocol {
+
+  open var cacheFolderName: String {
     return "CZBaseHttpFileCache"
   }
   
@@ -79,8 +79,8 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject, CZBaseHttp
     return diskCacheManager.downloadedURLs
   }
 
-  internal let memCache: NSCache<NSString, DataType>
-  private(set) var diskCacheManager: CZDiskCacheManager<DataType>!
+  internal let memCache: NSCache<NSString, ModelType>
+  private(set) var diskCacheManager: CZDiskCacheManager<ModelType>!
   private let preprocessQueue: DispatchQueue
   
   public init(maxCacheAge: TimeInterval = CacheConstant.kMaxFileAge,
@@ -107,7 +107,7 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject, CZBaseHttp
       maxCacheSize: maxCacheSize,
       cacheFolderName: cacheFolderName,
       shouldEnableCachedItemsDict: shouldEnableCachedItemsDict,
-      transformMetadataToCachedData: transformMetadataToCachedData,
+      transformDataToModel: transformDataToModel,
       downloadedObserverManager: downloadedObserverManager)
     
     // Clean cache
@@ -143,15 +143,15 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject, CZBaseHttp
       completeSaveCachedFile: completeSaveCachedFile)
 
     // Mem Cache.
-    // `transformMetadataToCachedData` transforms `Data` to real Data type.
+    // `transformDataToModel` transforms `Data` to real Data type.
     // e.g. let image = UIImage(data: data)
-    if let image = transformMetadataToCachedData(data) {
+    if let image = transformDataToModel(data) {
       setMemCache(image: image, forKey: cacheKey)
     }
   }
   
   public func getCachedFile(withUrl url: URL,
-                            completion: @escaping (DataType?) -> Void)  {
+                            completion: @escaping (ModelType?) -> Void)  {
     guard CZHttpFileDownloaderConfig.enableLocalCache else {
       MainQueueScheduler.async {
          completion(nil)
@@ -205,11 +205,11 @@ open class CZBaseHttpFileCache<DataType: NSObjectProtocol>: NSObject, CZBaseHttp
   
   // MARK: - Overriden methods
   
-  internal func transformMetadataToCachedData(_ data: Data) -> DataType? {
+  open func transformDataToModel(_ data: Data) -> ModelType? {
     fatalError("\(#function) should be overriden in subclass - \(type(of: self)).")
   }
   
-  internal func cacheCost(forImage image: DataType) -> Int {
+  open func cacheCost(forModel image: ModelType) -> Int {
     fatalError("\(#function) should be overriden in subclass - \(type(of: self)).")
   }
 }
@@ -232,12 +232,12 @@ public extension CZBaseHttpFileCache {
 // MARK: - Private methods
 
 internal extension CZBaseHttpFileCache {
-  func getMemCache(forKey key: String) -> DataType? {
+  func getMemCache(forKey key: String) -> ModelType? {
     return memCache.object(forKey: NSString(string: key))
   }
   
-  func setMemCache(image: DataType, forKey key: String) {
-    let cost = cacheCost(forImage: image)
+  func setMemCache(image: ModelType, forKey key: String) {
+    let cost = cacheCost(forModel: image)
     memCache.setObject(
       image,
       forKey: NSString(string: key),
