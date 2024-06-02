@@ -5,9 +5,7 @@ import PackageDescription
 
 let package = Package(
   name: "CZHttpFileListSwiftUI",
-  platforms: [
-    .iOS(.v14),
-  ],
+  platforms: [.iOS("15.0")],
   products: [
     .library(
       name: "CZHttpFileListSwiftUI",
